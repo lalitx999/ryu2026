@@ -1,0 +1,106 @@
+{% load static %}
+<!-- AUTH MODAL (Bootstrap modal, XP skin) -->
+<div class="modal fade xp-modal" id="authModal" tabindex="-1" aria-labelledby="auth-title" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header"><div class="xp-titlebar w-100">
+        <div class="title"><span style="font-size:16px">🔑</span><span id="auth-title">เข้าสู่ระบบสมาชิก RyuClass</span></div>
+        <button type="button" class="xp-btn-close" data-bs-dismiss="modal" aria-label="ปิด">✕</button></div></div>
+      <div class="xp-tabs">
+        <button type="button" data-tab="login" class="active">🔐 เข้าสู่ระบบ</button>
+        <button type="button" data-tab="register">📝 สมัครเรียนใหม่</button>
+        <button type="button" data-tab="reset">🔑 ลืมรหัสผ่าน</button>
+      </div>
+      <div class="modal-body p-3 xp-form">
+        <div id="auth-msg" class="d-none"></div>
+
+        <form id="form-login" data-pane="login" class="d-flex flex-column gap-3">
+          <div><label>อีเมลเข้าสู่ระบบ (Email)</label><input class="form-control" type="email" name="email" required autocomplete="username" placeholder="student@example.com"></div>
+          <div><label>รหัสผ่าน (Password)</label><input class="form-control" type="password" name="password" required autocomplete="current-password" placeholder="••••••••"></div>
+          <div class="d-flex justify-content-between align-items-center pt-2">
+            <button type="button" class="btn btn-link p-0 t11 fw-semibold" data-goto-tab="reset">ลืมรหัสผ่าน?</button>
+            <button type="submit" class="xp-btn-green px-4 py-2">เข้าสู่ระบบ</button></div>
+        </form>
+
+        <form id="form-reset" data-pane="reset" class="d-none d-flex flex-column gap-3">
+          <div class="xp-info">🔑 กรอกอีเมลสมาชิกที่เคยลงทะเบียนและกำหนดรหัสผ่านใหม่ได้ทันทีค่ะ</div>
+          <div><label>อีเมลลงทะเบียน (Email)</label><input class="form-control" type="email" name="email" required placeholder="student@example.com"></div>
+          <div><label>เบอร์โทรศัพท์ (ยืนยันตัวตน)</label><input class="form-control" name="phone" required placeholder="0812345678"></div>
+          <div><label>รหัสผ่านใหม่ (New Password)</label><input class="form-control" type="password" name="new_password" required minlength="6" autocomplete="new-password" placeholder="••••••••"></div>
+          <div class="d-flex justify-content-between align-items-center pt-2">
+            <button type="button" class="btn btn-link p-0 t11 fw-semibold" data-goto-tab="login">จำรหัสผ่านได้แล้ว? เข้าสู่ระบบ</button>
+            <button type="submit" class="xp-btn-green px-4 py-2">ตั้งรหัสผ่านใหม่</button></div>
+        </form>
+
+        <div data-pane="verify" class="d-none">
+          <div id="verify-form-wrap">
+            <form id="form-verify" class="d-flex flex-column gap-3">
+              <div class="xp-info">📧 เราส่งรหัสยืนยัน 6 หลักไปที่อีเมลของคุณแล้ว รหัสใช้ได้ 10 นาที</div>
+              <div><label>อีเมล</label><input class="form-control" type="email" name="email" id="verify-email" required></div>
+              <div><label>รหัสยืนยัน 6 หลัก</label><input class="form-control text-center font-monospace" style="font-size:18px;letter-spacing:.45em" id="verify-code" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="123456"></div>
+              <div class="d-flex justify-content-between align-items-center pt-2">
+                <button type="button" class="btn btn-link p-0 t11 fw-semibold" id="btn-resend">ส่งรหัสใหม่</button>
+                <button type="submit" id="verify-submit" class="xp-btn-green px-4 py-2" disabled>ยืนยันอีเมล</button></div>
+            </form>
+          </div>
+          <div id="verify-success" class="d-none">{% include "portal/_post_register.html" %}</div>
+        </div>
+
+        <form id="form-register" data-pane="register" class="d-none d-flex flex-column gap-2" enctype="multipart/form-data">
+          <div class="xp-bank">🏦 <b>โอนเงิน {{ BANK_INFO.bank }}:</b> {{ BANK_INFO.name }}<br>💸 <b>เลขบัญชี:</b> {{ BANK_INFO.account }} (ตรวจสอบสลิปอัตโนมัติ/เจ้าหน้าที่)</div>
+          <div class="row g-2">
+            <div class="col-6"><label>ชื่อจริง (ภาษาไทย)</label><input class="form-control" name="name" required placeholder="สมชาย เจนดี"></div>
+            <div class="col-6"><label>ชื่อเล่น (Nickname)</label><input class="form-control" name="nickname" placeholder="ชาย"></div>
+            <div class="col-6"><label>อีเมลเข้าสู่ระบบ</label><input class="form-control" type="email" name="email" required placeholder="student@example.com"></div>
+            <div class="col-6"><label>รหัสผ่าน (Password)</label><input class="form-control" type="password" name="password" required minlength="6" autocomplete="new-password" placeholder="••••••••"></div>
+            <div class="col-4"><label>เบอร์โทรศัพท์</label><input class="form-control" name="phone" required placeholder="0812345678"></div>
+            <div class="col-4"><label>ระดับที่สมัคร</label><select class="form-select fw-semibold" name="level"></select></div>
+            <div class="col-4"><label>ระยะเวลา</label><select class="form-select fw-semibold" name="duration"></select></div>
+          </div>
+          <div><p class="fw-bold mb-2" id="reg-amount" aria-live="polite" style="color:#1e3a8a"></p>
+            <label>แนบไฟล์ภาพสลิปโอนเงิน (Slip Image)</label><input class="form-control" type="file" name="slip" accept="image/*" required></div>
+          <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+            <button type="button" class="btn btn-link p-0 t11 fw-semibold" data-goto-tab="login">มีบัญชีอยู่แล้ว? เข้าสู่ระบบ</button>
+            <button type="submit" class="xp-btn-green px-4 py-2">ยืนยันการสมัครเรียน</button></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="modal fade xp-modal" id="payModal" tabindex="-1" aria-labelledby="pay-title" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:420px">
+    <div class="modal-content">
+      <div class="modal-header"><div class="xp-titlebar w-100"><div class="title"><span>💳</span><span id="pay-title">อัปโหลดสลิปต่ออายุ/สมัครคอร์สเพิ่ม</span></div>
+        <button type="button" class="xp-btn-close" data-bs-dismiss="modal" aria-label="ปิด">X</button></div></div>
+      <form id="form-payment" class="modal-body p-3 xp-form d-flex flex-column gap-2">
+        <div class="xp-bank">🏦 <b>โอนเงิน {{ BANK_INFO.bank }}:</b> {{ BANK_INFO.name }}<br>💸 <b>เลขบัญชี:</b> {{ BANK_INFO.account }}</div>
+        <div id="pay-renew-note" class="d-none p-2 rounded fw-bold" style="border:1px solid #fbbf24;background:#fffbeb;color:#78350f">⚠️ ต่ออายุก่อนหมดอายุ: ต่อสิทธิ์เพิ่ม 33 วันหลังสลิปผ่าน</div>
+        <div class="row g-2">
+          <div class="col-6"><label>เลือกคอร์สเรียน</label><select class="form-select" name="course_id"></select></div>
+          <div class="col-6"><label>ระยะเวลาแพ็กเกจ</label><select class="form-select" name="duration"></select></div>
+        </div>
+        <div class="xp-info fw-bold" id="pay-amount" aria-live="polite"></div>
+        <div><label>แนบไฟล์สลิป (Slip File)</label><input class="form-control" type="file" name="slip" accept="image/*" required></div>
+        <div id="pay-msg" class="d-none"></div>
+        <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+          <button type="button" class="xp-btn-gray" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="xp-btn-green px-4">ส่งสลิปชำระเงิน</button></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- RENEWAL REMINDER -->
+<div class="modal fade xp-modal" id="renewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:448px"><div class="modal-content">
+    <div class="modal-header"><div class="xp-titlebar w-100"><div class="title"><span>⚠️ แจ้งเตือนต่ออายุคอร์ส</span></div></div></div>
+    <div class="modal-body p-4 d-flex flex-column gap-2" style="font-size:14px;color:#1f2937">
+      <p class="fw-bold mb-0" style="color:#78350f" id="renew-text"></p>
+      <p class="mb-0">เหลือเวลาอีก <span id="renew-days"></span> วัน — ต่ออายุก่อนหมดอายุ รับสิทธิ์เพิ่ม 33 วัน</p>
+      <p class="t12 mb-0" style="color:#4b5563">แนบสลิปแล้วทีมงานจะตรวจสอบก่อนต่อสิทธิ์เพิ่ม 33 วัน</p>
+      <div class="d-flex justify-content-end gap-2 border-top pt-3"><button type="button" id="renew-later" class="xp-btn-gray">ไว้ก่อน</button><button type="button" id="renew-now" class="xp-btn-green">ต่ออายุเลย</button></div>
+    </div></div>
+  </div>
+</div>

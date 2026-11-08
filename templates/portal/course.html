@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load static ryu %}
+{% block title %}{{ outline.course_title }} | RyuClass ริวคลาส{% endblock %}
+{% block description %}{{ outline.course_description|default:"บทเรียนคุณภาพโดย Ryuso Sense ครบทั้งคันจิ ไวยากรณ์ และคำศัพท์สำหรับสอบ JLPT"|truncatechars:160 }}{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'css/course.css' %}">{% endblock %}
+{% block body %}
+<main class="xp-desktop d-flex flex-column align-items-center p-2 p-sm-3 pb-4" style="min-height:100vh">
+  <div class="xp-window w-100 my-2 shadow-lg" style="max-width:64rem">
+    <div class="xp-titlebar" style="cursor:default">
+      <div class="title"><span>📚</span><span>วิชาเรียน: {{ outline.course_title }}</span></div>
+      <a href="{% url 'portal:home' %}" class="xp-btn-close text-decoration-none" title="กลับหน้าหลัก">✕</a>
+    </div>
+    <div class="xp-body p-2 p-sm-3 t12 d-flex flex-column gap-3" style="background:#ece9d8">
+
+      <!-- top bar -->
+      <div class="cp-topbar">
+        <a href="{% url 'portal:home' %}" class="cp-back"><span>⬅️</span><span class="d-none d-sm-inline">กลับสู่หน้าหลัก Desktop</span><span class="d-sm-none">กลับ</span></a>
+        <div class="d-flex align-items-center gap-2">
+          {% if user.is_authenticated %}
+            <span class="fw-bold" style="color:#1e3a8a">👤 {{ user.name|default:user.email }}</span>
+            <button type="button" class="xp-btn-green px-3 py-1 fw-bold" id="btn-pay">💳 แจ้งชำระเงินคอร์สนี้</button>
+          {% else %}
+            <button type="button" class="xp-btn-green px-3 py-1 fw-bold" id="btn-login">🔑 เข้าสู่ระบบ / สมัครเรียน</button>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- course banner -->
+      <div class="cp-banner">
+        <div>
+          <div class="cp-badge"><span>JLPT COURSE</span><span>•</span><span>{% if outline.has_access %}🟢 สิทธิ์เข้าเรียนสมบูรณ์{% else %}🔒 ยังไม่มีสิทธิ์เข้าเรียน{% endif %}</span></div>
+          <h1 class="cp-title">{{ outline.course_title }}</h1>
+          <p class="cp-desc">{{ outline.course_description|default:"บทเรียนคุณภาพโดย Ryuso Sense ครบทั้งคันจิ ไวยากรณ์ และคำศัพท์สำหรับสอบ JLPT" }}</p>
+          <p class="cp-price">฿{{ outline.price|baht }}.- / 30 วัน</p>
+        </div>
+        {% if not outline.has_access %}<button type="button" class="xp-btn-green px-4 py-2 fw-bold flex-shrink-0" style="font-size:14px" id="buy-btn">🚀 สมัครเรียนวิชานี้</button>{% endif %}
+      </div>
+
+      <button type="button" id="toggle-curr" class="cp-curr-toggle d-lg-none"><span>📚 สารบัญบทเรียน · <span class="done-n">0</span>/<span class="all-n">0</span> จบแล้ว</span><span class="st">เลือกบทเรียน ▼</span></button>
+
+      <div class="row g-3">
+        <!-- curriculum -->
+        <div class="col-lg-4 order-2 order-lg-1 d-none d-lg-block" id="curr">
+          <div class="cp-curr">
+            <h3 class="cp-curr-h"><span>📚 สารบัญบทเรียนทั้งหมด</span><span class="cp-count"><span class="done-n">0</span>/<span class="all-n">0</span> เสร็จแล้ว</span></h3>
+            {% for m in outline.modules %}
+            <div class="d-flex flex-column gap-1">
+              <div class="module-head">โมดูลที่ {{ forloop.counter }}: {{ m.title }}</div>
+              <div class="d-flex flex-column gap-1 ps-1">
+                {% for l in m.lessons %}
+                <button type="button" class="lesson-row" data-lesson="{{ l.id }}">
+                  <span class="text-truncate pe-1"><span class="mark">{% if l.is_completed %}🟢{% elif l.is_free %}🎁{% else %}⚪{% endif %}</span> {{ forloop.counter }}. {{ l.title }}</span>
+                  {% if l.locked %}<span class="cp-lock">🔒</span>{% else %}<span class="t9 font-monospace" style="opacity:.75">{{ l.duration_seconds|minutes }}m</span>{% endif %}
+                </button>
+                {% endfor %}
+              </div>
+            </div>
+            {% empty %}<div class="fst-italic text-center p-2" style="color:#6b7280">ยังไม่มีบทเรียนในคอร์สนี้</div>{% endfor %}
+          </div>
+        </div>
+
+        <!-- player column -->
+        <div class="col-lg-8 order-1 order-lg-2">
+          <div id="player-empty" class="bevel-in p-5 text-center t12" style="background:#f9fafb;color:#6b7280">👈 กรุณาเลือกบทเรียนจากด้านซ้ายมือเพื่อเริ่มต้นเข้าเรียนวิดีโอค่ะ</div>
+
+          <div id="player" class="cp-panel d-none">
+            <div class="cp-head">
+              <div>
+                <h2 class="cp-lesson-title"><span id="p-title"></span> <span id="p-done" class="cp-done d-none">✓ เรียนจบแล้ว</span></h2>
+                <div class="t10" style="color:#6b7280" id="p-sub"></div>
+              </div>
+              <div class="cp-tabs">
+                <button type="button" class="cp-tab on-notes" id="tab-notes">📝 สมุดโน้ตส่วนตัว</button>
+                <button type="button" class="cp-tab" id="tab-quiz">❓ แบบฝึกหัด</button>
+              </div>
+            </div>
+
+            <div id="p-descbox" class="cp-descbox d-none"><span class="fw-bold d-block mb-1" style="color:#1e3a8a">📖 รายละเอียดบทเรียน</span><div id="p-desc"></div></div>
+
+            <!-- secure video: the YouTube chrome is hidden (controls=0), the iframe ignores the mouse and a shield sits on top -->
+            <div id="video-player-container" class="cp-video">
+              <iframe id="p-frame" class="d-none" title="video" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+              <div id="p-shield" class="cp-shield d-none" title="คลิกเพื่อ เล่น/หยุด วิดีโอ (คุ้มครองลิขสิทธิ์ - ปิดการแชร์วิดีโอภายนอก)"><div class="cp-bigplay" id="p-bigplay"><span>▶</span></div></div>
+              <div id="p-lock" class="cp-msg d-none"><div style="font-size:28px">🔒</div><div class="fw-bold" style="font-size:14px">บทเรียนนี้เฉพาะผู้เรียนที่สมัครคอร์สเรียบร้อยแล้วค่ะ</div>
+                <p class="t12 mb-0" style="color:#9ca3af">กรุณาเข้าสู่ระบบหรือแนบสลิปสมัครเรียนเพื่อปลดล็อกบทเรียนทั้งหมด</p>
+                <button type="button" class="xp-btn-green px-4 py-1 fw-bold mt-2" id="lock-buy">สมัครเรียนคอร์สนี้</button></div>
+              <div id="p-novideo" class="cp-msg d-none" style="color:#9ca3af;font-size:12px">🎬 ไม่มีวิดีโอสำหรับบทเรียนนี้</div>
+            </div>
+
+            <!-- custom control bar -->
+            <div class="cp-controls">
+              <div class="cp-row">
+                <span class="cp-time cur" id="cb-time">00:00</span>
+                <input type="range" class="cp-range wide" id="cb-scrub" min="0" max="100" value="0" step="1" aria-label="ตำแหน่งวิดีโอ">
+                <span class="cp-time" id="cb-dur">00:00</span>
+              </div>
+              <div class="cp-row bar2">
+                <div class="d-flex flex-wrap align-items-center gap-1">
+                  <button type="button" class="cp-btn play" id="cb-play">▶️ เล่น</button>
+                  <button type="button" class="cp-btn" id="cb-back" title="ถอยหลัง 10 วินาที">⏪ -10s</button>
+                  <button type="button" class="cp-btn" id="cb-fwd" title="เดินหน้า 10 วินาที">⏩ +10s</button>
+                  <button type="button" class="cp-btn cc" id="cb-cc" title="เปิด / ปิด คำบรรยายซับไตเติล (Subtitles / CC)">💬 CC <span id="cb-ccst">ปิดอยู่</span></button>
+                </div>
+                <div class="cp-vol"><button type="button" id="cb-mute" aria-label="เสียง">🔊</button><input type="range" class="cp-range" id="cb-vol" min="0" max="100" value="100" aria-label="ระดับเสียง"><span class="font-monospace" id="cb-volpct">100%</span></div>
+                <div class="d-flex align-items-center gap-1">
+                  <label class="d-flex align-items-center gap-1 mb-0 t11"><span style="color:#d1d5db;font-weight:bold">ความเร็ว:</span>
+                    <select id="cb-rate" class="cp-select"><option value="0.5">0.5x</option><option value="0.75">0.75x</option><option value="1" selected>1.0x (ปกติ)</option><option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2.0x</option></select></label>
+                  <button type="button" class="cp-btn" id="cb-full" title="ขยายเต็มจอ">🖥️ เต็มจอ</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- lesson actions -->
+            <div class="cp-actions">
+              <div class="cp-actions-l">
+                <button type="button" class="cp-nav" id="btn-prev"><span>⬅️</span><span>บทเรียนก่อนหน้า</span></button>
+                <button type="button" class="cp-nav" id="btn-next"><span>บทเรียนถัดไป</span><span>➡️</span></button>
+                <a id="p-pdf" class="cp-pdf d-none" target="_blank" rel="noopener noreferrer"><span>📄</span><span></span></a>
+              </div>
+              <div class="cp-actions-r">
+                <button type="button" class="cp-attach" id="btn-attach"><span>📥</span><span>ดาวน์โหลดเอกสารประกอบการเรียน</span></button>
+                <button type="button" class="cp-complete" id="btn-complete"><span class="ic">⚪</span><span class="tx">ทำเครื่องหมายว่าเรียนจบ</span></button>
+              </div>
+            </div>
+
+            <!-- notes -->
+            <div id="pane-notes" class="cp-notes bevel-in">
+              <div class="cp-notes-bar">
+                <div class="d-flex align-items-center gap-2 flex-wrap"><span class="fw-bolder" style="color:#451a03">📝 สมุดโน้ตส่วนตัวบทเรียนนี้</span><span id="note-status" class="cp-ns saved">✓ บันทึกให้อัตโนมัติ</span></div>
+                <div class="d-flex align-items-center gap-1 flex-wrap">
+                  <button type="button" class="cp-nb stamp" id="note-stamp">⏱️ แทรกเวลาวิดีโอ</button>
+                  <button type="button" class="cp-nb" id="note-copy">📋 คัดลอก</button>
+                  <button type="button" class="cp-nb" id="note-dl">📥 ดาวน์โหลด .txt</button>
+                </div>
+              </div>
+              <div id="note-stamps" class="cp-stamps d-none"><span class="t10 fw-bold" style="color:#78350f">กดข้ามเวลา:</span><span id="note-stamps-list" class="d-flex flex-wrap gap-1"></span></div>
+              <textarea id="note-text" class="cp-note-text" rows="5" placeholder="พิมพ์สรุปข้อความ โน้ตย่อ หรือกด '⏱️ แทรกเวลาวิดีโอ' เพื่อบันทึกเวลาสำคัญในบทเรียนนี้..."></textarea>
+            </div>
+
+            <!-- quiz -->
+            <div id="pane-quiz" class="cp-quiz bevel-in d-none"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% include "portal/_dialogs.html" %}
+{{ boot|json_script:"ryu-boot" }}
+{{ outline|json_script:"ryu-outline" }}
+{% endblock %}
+{% block scripts %}<script>window.RYU_AUTH = {{ user.is_authenticated|yesno:"true,false" }}; window.RYU_COURSE = {{ course_id }};</script>
+<script src="{% static 'js/dialogs.js' %}"></script><script src="{% static 'js/course.js' %}"></script>{% endblock %}

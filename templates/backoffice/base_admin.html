@@ -1,0 +1,40 @@
+{% load static %}<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}AdminCN{% endblock %} | RyuClass Admin</title><link rel="icon" href="{% static 'favicon.ico' %}">
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}"><link rel="stylesheet" href="{% static 'css/admin.css' %}"></head>
+<body class="admin-body" id="admin-root">
+<aside class="adm-sidebar" id="adm-side">
+  <a class="adm-brand" href="{% url 'backoffice:dashboard' %}"><img src="{% static 'assets/ryu_logo.jpg' %}" alt="RyuClass Logo"><div><div class="fw-bold" style="font-size:14px;line-height:1">AdminCN</div><div style="font-size:10px;color:#94a3b8;margin-top:2px">Dashboard Template</div></div></a>
+  <nav class="adm-nav">
+    <h6>เมนูหลัก</h6>
+    <a href="{% url 'backoffice:dashboard' %}" class="{% if nav == 'dashboard' %}active{% endif %}">📊 <span>ภาพรวมระบบ (Dashboard)</span></a>
+    <a href="{% url 'backoffice:payments' %}" class="{% if nav == 'payments' %}active{% endif %}">💳 <span>ตรวจสลิปชำระเงิน (Slip QC)</span><span class="badge text-bg-secondary">QC</span></a>
+    <a href="{% url 'backoffice:courses' %}" class="{% if nav == 'courses' %}active{% endif %}">📚 <span>จัดการคอร์สและบทเรียน</span></a>
+    <a href="{% url 'backoffice:sales' %}" class="{% if nav == 'sales' %}active{% endif %}">📈 <span>รายงานยอดขาย</span></a>
+    <a href="{% url 'backoffice:analytics' %}" class="{% if nav == 'analytics' %}active{% endif %}">📊 <span>สถิติการเรียน</span></a>
+    <h6>การจัดการ</h6>
+    <a href="{% url 'backoffice:users' %}" class="{% if nav == 'users' %}active{% endif %}">👥 <span>จัดการนักเรียนและสิทธิ์</span></a>
+    <a href="{% url 'backoffice:broadcast_page' %}" class="{% if nav == 'broadcast' %}active{% endif %}">✉️ <span>บรอดแคสต์อีเมล</span></a>
+    <h6>งานดูแลระบบ</h6>
+    <a href="{% url 'backoffice:renewals' %}" class="{% if nav == 'renewals' %}active{% endif %}">🔔 <span>แจ้งเตือนต่ออายุ</span></a>
+    <a href="{% url 'backoffice:community' %}" class="{% if nav == 'community' %}active{% endif %}">💬 <span>ตรวจเนื้อหาชุมชน</span></a>
+    <a href="{% url 'backoffice:tickets' %}" class="{% if nav == 'tickets' %}active{% endif %}">🎫 <span>คำร้องช่วยเหลือ</span></a>
+    <a href="{% url 'backoffice:migrations' %}" class="{% if nav == 'migrations' %}active{% endif %}">🔄 <span>คำขอย้ายระบบ</span></a>
+    <a href="{% url 'backoffice:slips' %}" class="{% if nav == 'slips' %}active{% endif %}">🛡️ <span>กฎ/ประวัติตรวจสลิป</span></a>
+    <h6>ระบบ</h6>
+    <a href="{% url 'backoffice:roles' %}" class="{% if nav == 'roles' %}active{% endif %}">🔐 <span>สิทธิ์การใช้งาน</span></a>
+    <a href="{% url 'backoffice:settings' %}" class="{% if nav == 'settings' %}active{% endif %}">⚙️ <span>ตั้งค่าระบบ</span></a>
+  </nav>
+  <div class="p-3 border-top"><a class="d-flex align-items-center gap-2 text-decoration-none small text-secondary" href="{% url 'portal:home' %}">🌐 กลับไปหน้าเว็บไซต์</a></div>
+</aside>
+<div class="adm-main">
+  <div class="adm-top"><div class="d-flex align-items-center gap-2"><button class="btn btn-sm btn-outline-secondary d-lg-none" id="adm-toggle" type="button" aria-label="เมนู">☰</button><b style="font-size:14px">{% block heading %}{% endblock %}</b></div>
+    <div class="small text-secondary">{{ request.user.name|default:request.user.email }}</div></div>
+  <div class="adm-content">{% block content %}{% endblock %}</div>
+</div>
+<div class="modal fade" id="payModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h6 class="modal-title" id="pay-title">รายละเอียดการชำระเงิน</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="pay-body"></div></div></div></div>
+<div class="modal fade" id="slipModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content"><div class="modal-body text-center"><img id="slip-img" alt="slip" class="img-fluid" style="max-height:80vh"></div></div></div></div>
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script><script src="{% static 'js/ajax.js' %}"></script><script src="{% static 'js/admin.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body></html>

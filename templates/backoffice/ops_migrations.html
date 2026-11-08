@@ -1,0 +1,22 @@
+{% extends "backoffice/base_admin.html" %}
+{% block title %}ย้ายระบบ{% endblock %}{% block heading %}คำขอย้ายระบบ และนักเรียนตลอดชีพนำเข้า{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap gap-2 mb-3"><a class="btn btn-sm {% if not status %}btn-secondary{% else %}btn-outline-secondary{% endif %}" href="?">ทั้งหมด</a>
+  {% for key, label, n in tabs %}<a class="btn btn-sm {% if status == key %}btn-secondary{% else %}btn-outline-secondary{% endif %}" href="?status={{ key }}">{{ label }} <span class="badge text-bg-light">{{ n }}</span></a>{% endfor %}</div>
+<div class="adm-card mb-4"><div class="card-h">คำขอย้ายระบบ</div><div class="table-responsive"><table class="table adm-table align-middle"><thead><tr><th>#</th><th>อีเมล</th><th>รหัสติดตาม</th><th>ระดับ</th><th>สถานะ</th><th>หมายเหตุ</th><th>เมื่อ</th><th></th></tr></thead><tbody>
+{% for m in page %}<tr><td>{{ m.id }}</td><td>{{ m.email }}</td><td><code>{{ m.tracking_code }}</code></td><td>{{ m.level|default:"-" }}</td>
+  <td><span class="st-pill st-{% if m.status == 'approved' %}approved{% elif m.status == 'rejected' %}rejected{% else %}pending{% endif %}">{{ m.status }}</span></td>
+  <td><input class="form-control form-control-sm" id="note{{ m.id }}" value="{{ m.admin_note|default:'' }}" maxlength="500" style="min-width:160px"></td><td class="small">{{ m.created_at|date:"d/m/Y H:i" }}</td>
+  <td class="text-nowrap"><button class="btn btn-sm btn-outline-dark" data-post="{% url 'backoffice:migration_action' m.id %}" data-body='{"action":"processing"}' data-note="#note{{ m.id }}" data-reload>กำลังทำ</button>
+    <button class="btn btn-sm btn-success" data-post="{% url 'backoffice:migration_action' m.id %}" data-body='{"action":"approve"}' data-note="#note{{ m.id }}" data-reload>อนุมัติ</button>
+    <button class="btn btn-sm btn-outline-danger" data-post="{% url 'backoffice:migration_action' m.id %}" data-body='{"action":"reject"}' data-note="#note{{ m.id }}" data-reload>ปฏิเสธ</button></td></tr>
+{% empty %}<tr><td colspan="8" class="text-center text-secondary py-4">ไม่มีคำขอ</td></tr>{% endfor %}</tbody></table></div></div>
+{% include "backoffice/_pager.html" %}
+<div class="adm-card"><div class="card-h"><span>นักเรียนตลอดชีพที่นำเข้า (รหัสเชิญ)</span><span class="small text-secondary">ลงทะเบียนแล้ว {{ stats.registered }} / {{ stats.total }}</span></div>
+  <div class="p-3 pb-0"><form class="d-flex gap-2" method="get"><input class="form-control form-control-sm" style="max-width:280px" name="q" value="{{ q }}" placeholder="ค้นหาอีเมล/รหัสเชิญ"><button class="btn btn-sm btn-outline-dark">ค้นหา</button></form></div>
+  <div class="table-responsive"><table class="table adm-table"><thead><tr><th>#</th><th>อีเมล</th><th>ระดับ</th><th>รหัสเชิญ</th><th>ลงทะเบียน</th><th>นำเข้าเมื่อ</th></tr></thead><tbody>
+  {% for i in imports %}<tr><td>{{ i.id }}</td><td>{{ i.email }}</td><td>{{ i.level }}</td><td><code>{{ i.invite_code|default:"-" }}</code></td><td>{% if i.is_registered %}<span class="st-pill st-approved">แล้ว</span>{% else %}<span class="st-pill st-pending">ยังไม่</span>{% endif %}</td><td class="small">{{ i.created_at|date:"d/m/Y" }}</td></tr>
+  {% empty %}<tr><td colspan="6" class="text-center text-secondary py-4">ไม่มีข้อมูล</td></tr>{% endfor %}</tbody></table></div>
+  {% if imports.paginator.num_pages > 1 %}<div class="p-3 small d-flex gap-2 align-items-center">หน้า {{ imports.number }} / {{ imports.paginator.num_pages }}
+    {% if imports.has_previous %}<a class="btn btn-sm btn-outline-secondary" href="?ipage={{ imports.previous_page_number }}&q={{ q }}">ก่อนหน้า</a>{% endif %}{% if imports.has_next %}<a class="btn btn-sm btn-outline-secondary" href="?ipage={{ imports.next_page_number }}&q={{ q }}">ถัดไป</a>{% endif %}</div>{% endif %}</div>
+{% endblock %}

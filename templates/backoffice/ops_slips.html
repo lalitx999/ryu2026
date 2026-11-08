@@ -1,0 +1,18 @@
+{% extends "backoffice/base_admin.html" %}{% load ryu %}
+{% block title %}กฎสลิป{% endblock %}{% block heading %}กฎสลิปต้องสงสัย และประวัติตรวจสลิป{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-5"><div class="adm-card"><div class="card-h">กฎสลิปต้องสงสัย (Blacklist)</div>
+    <form class="p-3 d-flex flex-column gap-2 border-bottom" data-ajax-url="{% url 'backoffice:rule_add' %}" data-reload="1">
+      <div class="row g-2"><div class="col-4"><select class="form-select form-select-sm" name="type"><option value="keyword">keyword</option><option value="bank">bank</option><option value="amount">amount</option><option value="name">name</option></select></div>
+        <div class="col-8"><input class="form-control form-control-sm" name="pattern" required maxlength="255" placeholder="รูปแบบที่ต้องการจับ"></div></div>
+      <input class="form-control form-control-sm" name="description" maxlength="500" placeholder="คำอธิบาย (ไม่บังคับ)"><div><button class="btn btn-dark btn-sm">➕ เพิ่มกฎ</button></div></form>
+    <ul class="list-group list-group-flush">{% for r in rules %}<li class="list-group-item d-flex justify-content-between align-items-center small"><span><span class="badge text-bg-secondary me-2">{{ r.type }}</span><code>{{ r.pattern }}</code>{% if r.description %}<div class="text-secondary">{{ r.description }}</div>{% endif %}</span>
+      <button class="btn btn-sm btn-outline-danger" data-post="{% url 'backoffice:rule_delete' r.id %}" data-confirm="ลบกฎนี้?" data-reload>🗑️</button></li>{% empty %}<li class="list-group-item small text-secondary">ยังไม่มีกฎ</li>{% endfor %}</ul></div></div>
+  <div class="col-lg-7"><div class="adm-card"><div class="card-h">ประวัติตรวจสลิปอัตโนมัติ (EasySlip)</div><div class="table-responsive"><table class="table adm-table"><thead><tr><th>#</th><th>รายการ</th><th>ผลตรวจ</th><th class="text-end">ยอดที่อ่านได้</th><th>ธนาคาร</th><th>เมื่อ</th></tr></thead><tbody>
+    {% for l in logs %}<tr><td>{{ l.id }}</td><td>#{{ l.payment_id }}<div class="small text-secondary">{{ l.user.email }}</div></td><td><span class="st-pill st-{% if l.status == 'approved' %}approved{% elif l.status == 'pending' %}pending{% else %}rejected{% endif %}">{{ l.status }}</span>{% if l.error_message %}<div class="small text-danger">{{ l.error_message|truncatechars:80 }}</div>{% endif %}</td>
+      <td class="text-end">{% if l.verified_amount is not None %}฿{{ l.verified_amount|baht2 }}{% else %}-{% endif %}</td><td class="small">{{ l.verified_bank|default:"-" }}</td><td class="small">{{ l.verified_at|date:"d/m/Y H:i" }}</td></tr>
+    {% empty %}<tr><td colspan="6" class="text-center text-secondary py-4">ยังไม่มีประวัติ</td></tr>{% endfor %}</tbody></table></div></div>
+    {% with page=logs %}{% include "backoffice/_pager.html" %}{% endwith %}</div>
+</div>
+{% endblock %}

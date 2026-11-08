@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static community_tags %}
+{% block title %}{{ post.title }} | RyuCommunity{% endblock %}
+{% block body_class %}xp-desktop community-page{% endblock %}
+{% block body %}
+{% include "partials/topbar.html" %}
+<main class="container py-3" style="max-width:56rem">
+  <div class="xp-window shadow-lg">
+    <div class="xp-titlebar" style="cursor:default">
+      <div class="title"><span>💬</span><span>RyuCommunity — รายละเอียดกระทู้</span></div>
+      <a href="{% url 'community_pages:forum' %}" class="xp-btn-close text-decoration-none">✕</a>
+    </div>
+    <div class="p-3 xp-body t12 d-flex flex-column gap-3" id="post-view" data-post-id="{{ post.id }}" data-logged-in="{{ user.is_authenticated|yesno:'1,0' }}">
+      <a href="{% url 'community_pages:forum' %}" class="fw-bold text-decoration-none" style="color:#1e3a8a">← ย้อนกลับไปหน้ากระทู้ทั้งหมด</a>
+
+      <article class="bg-white border rounded p-3 d-flex flex-column gap-2">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-2">
+            <div class="avatar-c">{{ post.user.name|default:"U"|slice:":1"|upper }}</div>
+            <div><span class="fw-bold" style="color:#1e3a8a">{{ post.user.name|default:"นักเรียน RyuClass" }}</span>
+              <span class="role-chip">{% if post.user.role == 'admin' %}🛡️ แอดมิน{% else %}🎓 นักเรียน{% endif %}</span>
+              <div class="t10 text-secondary">{{ post.created_at }}</div></div>
+          </div>
+          <span class="cat-chip">{{ post.category_display }}</span>
+        </div>
+        {% if post.moderation_status == 'REWRITTEN' %}<div class="xp-alert-ok fw-bold">✨ AI Notice: กระทู้นี้ได้รับการปรับแต่งถ้อยคำโดย AI เพื่อความสุภาพและเป็นมิตรในชุมชน</div>{% endif %}
+        {% if post.moderation_status == 'PENDING' %}<div class="xp-info fw-bold">⏳ กระทู้นี้กำลังรอระบบคัดกรอง (เห็นเฉพาะคุณจนกว่าจะผ่าน)</div>{% endif %}
+        <h1 class="fw-bold mb-0" style="font-size:16px;color:#1e3a8a">{{ post.title }}</h1>
+        <div style="line-height:1.7;color:#1f2937">{{ post.content|linkify }}</div>
+        {% if post.images %}<div class="d-flex flex-wrap gap-2 pt-1">{% for u in post.images %}<a href="{{ u }}" target="_blank" rel="noopener" class="thumb lg"><img src="{{ u }}" alt="รูปแนบกระทู้" loading="lazy"></a>{% endfor %}</div>{% endif %}
+        <div class="d-flex justify-content-between align-items-center border-top pt-2 t11 text-secondary">
+          <button type="button" class="like-btn {% if post.is_liked %}on{% endif %}" id="like-btn">{% if post.is_liked %}❤️{% else %}🤍{% endif %} <span id="like-n">{{ post.likes_count }}</span> ถูกใจ</button>
+          <span>💬 {{ post.comments_count }} ความคิดเห็น · 👁️ {{ post.views_count }} เข้าชม</span>
+        </div>
+      </article>
+
+      <section class="bg-white border rounded p-3 d-flex flex-column gap-3">
+        <h2 class="fw-bold border-bottom pb-2 mb-0" style="font-size:12px;color:#1e3a8a">💬 ความคิดเห็น ({{ post.comments_count }})</h2>
+        <form id="comment-form" class="d-flex flex-column gap-2">
+          <div id="comment-msg" class="d-none"></div>
+          <textarea class="form-control" name="content" rows="3" maxlength="2000" placeholder="เขียนความคิดเห็นหรือร่วมตอบคำถามที่นี่..." style="font-size:12px"></textarea>
+          <div><button type="submit" class="xp-btn-green px-3 py-1" id="comment-submit">ส่งความคิดเห็น</button></div>
+        </form>
+        {% for c in post.comments %}
+        <div class="border rounded p-2" style="background:#f9fafb"><div class="d-flex justify-content-between"><span class="fw-bold" style="color:#1e3a8a">{{ c.user.name }}</span><span class="t10 text-secondary">{{ c.created_at }}</span></div>
+          <div style="color:#1f2937">{{ c.content|linkify }}</div></div>
+        {% empty %}<div class="text-center text-secondary py-2">ยังไม่มีความคิดเห็น เป็นคนแรกที่แสดงความคิดเห็นเลย!</div>{% endfor %}
+      </section>
+    </div>
+  </div>
+</main>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/community.js' %}"></script>{% endblock %}

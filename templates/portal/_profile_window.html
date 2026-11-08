@@ -1,0 +1,131 @@
+{% load static ryu %}
+<section id="win-profile" class="xp-window xp-win-main" aria-label="โปรไฟล์ผู้เรียน">
+  <div class="xp-titlebar">
+    <div class="title"><span>🎓</span><span>โปรไฟล์ผู้เรียน: {{ user.name|default:user.email }}</span></div>
+    <div class="d-flex align-items-center gap-1">
+      <button type="button" class="xp-btn-min" data-act="min-main">_</button>
+      <button type="button" class="xp-btn-close" data-act="close-main">✕</button>
+    </div>
+  </div>
+  <div class="xp-win-content t12">
+    <div class="profile-banner bevel-out">
+      <div class="d-flex align-items-center gap-3">
+        <div class="profile-avatar"><img src="{% static 'assets/Ryupro.png' %}" alt="Profile Avatar"></div>
+        <div>
+          <div class="d-flex align-items-center gap-2"><h1 class="mb-0 fw-bold" style="font-size:20px">{{ user.name|default:"นักเรียน RyuClass" }}</h1>
+            {% if user.nickname %}<span class="t12 fw-bold px-2 rounded-pill" style="background:#fbbf24;color:#172554">({{ user.nickname }})</span>{% endif %}</div>
+          <div class="t12 fw-medium" style="color:#dbeafe">📧 {{ user.email }}</div>
+          <div class="t11" style="color:#bfdbfe">📞 {{ user.phone|default:"ยังไม่ระบุเบอร์โทร" }}</div>
+        </div>
+      </div>
+      <div class="d-flex flex-column align-items-md-end gap-2">
+        <span class="fw-bold t12 px-3 py-1 rounded" style="background:#10b981;color:#fff">{% if profile.is_lifetime %}⭐ สิทธิ์ตลอดชีพ (Lifetime){% else %}⏳ สิทธิ์เข้าเรียน: {{ profile.level }}{% endif %}</span>
+        <button type="button" class="xp-btn-green" data-act="open-pay">💳 สมัครคอร์สเพิ่ม / ต่ออายุ</button>
+      </div>
+    </div>
+
+    <div class="flex-grow-1 overflow-auto pe-1" style="min-height:0">
+      <div class="row g-3">
+        <!-- lifetime tier -->
+        <div class="col-12">
+          {% with t=profile.lifetime_progress %}
+          <div class="tier-box bevel-out">
+            <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
+              <div>
+                <div class="d-flex align-items-center gap-2"><span class="fw-bold" style="color:#fbbf24;font-size:14px">💎 สะสมยอดโอนเรียนปลดล็อก Lifetime</span>
+                  {% if t.current_level %}<span class="t10 fw-bold px-2 rounded-pill" style="background:#2563eb">ระดับปัจจุบัน: {{ t.current_level }}</span>{% endif %}</div>
+                <p class="t11 mb-0" style="color:#cbd5e1">ทุกการชำระเงินบวกเพิ่มสะสมยอดเพื่อรับสิทธิ์เรียนคอร์สและวิดีโอตลอดชีพโดยอัตโนมัติ</p>
+              </div>
+              <div class="p-2 rounded w-100" style="max-width:28rem;background:rgba(15,23,42,.8);border:1px solid #334155">
+                <div class="d-flex justify-content-between t11 fw-bold mb-1" style="color:#e2e8f0"><span>💰 ยอดสะสมเรียน: ฿{{ t.total_spent|baht }}</span>
+                  <span style="color:#fcd34d">{% if t.is_max_tier %}🎉 คุณได้สิทธิ์เรียนตลอดชีพครบทุกระดับแล้ว!{% else %}เป้าหมายถัดไป: {{ t.next_level }} (฿{{ t.next_threshold|baht }}){% endif %}</span></div>
+                <div class="tier-bar"><div style="width:{{ t.progress_percent }}%"></div></div>
+                <div class="d-flex justify-content-between t10 mt-1" style="color:#94a3b8"><span>ความคืบหน้าระดับนี้: {{ t.progress_percent }}%</span>
+                  {% if not t.is_max_tier %}<span class="fw-bold" style="color:#fbbf24">ขาดอีก ฿{{ t.remaining_amount|baht }} เพื่อปลดล็อก {{ t.next_level }} Lifetime</span>{% endif %}</div>
+              </div>
+            </div>
+          </div>
+          {% endwith %}
+        </div>
+
+        <!-- my courses -->
+        <div class="col-12 col-lg-8">
+          <div class="d-flex justify-content-between align-items-center bg-white p-2 rounded border mb-3" style="border-color:#9ca3af !important">
+            <div><h2 class="fw-bold mb-0" style="font-size:14px;color:#1e3a8a">📚 คอร์สเรียนของฉัน ({{ my_courses|length }} วิชา)</h2>
+              <p class="t11 mb-0" style="color:#6b7280">คอร์สที่คุณลงทะเบียนไว้ สามารถกดเข้าเรียนวิดีโอได้ทันที</p></div>
+            <button type="button" class="xp-btn-gray" data-act="open-public">🌐 ดูหลักสูตรทั้งหมด</button>
+          </div>
+          {% if not my_courses %}
+          <div class="bevel-in bg-white p-5 text-center border" style="color:#6b7280">
+            <div style="font-size:30px">🔒</div><div class="fw-bold" style="font-size:14px;color:#374151">คุณยังไม่มีคอร์สเรียนที่ลงทะเบียนไว้</div>
+            <p class="t12">สามารถกดดูหลักสูตรทั้งหมดเพื่อแนบสลิปชำระเงินสมัครเรียนได้ทันทีค่ะ</p>
+            <button type="button" class="xp-btn-green" data-act="open-public">เลือกสมัครคอร์สเรียน</button>
+          </div>
+          {% else %}
+          <div class="row g-3 row-cols-1 row-cols-sm-2">
+            {% for c in my_courses %}
+            <div class="col"><div class="bevel-out course-card" style="background:#fcfcf9;border-radius:4px">
+              <div>
+                <div class="d-flex justify-content-between align-items-start mb-2"><span class="badge-jlpt rounded">JLPT {{ c.level }}</span><span class="pill-ok">🟢 พร้อมเรียน</span></div>
+                <div class="thumb bevel-in rounded"><img src="{% static 'assets/course/' %}{{ c.level }}.png" alt="{{ c.title }}" onerror="this.onerror=null;this.src='{% static 'assets/Ryupro.png' %}'"></div>
+                <h4>{{ c.title }}</h4><p>{{ c.description }}</p>
+                <div class="bg-white p-2 border rounded mb-3">
+                  <div class="d-flex justify-content-between t10 fw-semibold" style="color:#374151"><span>ความคืบหน้าเรียน:</span><span class="fw-bold" style="color:#1e40af">{{ c.progress_percent }}% ({{ c.completed_lessons }}/{{ c.total_lessons }} บท)</span></div>
+                  <div class="mini-progress" style="height:8px"><div style="width:{{ c.progress_percent }}%;background:#2563eb"></div></div>
+                </div>
+              </div>
+              <a class="xp-btn-green w-100" href="{% url 'portal:course' c.id %}">▶️ เข้าสู่ห้องเรียนวิชานี้</a>
+            </div></div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- streak + edit + support -->
+        <div class="col-12 col-lg-4 d-flex flex-column gap-3">
+          <div class="bg-white rounded border overflow-hidden" style="border-color:#9ca3af !important">
+            <div class="streak-head">
+              <div class="mascot"><img src="{% static 'images/shibamaru_streak.jpg' %}" alt="Shibamaru Streak Mascot"></div>
+              <div class="flex-grow-1" style="min-width:0">
+                <div class="d-flex align-items-center gap-1"><span class="fw-bold t12 text-truncate" style="color:#7c2d12">ชิบะมารุ (しばまる)</span><span class="streak-pill">🔥 <span id="streak-n">0 วันติด!</span></span></div>
+                <p class="t10 fw-medium mb-0 text-truncate" id="streak-msg" style="color:#9a3412">✨ มาเรียนสะสมไฟต่อเนื่องกันนะ!</p>
+                <div class="t10 mt-1" style="color:#4b5563">💮 เข้าเรียน: <strong id="study-days">0 วัน</strong> &nbsp; ⏱️ <strong id="study-mins">0 น.</strong></div>
+              </div>
+            </div>
+            <div class="p-2" style="background:#fbfbf8">
+              <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+                <button type="button" class="cal-nav" id="cal-prev" title="เดือนก่อนหน้า">◀</button>
+                <span class="fw-bold t12" id="cal-title" style="color:#1f2937"></span>
+                <button type="button" class="cal-nav" id="cal-next" title="เดือนถัดไป">▶</button>
+              </div>
+              <div class="cal-grid mb-1">                <div class="t10 fw-bold" style="color:#ef4444">อา</div><div class="t10 fw-bold" style="color:#6b7280">จ</div><div class="t10 fw-bold" style="color:#6b7280">อ</div><div class="t10 fw-bold" style="color:#6b7280">พ</div><div class="t10 fw-bold" style="color:#6b7280">พฤ</div><div class="t10 fw-bold" style="color:#6b7280">ศ</div><div class="t10 fw-bold" style="color:#3b82f6">ส</div>
+              </div>
+              <div class="cal-grid" id="cal-grid"></div>
+              <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top t10 px-1" style="color:#4b5563"><span>💮 วันที่เข้าเรียน</span><span><span class="d-inline-block rounded-circle border me-1" style="width:8px;height:8px;border-color:#3b82f6 !important;background:#dbeafe"></span>วันนี้</span><span>🏆 สูงสุด: <strong id="longest">0 วัน</strong></span></div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded border overflow-hidden" style="border-color:#9ca3af !important">
+            <button type="button" id="toggle-edit" class="w-100 p-2 d-flex justify-content-between align-items-center t12 fw-bold border-0 border-bottom" style="background:#f9fafb;color:#1f2937">
+              <span style="color:#1e3a8a;font-weight:800">✏️ แก้ไขข้อมูลส่วนตัว</span><span class="st t11" style="color:#6b7280">▼ เปิดแก้ไข</span></button>
+            <div id="edit-body" class="p-3 d-none xp-form">
+              <div id="profile-msg" class="d-none"></div>
+              <form id="form-profile" class="d-flex flex-column gap-2">
+                <div><label class="t11">ชื่อเล่น (Nickname)</label><input class="form-control" name="nickname" value="{{ user.nickname|default:'' }}" placeholder="เช่น ชาย"></div>
+                <div><label class="t11">เบอร์โทรศัพท์ (Phone)</label><input class="form-control" name="phone" value="{{ user.phone|default:'' }}" placeholder="0812345678"></div>
+                <div><label class="t11">เปลี่ยนรหัสผ่านใหม่ (Optional)</label><input class="form-control" type="password" name="password" autocomplete="new-password" placeholder="•••••••• (เว้นว่างหากไม่เปลี่ยน)"></div>
+                <button type="submit" class="xp-btn-green w-100">💾 บันทึกข้อมูลส่วนตัว</button>
+              </form>
+            </div>
+          </div>
+
+          <div class="line-box">
+            <div class="fw-bold t12 mb-1">💬 ต้องการความช่วยเหลือ / สอบถามเพิ่มเติม?</div>
+            <p class="t11 mb-2" style="color:#374151;line-height:1.5">หากมีปัญหาการเข้าเรียน ส่งสลิปเพิ่มเติม หรือต้องการสอบถามไวยากรณ์ สามารถทักทายพี่ริวได้ใน LINE Support</p>
+            <a class="btn-line" href="{{ LINE_SUPPORT_URL }}" target="_blank" rel="noopener noreferrer"><span>💬</span><span>แอด LINE พี่ริว (@ryusosense)</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

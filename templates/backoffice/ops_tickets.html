@@ -1,0 +1,13 @@
+{% extends "backoffice/base_admin.html" %}
+{% block title %}คำร้อง{% endblock %}{% block heading %}คำร้องช่วยเหลือ (Support Tickets){% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap gap-2 mb-3"><a class="btn btn-sm {% if not status %}btn-secondary{% else %}btn-outline-secondary{% endif %}" href="?">ทั้งหมด</a>
+  {% for key, label, n in tabs %}<a class="btn btn-sm {% if status == key %}btn-secondary{% else %}btn-outline-secondary{% endif %}" href="?status={{ key }}">{{ label }} <span class="badge text-bg-light">{{ n }}</span></a>{% endfor %}</div>
+<div class="adm-card"><div class="table-responsive"><table class="table adm-table align-top"><thead><tr><th>#</th><th>ผู้แจ้ง</th><th>หมวด</th><th>รายละเอียด</th><th>สถานะ</th><th>เมื่อ</th><th></th></tr></thead><tbody>
+{% for t in page %}<tr><td>{{ t.id }}</td><td>{{ t.user.name|default:t.user.email }}<div class="small text-secondary">{{ t.user.email }}</div></td><td>{{ t.category }}</td>
+  <td style="max-width:420px;white-space:pre-line" class="small">{{ t.message|truncatechars:500 }}{% if t.user_agent %}<div class="text-secondary mt-1" style="font-size:10px">{{ t.user_agent|truncatechars:90 }}</div>{% endif %}</td>
+  <td><span class="st-pill st-{% if t.status == 'resolved' %}approved{% else %}pending{% endif %}">{{ t.status }}</span></td><td class="small">{{ t.created_at|date:"d/m/Y H:i" }}</td>
+  <td>{% if t.status == 'pending' %}<button class="btn btn-sm btn-success" data-post="{% url 'backoffice:ticket_action' t.id %}" data-body='{"action":"resolve"}' data-reload>ปิดคำร้อง</button>{% else %}<button class="btn btn-sm btn-outline-secondary" data-post="{% url 'backoffice:ticket_action' t.id %}" data-body='{"action":"reopen"}' data-reload>เปิดอีกครั้ง</button>{% endif %}</td></tr>
+{% empty %}<tr><td colspan="7" class="text-center text-secondary py-5">ไม่มีคำร้อง</td></tr>{% endfor %}</tbody></table></div></div>
+{% include "backoffice/_pager.html" %}
+{% endblock %}

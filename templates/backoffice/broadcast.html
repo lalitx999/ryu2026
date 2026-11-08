@@ -1,0 +1,14 @@
+{% extends "backoffice/base_admin.html" %}
+{% block title %}บรอดแคสต์{% endblock %}{% block heading %}บรอดแคสต์อีเมล{% endblock %}
+{% block content %}
+<form class="adm-card p-4 d-flex flex-column gap-3" style="max-width:720px" data-ajax-url="{% url 'backoffice:broadcast' %}">
+  <div><label class="form-label small fw-semibold">กลุ่มเป้าหมาย</label><select name="target" class="form-select form-select-sm">
+    <option value="all">ผู้ใช้ทั้งหมดที่เปิดใช้งาน</option><option value="student">เฉพาะนักเรียน</option><option value="admin">เฉพาะแอดมิน</option>
+    <option value="active">นักเรียนที่มีคอร์สใช้งานอยู่</option><option value="expired">นักเรียนที่คอร์สหมดอายุแล้ว</option>
+    {% for c in courses %}<option value="course_{{ c.id }}">ผู้เรียนคอร์ส {{ c.level }} · {{ c.title }}</option>{% endfor %}</select></div>
+  <div><label class="form-label small fw-semibold">หัวข้อ</label><input class="form-control" name="subject" required maxlength="200"></div>
+  <div><label class="form-label small fw-semibold">เนื้อหา</label><textarea class="form-control" name="message" rows="8" required></textarea></div>
+  <div class="small text-secondary">อีเมลถูกส่งเบื้องหลังผ่าน Celery - หน้านี้จะตอบกลับทันทีไม่ต้องรอ</div>
+  <div class="text-end"><button class="btn btn-dark">✉️ ส่งบรอดแคสต์</button></div>
+</form>
+{% endblock %}

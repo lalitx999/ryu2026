@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Ryutube ทดลองเรียนฟรี | RyuClass ริวคลาส{% endblock %}
+{% block body %}
+<main class="ryutube-wrap"><section class="ryutube-frame">
+  <header class="ryutube-top"><div class="d-flex align-items-center gap-2"><span style="font-size:18px">▶️</span><span class="fw-bold">Ryutube — ทดลองเรียนฟรี</span></div>
+    <a href="{% url 'portal:home' %}" class="btn btn-sm btn-outline-light t12 py-0">✕</a></header>
+  <div class="ryutube-hero"><p class="t12 fw-bold text-uppercase mb-0" style="letter-spacing:.2em;color:#fecaca">RyuClass Free Trial</p>
+    <h1 class="mb-1" style="font-size:30px;font-weight:900">Ryutube</h1><p class="mb-0" style="color:#fef2f2">คลิปทดลองเรียนฟรีจากคอร์ส RyuClass เลือกดูบทเรียนที่สนใจได้เลย</p></div>
+  <div class="p-3 p-sm-4">
+    {% if not lessons %}
+      <div class="text-center bg-white p-5 rounded" style="border:1px dashed #9ca3af"><p style="font-size:36px">📺</p><h2 class="fw-bold" style="font-size:16px;color:#374151">ยังไม่มีคลิปทดลองเรียนฟรี</h2><p class="t12 mb-0" style="color:#6b7280">แอดมินตั้งค่าบทเรียนในคอร์สเป็น “ฟรี” แล้วคลิปจะมาแสดงหน้านี้อัตโนมัติ</p></div>
+    {% else %}
+    <div class="row g-4">
+      <aside class="col-lg-4 order-2 order-lg-1"><div class="bg-white border rounded p-3">
+        <h2 class="t12 fw-bold border-bottom pb-2" style="color:#1f2937">🎁 คลิปทดลองเรียนฟรี ({{ lessons|length }})</h2>
+        <div class="d-flex flex-column gap-2 mt-2" style="max-height:55vh;overflow-y:auto">
+          {% for l in lessons %}
+          <button type="button" class="lesson-btn {% if forloop.first %}active{% endif %}" data-video="{{ l.video_url }}" data-title="{{ l.title }}" data-course="{{ l.course_title }}" data-course-id="{{ l.course_id }}" data-desc="{{ l.description }}">
+            <span class="d-block fw-bold">{{ forloop.counter }}. {{ l.title }}</span><span class="d-block t10 text-truncate mt-1" style="opacity:.8">{{ l.course_title }} · {{ l.module_title }}</span></button>
+          {% endfor %}
+        </div></div></aside>
+      <section class="col-lg-8 order-1 order-lg-2">
+        <div class="ratio ratio-16x9 rounded overflow-hidden bg-black" style="border:2px solid #111827"><iframe id="rt-frame" src="{{ lessons.0.video_url }}" title="{{ lessons.0.title }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+        <h2 id="rt-title" class="mt-3 fw-bold" style="font-size:18px;color:#111827">{{ lessons.0.title }}</h2>
+        <p class="t12 fw-bold mb-0" style="color:#b91c1c">ทดลองเรียนจาก <span id="rt-course">{{ lessons.0.course_title }}</span></p>
+        <p id="rt-desc" class="mt-3" style="white-space:pre-line;color:#374151">{{ lessons.0.description }}</p>
+        <a id="rt-link" href="{% url 'portal:course' lessons.0.course_id %}" class="btn btn-danger btn-sm fw-bold mt-3">สนใจคอร์สเต็ม →</a>
+      </section>
+    </div>
+    {% endif %}
+  </div>
+</section></main>
+{% endblock %}
+{% block scripts %}<script>
+document.querySelectorAll('.lesson-btn').forEach(function (b) { b.addEventListener('click', function () {
+  document.querySelectorAll('.lesson-btn').forEach(function (x) { x.classList.remove('active'); }); b.classList.add('active');
+  document.getElementById('rt-frame').src = b.dataset.video; document.getElementById('rt-title').textContent = b.dataset.title;
+  document.getElementById('rt-course').textContent = b.dataset.course; document.getElementById('rt-desc').textContent = b.dataset.desc;
+  document.getElementById('rt-link').href = '/courses/' + b.dataset.courseId + '/';
+}); });
+</script>{% endblock %}

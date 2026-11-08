@@ -1,0 +1,40 @@
+{% load static seo %}<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+  <meta name="theme-color" content="#0f172a">
+  <title>{% block title %}RyuClass - เรียนภาษาญี่ปุ่นออนไลน์ & เตรียมสอบ JLPT N5 - N1{% endblock %}</title>
+  <meta name="description" content="{% block description %}คอร์สเรียนภาษาญี่ปุ่นออนไลน์เตรียมสอบ JLPT N5, N4, N3, N2, N1 ครบวงจร วิดีโอ HD เอกสาร PDF แบบทดสอบ พร้อมระบบ AI Tutor และสิทธิ์เรียนตลอดชีพ{% endblock %}">
+  <link rel="icon" href="{% static 'favicon.ico' %}">
+  <link rel="manifest" href="{% url 'portal:manifest' %}">
+  <link rel="canonical" href="{{ SITE_URL }}{{ request.path }}">
+  <meta property="og:type" content="website"><meta property="og:site_name" content="RyuClass"><meta property="og:locale" content="th_TH">
+  <meta property="og:title" content="{% block og_title %}RyuClass - เรียนภาษาญี่ปุ่นออนไลน์ & เตรียมสอบ JLPT N5 - N1{% endblock %}">
+  <meta property="og:url" content="{{ SITE_URL }}{{ request.path }}">
+  <meta property="og:image" content="{{ SITE_URL }}{% static 'images/cover_home.jpg' %}">
+  <meta name="twitter:card" content="summary_large_image">
+  {% jsonld %}
+  <link rel="apple-touch-icon" href="{% static 'assets/ryu_logo.jpg' %}">
+  <!-- Bootstrap 5.3.8 - self-hosted (no CDN) -->
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/xp.css' %}">
+  {% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+{% block body %}{% endblock %}
+{% block mobile_nav %}
+<nav class="m-nav" aria-label="เมนูหลักสำหรับมือถือ">
+  <a href="{% url 'portal:home' %}"><span class="ic">⌂</span><span>หน้าแรก</span></a>
+  <a href="{% url 'portal:ryutube' %}" {% if request.resolver_match.url_name == 'ryutube' %}class="active"{% endif %}><span class="ic">▶</span><span>Ryutube</span></a>
+  <a href="{% url 'portal:course' 1 %}" {% if request.resolver_match.url_name == 'course' %}class="active"{% endif %}><span class="ic">▣</span><span>เรียน</span></a>
+  <a href="{% url 'games_page' %}" {% if request.resolver_match.url_name == 'games_page' %}class="active"{% endif %}><span class="ic">🎮</span><span>เกม</span></a>
+  <a href="{% url 'community_pages:forum' %}" {% if request.resolver_match.app_name == 'community_pages' %}class="active"{% endif %}><span class="ic">◉</span><span>ชุมชน</span></a>
+</nav>
+{% endblock %}
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'js/ajax.js' %}"></script>
+<script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function () {});</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

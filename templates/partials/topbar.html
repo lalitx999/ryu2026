@@ -1,0 +1,33 @@
+{% load static %}
+<header class="xp-taskbar xp-topbar scrollbar-none">
+  <div class="d-flex align-items-center gap-2 gap-sm-3 flex-shrink-0">
+    <a href="{% url 'portal:home' %}" class="d-flex align-items-center gap-2 text-decoration-none">
+      <div class="xp-brand-logo"><img src="{% static 'assets/ryu_logo.jpg' %}" alt="RyuClass Logo"></div>
+      <div class="d-flex flex-column lh-tight">
+        <span class="fw-bold text-white small" style="text-shadow:0 1px 2px rgba(0,0,0,.8);letter-spacing:.03em">RyuClass</span>
+        <span class="d-none d-sm-inline t10 fw-medium" style="color:#dbeafe">Japanese Academy</span>
+      </div>
+    </a>
+    <div style="height:20px;width:1px;background:rgba(96,165,250,.4)" class="mx-1 flex-shrink-0"></div>
+    <nav class="d-none d-md-flex align-items-center gap-1 scrollbar-none py-1">
+      <a class="xp-nav-link yellow" href="{% url 'portal:ryutube' %}"><span>▶️</span><span>Ryutube</span></a>
+      <a class="xp-nav-link" href="{% url 'portal:guide' %}"><span>📖</span><span>คู่มือการเรียน</span></a>
+      <a class="xp-nav-link" href="{% url 'araigogu_page' %}"><span>🤖</span><span>Araigogu AI</span></a>
+      <a class="xp-nav-link" href="{% url 'community_pages:forum' %}"><span>🌐</span><span>ชุมชนออนไลน์</span></a>
+      <a class="xp-nav-link" href="{% url 'games_page' %}"><span>🎮</span><span>RyuGames</span></a>
+    </nav>
+  </div>
+  <div class="d-flex align-items-center gap-2 flex-shrink-0">
+    {% if user.is_authenticated %}
+      <div class="xp-userbox">
+        <span style="font-size:14px">👤</span>
+        <div class="who"><div class="fw-bold t11">{{ user.name|default:user.email }}</div><div class="lvl">{{ profile.level|default:"นักเรียน" }}</div></div>
+        <button class="xp-logout" data-act="logout" type="button">ออก</button>
+      </div>
+    {% else %}
+      <button type="button" class="xp-btn-green fw-bold d-flex align-items-center gap-1" data-act="open-auth">
+        <span>🔑</span><span class="d-none d-sm-inline">เข้าสู่ระบบ / สมัครเรียน</span><span class="d-sm-none">เข้าสู่ระบบ</span>
+      </button>
+    {% endif %}
+  </div>
+</header>

@@ -1,0 +1,43 @@
+{% extends "backoffice/base_admin.html" %}{% load static %}
+{% block title %}{{ course.title }}{% endblock %}{% block heading %}จัดการบทเรียน · {{ course.level }} {{ course.title }}{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3" id="ce" data-course="{{ course.id }}">
+  <a class="btn btn-outline-secondary btn-sm" href="{% url 'backoffice:courses' %}">← กลับรายการคอร์ส</a>
+  <div class="d-flex gap-2"><button class="btn btn-dark btn-sm" id="add-module">➕ เพิ่มหมวดใหญ่</button>
+    <button class="btn btn-outline-danger btn-sm" id="del-course" data-url="{% url 'backoffice:delete_course' course.id %}">🗑️ ลบคอร์ส</button></div>
+</div>
+<p class="small text-secondary">ลากการ์ดหมวด หรือแถวบทเรียนเพื่อจัดลำดับ (บันทึกอัตโนมัติ) · วางลิงก์วิดีโอ (YouTube/Vimeo) ในช่อง Video URL</p>
+<div id="modules" class="d-flex flex-column gap-3">
+{% for m in course.modules.all %}
+  <section class="adm-card mod" draggable="true" data-id="{{ m.id }}">
+    <div class="card-h"><span class="d-flex align-items-center gap-2"><span class="grip" title="ลากเพื่อจัดลำดับ">⋮⋮</span><b class="mod-title">{{ m.title }}</b></span>
+      <span class="d-flex gap-1"><button class="btn btn-sm btn-outline-dark" data-act="add-lesson" data-module="{{ m.id }}">➕ บทเรียน</button>
+        <button class="btn btn-sm btn-outline-secondary" data-act="sort-module" data-id="{{ m.id }}" title="จัดเรียงลำดับบทเรียน 1..N อัตโนมัติตามเลขหน้าชื่อบท">🔢 จัดเรียงตามเลขบท (1..N)</button>
+        <button class="btn btn-sm btn-outline-secondary" data-act="rename-module" data-id="{{ m.id }}">✏️</button><button class="btn btn-sm btn-outline-danger" data-act="del-module" data-id="{{ m.id }}">🗑️</button></span></div>
+    <ul class="list-group list-group-flush lessons" data-module="{{ m.id }}">
+    {% for l in m.lessons.all %}
+      <li class="list-group-item d-flex justify-content-between align-items-center lesson" draggable="true" data-id="{{ l.id }}">
+        <span class="d-flex align-items-center gap-2"><span class="grip">⋮⋮</span><span>{{ l.title }}</span>{% if l.is_free %}<span class="badge text-bg-success">ฟรี</span>{% endif %}{% if l.pdf_file %}<span class="badge text-bg-light border">PDF</span>{% endif %}</span>
+        <span class="d-flex gap-1"><button class="btn btn-sm btn-outline-dark" data-act="edit-lesson" data-id="{{ l.id }}">แก้ไข</button><button class="btn btn-sm btn-outline-danger" data-act="del-lesson" data-id="{{ l.id }}">🗑️</button></span></li>
+    {% empty %}<li class="list-group-item small text-secondary empty">ยังไม่มีบทเรียนในหมวดนี้</li>{% endfor %}
+    </ul>
+  </section>
+{% empty %}<div class="adm-card p-4 text-center text-secondary">ยังไม่มีหมวด เริ่มจากกด “เพิ่มหมวดใหญ่”</div>{% endfor %}
+</div>
+
+<div class="modal fade" id="lessonModal" tabindex="-1"><div class="modal-dialog modal-lg"><form class="modal-content" id="lesson-form" enctype="multipart/form-data">
+  <div class="modal-header"><h6 class="modal-title" id="lesson-title">บทเรียน</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body d-flex flex-column gap-2">
+    <input type="hidden" name="lesson_id"><input type="hidden" name="module_id">
+    <div><label class="form-label small fw-semibold">ชื่อบทเรียน *</label><input class="form-control form-control-sm" name="title" required maxlength="200"></div>
+    <div><label class="form-label small fw-semibold">Video URL</label><input class="form-control form-control-sm" name="video_url" placeholder="https://www.youtube.com/watch?v=..."></div>
+    <div><label class="form-label small fw-semibold">รายละเอียด</label><textarea class="form-control form-control-sm" name="description" rows="3"></textarea></div>
+    <div class="row g-2"><div class="col-md-4"><label class="form-label small fw-semibold">ความยาว (วินาที)</label><input class="form-control form-control-sm" type="number" min="0" name="duration" value="0"></div>
+      <div class="col-md-4"><label class="form-label small fw-semibold">ชื่อเอกสารแนบ</label><input class="form-control form-control-sm" name="pdf_title" maxlength="255"></div>
+      <div class="col-md-4"><label class="form-label small fw-semibold">ไฟล์ PDF (≤20MB)</label><input class="form-control form-control-sm" type="file" name="pdf_file" accept="application/pdf"></div></div>
+    <div class="d-flex gap-4"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_free" id="l-free"><label class="form-check-label small" for="l-free">เปิดให้ทดลองเรียนฟรี (แสดงใน Ryutube)</label></div>
+      <div class="form-check"><input class="form-check-input" type="checkbox" name="remove_pdf" id="l-rmpdf"><label class="form-check-label small" for="l-rmpdf">ลบไฟล์ PDF เดิม</label></div></div>
+  </div><div class="modal-footer"><button class="btn btn-dark btn-sm">บันทึก</button></div></form></div></div>
+{{ lessons_data|json_script:"lessons-data" }}
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/admin_courses.js' %}"></script>{% endblock %}

@@ -1,0 +1,10 @@
+Django==5.0.14
+django-environ==0.14.0
+PyMySQL==1.2.3        # MySQL driver (pure python) - installed as MySQLdb in config/__init__.py
+cryptography>=43
+bcrypt==4.1.2          # legacy PHP $2y$ password hashes
+whitenoise==6.12.0     # static files in production (or let Nginx serve /static/)
+celery[redis]==5.7.0   # background work: email, AI, EasySlip, Telegram
+requests==2.34.2       # used only inside Celery tasks (sync)
+Pillow==13.0.0
+gunicorn>=22           # production WSGI server

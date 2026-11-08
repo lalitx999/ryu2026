@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static ryu %}
+{% block body_class %}xp-lock{% endblock %}
+{% block mobile_nav %}{% endblock %}
+{% block body %}
+<main class="xp-home d-flex flex-column position-relative overflow-hidden xp-select-none" style="height:100vh;width:100%">
+  <canvas id="ambient-canvas"></canvas>
+  <button id="ambient-toggle" class="ambient-toggle" type="button" title="เปลี่ยนเอฟเฟกต์"></button>
+
+  {% include "partials/topbar.html" %}
+
+  <!-- Desktop icons -->
+  <div class="xp-desktop-grid">
+    <button type="button" class="xp-desktop-icon" data-act="my-computer">
+      <img src="{% static 'assets/ryuonline.png' %}" alt="My Computer"><span>{% if user.is_authenticated %}โปรไฟล์ส่วนตัว{% else %}My Computer{% endif %}</span>
+    </button>
+    <button type="button" class="xp-desktop-icon" data-act="open-public">
+      <img src="{% static 'assets/ryu_logo.jpg' %}" alt="RyuPortal" style="object-fit:cover;border-radius:4px"><span>RyuClass Portal</span>
+    </button>
+    <button type="button" class="xp-desktop-icon" data-act="open-chat">
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="18" r="8" fill="#ff4d6d"/><path d="M8 38C8 30 16 30 16 30C16 30 24 30 24 38" fill="#ff4d6d"/><circle cx="32" cy="18" r="8" fill="#4ea8de"/><path d="M24 38C24 30 32 30 32 30C32 30 40 40 40 38" fill="#4ea8de"/></svg>
+      <span>Nong Ryuso (AI)</span>
+    </button>
+    <button type="button" class="xp-desktop-icon" data-act="open-pay">
+      <img src="{% static 'assets/line_qr.png' %}" alt="QR"><span>แจ้งสลิปต่ออายุคอร์ส</span>
+    </button>
+    <button type="button" class="xp-desktop-icon" data-act="goto-library">
+      <div class="emoji">📚</div><span>Ryu-Library</span>
+    </button>
+  </div>
+
+  {% if user.is_authenticated %}{% include "portal/_profile_window.html" %}{% endif %}
+  {% include "portal/_welcome_window.html" %}
+  {% include "portal/_chat_window.html" %}
+  {% include "portal/_dialogs.html" %}
+  {% include "partials/halloween_banner.html" %}
+
+  <!-- Taskbar -->
+  <div class="xp-taskbar xp-bottombar">
+    <div class="d-flex align-items-center h-100 gap-2">
+      <button type="button" class="xp-start-button" data-act="toggle-start"><span style="font-size:20px">❖</span><span>start</span></button>
+      <button type="button" class="xp-task-btn active" data-task="main" data-act="toggle-main"><span class="ic">💻</span><span class="lbl">RyuClass Dashboard</span></button>
+      <button type="button" id="task-chat" class="xp-task-btn d-none" data-act="toggle-chat"><span>💬</span><span>Nong Ryuso AI</span></button>
+    </div>
+    <div class="xp-tray"><span>🔋</span><span>🔊</span><span id="xp-clock">10:00 AM</span></div>
+  </div>
+
+  <!-- Start menu -->
+  <div id="start-menu" class="xp-startmenu">
+    <div class="head">
+      <div class="avatar"><img src="{% static 'assets/Ryupro.png' %}" alt="Profile"></div>
+      <div><div class="fw-bold small">{% if user.is_authenticated %}{{ user.name|default:user.email }}{% else %}ผู้เรียนทั่วไป{% endif %}</div>
+        <div class="t10" style="opacity:.75">{% if user.is_authenticated %}อีเมล: {{ user.email }}{% else %}RyuClass Guest{% endif %}</div></div>
+    </div>
+    <div class="cols">
+      <div class="left">
+        <div class="fw-bold t10 p-1" style="color:#6b7280">โปรแกรมหลัก</div>
+        {% if not user.is_authenticated %}
+          <button class="xp-menu-item fw-bold" data-act="open-auth"><span>🔑</span><span>เข้าสู่ระบบ / สมัครเรียน</span></button>
+        {% else %}
+          <button class="xp-menu-item fw-bold" data-act="open-main"><span>🎓</span><span>โปรไฟล์นักเรียนของฉัน</span></button>
+          <button class="xp-menu-item" data-act="open-pay"><span>💳</span><span>สมัครคอร์สเพิ่ม / ต่ออายุ</span></button>
+        {% endif %}
+        <button class="xp-menu-item" data-act="open-chat"><span>💬</span><span>คุยกับริวโซ่ AI</span></button>
+      </div>
+      <div class="right">
+        <button class="xp-menu-item" style="color:#00156e" data-act="open-public">📂 หลักสูตรคอร์สทั้งหมด</button>
+        {% if IS_ADMIN_USER %}<a class="xp-menu-item" style="color:#8b0000" href="{% url 'backoffice:dashboard' %}" target="_blank" rel="noreferrer">🛠️ AdminCN Portal (หลังบ้าน)</a>{% endif %}
+      </div>
+    </div>
+    <div class="foot">
+      {% if user.is_authenticated %}<button data-act="logout">🔑 ออกจากระบบ</button>{% endif %}
+      <button data-act="close-start">❌ ปิดเมนู Start</button>
+    </div>
+  </div>
+</main>
+{{ boot|json_script:"ryu-boot" }}
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/ambient.js' %}"></script>
+<script src="{% static 'js/dialogs.js' %}"></script>
+<script src="{% static 'js/desktop.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Ryu-Library | RyuClass ริวคลาส{% endblock %}
+{% block body_class %}lib-page{% endblock %}
+{% block body %}
+{% include "partials/topbar.html" %}
+<main class="container py-4 py-md-5" style="max-width:64rem">
+  <div class="lib-card">
+    <div class="px-4 py-3 d-flex justify-content-between align-items-center border-bottom" style="border-color:#1e293b !important">
+      <div class="fw-semibold" style="font-size:14px;color:#e2e8f0">📚 Ryu-Library · ห้องสมุดเอกสาร & หนังสือ JLPT</div>
+      <a href="{% url 'portal:home' %}" class="btn btn-sm btn-outline-secondary t12">กลับหน้าหลัก</a>
+    </div>
+    <div class="p-3 p-md-4 d-flex flex-column gap-4">
+      <section class="lib-inner p-3 p-md-4 d-flex flex-column flex-md-row align-items-center gap-4">
+        <img src="{% static 'images/shibamaru_library.jpg' %}" alt="น้องชิบะมารุในห้องสมุด RyuClass" class="rounded-3 flex-shrink-0" style="width:192px;height:192px;object-fit:cover;border:1px solid #334155">
+        <div class="text-center text-md-start d-flex flex-column gap-2">
+          <span class="t12 fw-medium" style="color:#fb923c">🐾 รอพี่ริวอัปเดตชีทเรียน</span>
+          <h1 class="fw-bold mb-0" style="font-size:28px;color:#f1f5f9">ยินดีต้อนรับสู่ Ryu-Library</h1>
+          <p class="mb-0" style="color:#94a3b8;line-height:1.6">รวม<strong style="color:#e2e8f0">ชีทสรุป PDF โหลดฟรี</strong> ของแต่ละระดับ N และ<strong style="color:#e2e8f0">ลิงก์สั่งซื้อหนังสือเตรียมสอบ</strong> ไว้ในที่เดียว</p>
+          <div class="p-3 rounded t12" style="background:#0b101b;border:1px solid #1e293b"><p class="fw-medium mb-1" style="color:#cbd5e1">✨ น้องชิบะมารุกำลังช่วยจัดชั้นหนังสืออยู่ครับ</p><p class="mb-0 t12" style="color:#64748b">เมื่ออัปโหลดไฟล์เสร็จ เอกสารดาวน์โหลดและลิงก์สั่งซื้อจะแสดงที่นี่ทันที</p></div>
+          <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-md-start pt-1">
+            <a href="{% url 'portal:home' %}" class="btn btn-warning btn-sm fw-medium">กลับสู่หน้าหลัก</a>
+            <a href="{{ LINE_SUPPORT_URL }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">ติดต่อพี่ริวทาง LINE</a>
+          </div>
+        </div>
+      </section>
+      <section>
+        <div class="d-flex justify-content-between border-bottom pb-2 mb-3" style="border-color:#1e293b !important"><h2 class="mb-0" style="font-size:16px;font-weight:600;color:#e2e8f0">หมวดหมู่เอกสารและหนังสือ</h2><span class="t12" style="color:#64748b">5 ระดับ JLPT</span></div>
+        <div class="row g-3">
+          {% for level, title, desc, accent in levels %}
+          <div class="col-12 col-sm-6 col-lg-4"><div class="lib-item">
+            <div class="d-flex justify-content-between align-items-center"><span class="fw-bold {{ accent }}" style="font-size:18px">{{ level }}</span><span class="t10 rounded-pill px-2" style="color:#64748b;border:1px solid #1e293b">เร็วๆ นี้</span></div>
+            <div><h3 class="mb-1" style="font-size:14px;font-weight:500;color:#e2e8f0">{{ title }}</h3><p class="t12 mb-0" style="color:#64748b;line-height:1.5">{{ desc }}</p></div>
+            <div class="mt-auto pt-2 d-flex justify-content-between t11 border-top" style="color:#64748b;border-color:#1e293b !important"><span>PDF ฟรี</span><span>หนังสือแนะนำ</span></div>
+          </div></div>
+          {% endfor %}
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+<footer class="text-center py-4 t12" style="color:#475569;border-top:1px solid rgba(30,41,59,.8)"><p class="mb-0">RyuClass © 2026 — เรียนภาษาญี่ปุ่นเข้าใจง่าย สไตล์พี่ริว 🐾</p></footer>
+{% endblock %}

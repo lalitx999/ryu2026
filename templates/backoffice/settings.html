@@ -1,0 +1,28 @@
+{% extends "backoffice/base_admin.html" %}
+{% block title %}ตั้งค่าระบบ{% endblock %}{% block heading %}ตั้งค่าระบบและเซิร์ฟเวอร์ (อ่านอย่างเดียว){% endblock %}
+{% block content %}
+<p class="small text-secondary">ค่าทั้งหมดตั้งผ่านไฟล์ <code>.env</code> บนเซิร์ฟเวอร์ หน้านี้แสดงเพียงสถานะ “ตั้งแล้ว/ยังไม่ตั้ง” และไม่เปิดเผยค่าความลับ</p>
+<div class="row g-3">
+  <div class="col-md-6"><div class="adm-card h-100"><div class="card-h">✉️ ระบบอีเมล (SMTP)</div><ul class="list-group list-group-flush small">
+    <li class="list-group-item d-flex justify-content-between"><span>Host</span><code>{{ s.email.host }}</code></li>
+    <li class="list-group-item d-flex justify-content-between"><span>Port / TLS</span><code>{{ s.email.port }}{% if s.email.tls %} · TLS{% endif %}</code></li>
+    <li class="list-group-item d-flex justify-content-between"><span>ผู้ส่งเริ่มต้น</span><code>{{ s.email.sender }}</code></li>
+    <li class="list-group-item d-flex justify-content-between"><span>บัญชี SMTP</span>{% if s.email.configured %}<span class="st-pill st-approved">ตั้งแล้ว</span>{% else %}<span class="st-pill st-pending">ยังไม่ตั้ง (พิมพ์ลงคอนโซล)</span>{% endif %}</li></ul></div></div>
+  <div class="col-md-6"><div class="adm-card h-100"><div class="card-h">⚙️ ระบบหลัก</div><ul class="list-group list-group-flush small">
+    <li class="list-group-item d-flex justify-content-between"><span>ฐานข้อมูล</span><code>{{ s.database.engine }}</code></li>
+    <li class="list-group-item d-flex justify-content-between"><span>Celery</span>{% if s.celery.eager %}<span class="st-pill st-pending">inline (ไม่มี worker)</span>{% elif s.celery.broker_up %}<span class="st-pill st-approved">Redis พร้อม</span>{% else %}<span class="st-pill st-rejected">เชื่อม Redis ไม่ได้</span>{% endif %}</li>
+    <li class="list-group-item d-flex justify-content-between"><span>โหมด DEBUG</span>{% if s.debug %}<span class="st-pill st-pending">เปิด (ห้ามใช้บน production)</span>{% else %}<span class="st-pill st-approved">ปิด</span>{% endif %}</li>
+    <li class="list-group-item d-flex justify-content-between"><span>SITE_URL</span><code>{{ s.site_url }}</code></li></ul></div></div>
+  <div class="col-md-6"><div class="adm-card h-100"><div class="card-h">🔑 บริการภายนอก</div><ul class="list-group list-group-flush small">
+    {% for name, ok in s.keys %}<li class="list-group-item d-flex justify-content-between"><span>{{ name }}</span>{% if ok %}<span class="st-pill st-approved">ตั้งแล้ว</span>{% else %}<span class="st-pill st-pending">ยังไม่ตั้ง</span>{% endif %}</li>{% endfor %}</ul></div></div>
+  <div class="col-md-6"><div class="adm-card h-100"><div class="card-h">💾 พื้นที่จัดเก็บไฟล์</div><ul class="list-group list-group-flush small">
+    <li class="list-group-item d-flex justify-content-between"><span>สลิปชำระเงิน (private)</span><span>{{ s.storage.slips.files }} ไฟล์ · {{ s.storage.slips.size_mb }} MB</span></li>
+    <li class="list-group-item d-flex justify-content-between"><span>เอกสาร PDF บทเรียน</span><span>{{ s.storage.pdfs.files }} ไฟล์ · {{ s.storage.pdfs.size_mb }} MB</span></li>
+    <li class="list-group-item d-flex justify-content-between"><span>รูปในชุมชน</span><span>{{ s.storage.community.files }} ไฟล์ · {{ s.storage.community.size_mb }} MB</span></li>
+    <li class="list-group-item d-flex justify-content-between"><span>พื้นที่ว่างบนดิสก์</span><b>{{ s.storage.disk_free_gb }} GB</b></li></ul></div></div>
+  <div class="col-12"><div class="adm-card"><div class="card-h"><span>🧩 ค่าตั้งระบบในฐานข้อมูล (settings)</span><span class="small text-secondary">ค่าถูกซ่อน แสดงเฉพาะความยาว</span></div>
+    {% if is_super %}<form class="p-3 d-flex flex-wrap gap-2 border-bottom" data-ajax-url="{% url 'backoffice:setting_save' %}" data-reload="1"><input class="form-control form-control-sm" style="max-width:220px" name="key" placeholder="ชื่อคีย์" required maxlength="100"><input class="form-control form-control-sm flex-grow-1" name="value" placeholder="ค่าใหม่ (บันทึกทับค่าเดิม)" autocomplete="off"><button class="btn btn-dark btn-sm">บันทึก</button></form>{% else %}<div class="p-3 small text-secondary border-bottom">แก้ไขได้เฉพาะ Super Admin</div>{% endif %}
+    <ul class="list-group list-group-flush small">{% for r in rows %}<li class="list-group-item d-flex justify-content-between align-items-center"><span><code>{{ r.key }}</code> <span class="text-secondary">· ••••••• ({{ r.length }} ตัวอักษร)</span></span>
+      {% if is_super %}<button class="btn btn-sm btn-outline-danger" data-post="{% url 'backoffice:setting_delete' %}" data-body='{"key":"{{ r.key|escapejs }}"}' data-confirm="ลบคีย์ {{ r.key|escapejs }}?" data-reload>🗑️</button>{% endif %}</li>{% empty %}<li class="list-group-item text-secondary">ยังไม่มีค่า</li>{% endfor %}</ul></div></div>
+</div>
+{% endblock %}

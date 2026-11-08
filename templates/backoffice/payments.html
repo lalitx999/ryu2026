@@ -1,0 +1,21 @@
+{% extends "backoffice/base_admin.html" %}{% load ryu %}
+{% block title %}ตรวจสลิป{% endblock %}{% block heading %}ตรวจสลิปชำระเงิน (Slip QC){% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
+  {% for key, label, n in tabs %}<a class="btn btn-sm {% if status == key %}btn-dark{% else %}btn-outline-dark{% endif %}" href="?status={{ key }}&per_page={{ per_page }}">{{ label }} <span class="badge text-bg-light">{{ n }}</span></a>{% endfor %}
+  <form class="ms-auto d-flex gap-2" method="get"><input type="hidden" name="status" value="{{ status }}"><select class="form-select form-select-sm" name="per_page" style="width:auto" onchange="this.form.submit()">{% for n in sizes %}<option value="{{ n }}" {% if n == per_page %}selected{% endif %}>{{ n }} รายการต่อหน้า</option>{% endfor %}</select><input class="form-control form-control-sm" name="q" value="{{ q }}" placeholder="ค้นหา ชื่อ/อีเมล/เบอร์"><button class="btn btn-sm btn-outline-secondary">ค้นหา</button></form>
+</div>
+<div class="adm-card"><div class="table-responsive"><table class="table adm-table align-middle"><thead><tr><th>#</th><th>สลิป</th><th>นักเรียน</th><th>คอร์ส/แพ็กเกจ</th><th class="text-end">ยอด</th><th>สถานะ</th><th>ส่งเมื่อ</th><th>ดำเนินการ</th></tr></thead><tbody>
+{% for p in page %}<tr>
+  <td>{{ p.id }}</td>
+  <td>{% if p.slip_path %}<img class="slip-thumb" src="{% url 'payments:slip' p.id %}" data-slip="{% url 'payments:slip' p.id %}" alt="slip" loading="lazy">{% endif %}</td>
+  <td>{{ p.user.name|default:p.user.email }}<div class="small text-secondary">{{ p.user.email }} · {{ p.user.phone|default:"-" }}</div></td>
+  <td>{{ p.course.title }}<div class="small text-secondary">{% if p.duration_days >= 999 %}ตลอดชีพ{% else %}{{ p.duration_days }} วัน{% endif %}{% if p.is_renewal %} · ต่ออายุ{% endif %}</div></td>
+  <td class="text-end fw-semibold">฿{{ p.amount|baht2 }}</td>
+  <td class="st-cell"><span class="st-pill st-{{ p.status }}">{{ p.status }}</span>{% if p.rejection_reason %}<div class="small text-danger">{{ p.rejection_reason }}</div>{% endif %}</td>
+  <td class="small">{{ p.submitted_at|date:"d/m/Y H:i" }}</td>
+  <td class="act-cell">{% if p.status == 'pending' %}<button class="btn btn-sm btn-success" data-review="approve" data-id="{{ p.id }}">✅ อนุมัติ</button> <button class="btn btn-sm btn-outline-danger" data-review="reject" data-id="{{ p.id }}">ปฏิเสธ</button>{% else %}<span class="text-muted small">ดำเนินการแล้ว</span>{% endif %} <button class="btn btn-sm btn-outline-secondary" data-detail="{{ p.id }}">รายละเอียด</button></td>
+</tr>{% empty %}<tr><td colspan="8" class="text-center text-secondary py-5">ไม่พบรายการ</td></tr>{% endfor %}
+</tbody></table></div></div>
+{% include "backoffice/_pager.html" %}
+{% endblock %}

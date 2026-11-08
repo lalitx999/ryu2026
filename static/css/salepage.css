@@ -1,0 +1,25 @@
+/* Sale page: light marketing layout (the original Tailwind design, rebuilt on Bootstrap utilities). */
+body.sale-page { background:#f9fafb; color:#111827; }
+.sale-main { max-width:80rem; margin:0 auto; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.1); min-height:100vh; display:flex; flex-direction:column; }
+.sale-sec { padding:48px 20px; } @media (min-width:576px){ .sale-sec { padding:48px 32px; } } @media (min-width:768px){ .sale-sec { padding:48px 48px; } }
+.sale-img { display:block; width:100%; height:auto; transition:transform .5s; }
+.sale-tile { overflow:hidden; border-radius:12px; border:1px solid #f3f4f6; box-shadow:0 2px 6px rgba(0,0,0,.12); transition:box-shadow .3s; display:block; }
+.sale-tile:hover { box-shadow:0 10px 24px rgba(0,0,0,.2); } .sale-tile:hover .sale-img { transform:scale(1.05); }
+.sale-h1 { color:#b91c1c; font-weight:900; letter-spacing:-.02em; font-size:clamp(30px,5vw,48px); }
+.sale-rule { height:4px; width:80px; background:#dc2626; border-radius:99px; margin:24px auto 0; }
+.sale-chip { display:inline-flex; align-items:center; gap:8px; background:#fef2f2; color:#b91c1c; font-weight:600; padding:8px 16px; border-radius:99px; }
+.sale-table { width:100%; border-collapse:collapse; font-size:14px; }
+.sale-table thead tr { background:#111827; color:#fff; } .sale-table th { padding:12px 16px; text-align:center; font-weight:bold; } .sale-table th:first-child { text-align:left; border-top-left-radius:12px; } .sale-table th:last-child { border-top-right-radius:12px; }
+.sale-table th small { display:block; color:#86efac; font-size:10px; font-weight:normal; }
+.sale-table td { padding:14px 16px; text-align:center; font-weight:500; color:#374151; border-bottom:1px solid #f3f4f6; } .sale-table td:first-child { text-align:left; font-weight:bold; color:#1f2937; }
+.sale-table tbody tr:nth-child(even) { background:#f9fafb; } .sale-table tbody tr:hover { background:#fef2f2; }
+.sale-table td small { display:block; font-size:10px; color:#16a34a; font-weight:600; } .sale-table td.life { color:#b91c1c; font-weight:bold; } .sale-table td.life small { color:#6b7280; font-weight:normal; }
+.sale-cta { max-width:48rem; margin:0 auto; background:linear-gradient(to right,#fef2f2,#fff7ed); border:1px solid #fee2e2; border-radius:16px; padding:40px 32px; text-align:center; box-shadow:0 4px 10px rgba(0,0,0,.08); }
+.sale-btn { display:inline-block; background:#dc2626; color:#fff; font-weight:bold; padding:16px 32px; border-radius:12px; text-decoration:none; box-shadow:0 8px 20px rgba(220,38,38,.3); transition:all .2s; } .sale-btn:hover { background:#b91c1c; color:#fff; transform:translateY(-2px); }
+.sale-contact { background:linear-gradient(135deg,#f3f4f6,#f9fafb); margin-top:32px; padding:64px 20px; }
+.sale-card { max-width:48rem; margin:0 auto; background:#fff; border-radius:24px; padding:32px; display:flex; flex-direction:column; align-items:center; box-shadow:0 10px 30px rgba(0,0,0,.12); border:1px solid #f3f4f6; }
+.sale-avatar { width:160px; height:160px; border-radius:50%; object-fit:cover; border:4px solid #fee2e2; box-shadow:0 4px 12px rgba(0,0,0,.2); margin-bottom:24px; }
+.sale-social { width:56px; height:56px; border-radius:50%; color:#fff; display:flex; align-items:center; justify-content:center; transition:transform .2s; box-shadow:0 2px 6px rgba(0,0,0,.25); } .sale-social:hover { transform:scale(1.1); color:#fff; } .sale-social svg { width:28px; height:28px; fill:currentColor; }
+.sale-line { width:100%; max-width:75%; background:linear-gradient(to right,#22c55e,#16a34a); color:#fff; border-radius:16px; padding:20px; text-align:center; text-decoration:none; box-shadow:0 8px 20px rgba(22,163,74,.3); transition:all .2s; } .sale-line:hover { color:#fff; transform:translateY(-4px); }
+@media (max-width:767px){ .sale-line { max-width:100%; } }
+.sale-foot { background:#111827; color:#fff; padding:48px 20px; text-align:center; margin-top:auto; }

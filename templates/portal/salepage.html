@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load static ryu %}
+{% block title %}เรียนภาษาญี่ปุ่นกับพี่ริว เริ่มจาก 0 สู่ N1 | RyuClass{% endblock %}
+{% block description %}คอร์สภาษาญี่ปุ่นออนไลน์ N5-N1 เรียนสดผ่าน Zoom ระบบ Teachable กลุ่ม LINE ส่วนตัว พร้อมสิทธิ์เรียนตลอดชีพ ดูราคาแพ็กเกจและโปรโมชั่นได้ที่นี่{% endblock %}
+{% block body_class %}sale-page{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'css/salepage.css' %}">{% endblock %}
+{% block mobile_nav %}{% endblock %}
+{% block body %}
+{% with img='assets/images/salepage/' %}
+<main class="sale-main">
+  <div style="background:#f3f4f6"><img class="sale-img" src="{% static img|add:'cover.png' %}" alt="RyusoSense Cover" fetchpriority="high"></div>
+
+  <section class="sale-sec text-center">
+    <h1 class="sale-h1 mb-3">เรียนภาษาญี่ปุ่นกับพี่ริว</h1>
+    <p class="mb-0 fw-semibold" style="font-size:clamp(20px,3vw,24px);color:#1f2937">เริ่มจาก 0 สู่ N1 ทั้งสอนและติวสอบ</p>
+    <div class="sale-rule"></div>
+  </section>
+
+  <section class="sale-sec">
+    <div class="row g-3 g-md-4 mb-4">
+      {% for level in levels %}
+      <div class="col-6 col-md-3"><a class="sale-tile" href="/auth/register/?level={{ level }}"><img class="sale-img" src="{% static img|add:level|add:'.png' %}" alt="JLPT {{ level }}" loading="lazy"></a></div>
+      {% endfor %}
+    </div>
+    <div class="d-flex justify-content-center px-md-5"><a class="sale-tile w-100" style="max-width:42rem" href="/auth/register/?level=N5"><img class="sale-img" src="{% static img|add:'N5.png' %}" alt="JLPT N5" loading="lazy"></a></div>
+  </section>
+
+  <section class="sale-sec" id="pricing-section">
+    <div class="mb-5" style="border-top:2px dashed #e5e7eb"></div>
+    <div class="mx-auto" style="max-width:72rem">
+      <div class="text-center mb-4"><div class="sale-chip mb-3"><span style="font-size:24px">🎯</span><span>โปรโมชั่นพิเศษ</span></div>
+        <h2 class="fw-bold mb-2" style="font-size:clamp(24px,3.5vw,36px);color:#1f2937">ค่าสมาชิก</h2><p class="text-secondary mb-0">เลือกระดับและแพ็กเกจที่เหมาะกับคุณ</p></div>
+      <div class="table-responsive rounded-3 shadow border">
+        <table class="sale-table">
+          <thead><tr><th>ระดับ</th><th>รายเดือน</th><th>6 เดือน</th><th>12 เดือน</th><th>ตลอดชีพ</th></tr></thead>
+          <tbody>
+          {% for r in rows %}
+            <tr><td>{{ r.level }}</td><td>{{ r.monthly|baht }} ฿</td>
+              <td>{% if r.six %}{{ r.six|baht }} ฿{% if r.six_saving and r.six_saving > 0 %}<small>ประหยัด {{ r.six_saving|baht }}</small>{% endif %}{% else %}-{% endif %}</td>
+              <td>{% if r.twelve %}{{ r.twelve|baht }} ฿{% if r.twelve_saving and r.twelve_saving > 0 %}<small>ประหยัด {{ r.twelve_saving|baht }}</small>{% endif %}{% else %}-{% endif %}</td>
+              <td class="life">{% if r.lifetime %}{{ r.lifetime|baht }} ฿<small>เรียน {{ r.label }}</small>{% else %}-{% endif %}</td></tr>
+          {% empty %}<tr><td colspan="5" class="text-secondary py-4">ยังไม่มีราคาแพ็กเกจที่เปิดจำหน่าย</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="text-center mt-3 mb-0 fw-medium" style="font-size:12px;color:#6b7280">💡 ราคาสามารถเปลี่ยนแปลงได้ตามโปรโมชั่น | สิทธิ์ตลอดชีพสะสมเลเวลตามยอดที่จ่าย</p>
+    </div>
+  </section>
+
+  <section class="sale-sec">
+    <div class="text-center mb-5"><h2 class="fw-bold mb-2" style="font-size:clamp(24px,3.5vw,36px);color:#1f2937">จุดเด่นของคอร์สเรียน</h2><p class="text-secondary mb-0" style="font-size:18px">เรียนที่ไหนก็ได้ สะดวกทุกที่</p></div>
+    <div class="row g-3 g-md-4">
+      {% for file, alt, label in features %}
+      <div class="col-6 col-md-3"><div class="sale-tile"><img class="sale-img" src="{% static img|add:file %}" alt="{{ alt }}" loading="lazy"></div><p class="text-center fw-medium mt-3 mb-0" style="font-size:14px;color:#4b5563">{{ label }}</p></div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="sale-sec">
+    <div class="text-center mb-5"><p class="fw-medium mb-0 text-secondary" style="font-size:18px">ดูตัวอย่างบทเรียนก่อนตัดสินใจ</p><div style="height:2px;width:64px;background:#ef4444;margin:16px auto 0"></div></div>
+    <div class="row g-4 mx-auto" style="max-width:72rem">
+      <div class="col-md-6"><div class="ratio ratio-16x9 bg-black rounded-3 overflow-hidden shadow border"><iframe src="https://www.youtube-nocookie.com/embed/oYLXG0PCDkM" title="ตัวอย่างบทเรียน N5-N1" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div></div>
+      <div class="col-md-6"><div class="ratio ratio-16x9 bg-black rounded-3 overflow-hidden shadow border"><iframe src="https://www.youtube-nocookie.com/embed/lKL1hRAs2Yw" title="ตัวอย่างการสอนพิเศษ" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div></div>
+    </div>
+  </section>
+
+  <section class="sale-sec" style="padding-top:32px;padding-bottom:32px">
+    <div class="sale-cta"><h3 class="fw-bold mb-2" style="font-size:24px;color:#1f2937">พร้อมเริ่มเรียนภาษาญี่ปุ่นแล้วหรือยัง?</h3>
+      <p class="text-secondary mb-4" style="font-size:14px">สมัครวันนี้ เริ่มเรียนได้ทันที พร้อมรับสิทธิ์ Lifetime สะสมเลเวล</p>
+      <a href="/auth/register/" class="sale-btn">สมัครเรียนเลย 🚀</a></div>
+  </section>
+
+  <section class="sale-contact"><div class="sale-card">
+    <img class="sale-avatar" src="{% static img|add:'ryuuu.png' %}" alt="พี่ริว ครูสอนภาษาญี่ปุ่น" loading="lazy">
+    <p class="text-center fw-medium mb-4" style="color:#4b5563">อัปเดตเทคนิคเรียนภาษาญี่ปุ่นฟรีทุกวัน</p>
+    <div class="d-flex flex-wrap justify-content-center gap-3 mb-5">
+      <a class="sale-social" style="background:#1877F2" href="https://www.facebook.com/RyusoSense" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg viewBox="0 0 448 512"><path d="M400 32H48A48 48 0 0 0 0 80v352a48 48 0 0 0 48 48h137.25V327.69h-63V256h63v-54.64c0-62.15 37-96.48 93.67-96.48 27.14 0 55.52 4.84 55.52 4.84v61h-31.27c-30.81 0-40.43 19.12-40.43 38.73V256h68.78l-11 71.69h-57.78V512H400a48 48 0 0 0 48-48V80a48 48 0 0 0-48-48z"/></svg></a>
+      <a class="sale-social" style="background:#00B900" href="{{ LINE_SUPPORT_URL }}" target="_blank" rel="noopener noreferrer" aria-label="LINE"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 5.42 2 9.63c0 2.21 1.21 4.19 3.19 5.56l-.82 3.01c-.1.35.1.72.46.82.08.02.16.03.24.03.27 0 .52-.16.63-.42l1.64-2.4c.54.12 1.1.18 1.66.18 5.52 0 10-3.42 10-7.63S17.52 2 12 2z"/></svg></a>
+      <a class="sale-social" style="background:#000" href="https://www.tiktok.com/@ryusosense" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><svg viewBox="0 0 448 512"><path d="M448 209.91a210.06 210.06 0 0 1-122.77-39.25v178.72A162.55 162.55 0 1 1 185 188.31v89.89a74.62 74.62 0 1 0 52.23 71.18V0h88a121.18 121.18 0 0 0 1.86 22.17A122.18 122.18 0 0 0 381 102.39a121.43 121.43 0 0 0 67 20.14z"/></svg></a>
+      <a class="sale-social" style="background:#FF0000" href="https://www.youtube.com/@RyusoSense" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><svg viewBox="0 0 576 512"><path d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.537V175.185l142.739 81.205-142.739 81.23z"/></svg></a>
+      <a class="sale-social" style="background:#5865F2" href="https://discord.com/invite/qs6uubcFGs" target="_blank" rel="noopener noreferrer" aria-label="Discord"><svg viewBox="0 0 640 512"><path d="M524.531 69.836a1.5 1.5 0 0 0-.764-.7A485.067 485.067 0 0 0 404.081 32a1.816 1.816 0 0 0-1.013.447c-5.029 9.17-10.647 21.037-14.562 30.294-41.93-6.291-83.694-6.291-125.013 0-3.915-9.257-9.59-21.124-14.623-30.294a1.8 1.8 0 0 0-1.026-.447 484.599 484.599 0 0 0-119.686 37.13 1.5 1.5 0 0 0-.764.7C53.295 186.499 31.939 300.268 40.33 412.242a1.693 1.693 0 0 0 .765 1.202 486.648 486.648 0 0 0 146.66 74.07 1.875 1.875 0 0 0 1.026-.334c11.376-15.54 21.5-32.064 30.219-49.274a1.812 1.812 0 0 0-.986-2.529 319.467 319.467 0 0 1-45.892-21.844 1.814 1.814 0 0 1-.185-3.003c3.08-2.3 6.16-4.713 9.071-7.177a1.8 1.8 0 0 1 1.865-.248c90.686 41.5 188.583 41.5 277.636 0a1.8 1.8 0 0 1 1.89.235c2.91 2.477 5.991 4.89 9.071 7.19a1.807 1.807 0 0 1-.173 3.002 318.59 318.59 0 0 1-45.954 21.819 1.82 1.82 0 0 0-.974 2.543c8.845 17.185 18.91 33.684 30.17 49.212a1.884 1.884 0 0 0 1.038.347 485.447 485.447 0 0 0 146.77-74.084 1.7 1.7 0 0 0 .777-1.19c9.932-127.352-17.065-240.23-71.18-342.368zM220.288 339.552c-28.734 0-52.48-26.43-52.48-58.87 0-32.44 23.23-58.87 52.48-58.87 29.49 0 52.955 26.68 52.48 58.87 0 32.44-23.22 58.87-52.48 58.87zm199.424 0c-28.73 0-52.48-26.43-52.48-58.87 0-32.44 23.24-58.87 52.48-58.87 29.48 0 52.95 26.68 52.48 58.87 0 32.44-23.22 58.87-52.48 58.87z"/></svg></a>
+    </div>
+    <a class="sale-line" href="{{ LINE_SUPPORT_URL }}" target="_blank" rel="noopener noreferrer"><div class="fw-bold mb-1" style="font-size:20px">ติดต่อพี่ริวได้ที่นี่</div><div class="fw-medium" style="font-size:14px;opacity:.9">LINE ID : @ryusosense</div></a>
+  </div></section>
+
+  <section class="sale-sec d-flex justify-content-center">
+    <div class="w-100" style="max-width:42rem"><div class="text-center mb-4"><h3 class="fw-semibold mb-1" style="font-size:20px;color:#374151">พูดคุยกับพี่ริวได้เลย</h3><p class="text-secondary mb-0" style="font-size:14px">สอบถามข้อมูลเพิ่มเติมผ่าน LINE OA</p></div>
+      <div class="rounded-4 overflow-hidden shadow border"><img class="sale-img" src="{% static img|add:'line_oa_chat_250822_080345.jpg' %}" alt="ตัวอย่างการแชท LINE OA กับพี่ริว" loading="lazy"></div></div>
+  </section>
+
+  <footer class="sale-foot"><h4 class="fw-bold" style="font-size:20px">เรียนภาษาญี่ปุ่นกับพี่ริว</h4><p class="mb-2" style="color:#d1d5db;font-size:14px">สนใจสามารถติดต่อสอบถามพี่ริวได้ที่</p>
+    <a href="{{ LINE_SUPPORT_URL }}" target="_blank" rel="noopener noreferrer" class="fw-bold text-decoration-none" style="color:#4ade80;font-size:14px">LINE OA @ryusosense</a>
+    <div class="pt-4" style="color:#6b7280;font-size:12px">© {% now "Y" %} ryusosense.com | All Rights Reserved</div></footer>
+</main>
+{% endwith %}
+{% endblock %}

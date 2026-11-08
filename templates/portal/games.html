@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}RyuGames Arcade — เกมฝึกภาษาญี่ปุ่น | RyuClass{% endblock %}
+{% block description %}ศูนย์รวมเกมส์เรียนภาษาญี่ปุ่นและทดสอบคันจิ เล่นฟรี มี Ranking Board แยกตามเกมและระดับ JLPT{% endblock %}
+{% block body_class %}games-page{% endblock %}
+{% block head %}<link rel="stylesheet" href="{% static 'css/games.css' %}">{% endblock %}
+{% block mobile_nav %}{% endblock %}
+{% block body %}
+<main id="games-root" data-games-url="{{ games_json }}" data-quiz-url="{{ quiz_json }}" data-member="{{ member_name }}"
+      data-logged-in="{{ user.is_authenticated|yesno:'1,0' }}" data-home="{% url 'portal:home' %}">
+
+  <!-- Player check-in -->
+  <section id="g-checkin" class="g-checkin g-bevel">
+    <header class="g-checkin-bar"><span class="fw-bold">🎮 RyuGames — Player Check-in</span><a href="{% url 'portal:home' %}" class="g-x">✕</a></header>
+    <div class="p-3 p-sm-4">
+      <div class="text-center mb-4"><div style="font-size:48px">🐕</div>
+        <h1 class="mt-2 mb-1" style="font-size:24px;font-weight:900;color:#172554">พร้อมเข้าสู่ RyuGames ไหม?</h1>
+        <p class="mb-0 text-secondary">เลือกวิธีเล่นก่อน คะแนนของคุณจะถูกแยกตามเกมและระดับ JLPT</p></div>
+      <div class="row g-3">
+        <div class="col-md-6"><section class="g-box amber h-100">
+          <h2>✍️ เล่นแบบกรอกชื่อ</h2><p class="t12">ไม่ต้องสมัคร ใช้ชื่อเล่นของคุณบน Ranking Board</p>
+          <input id="g-guest" class="form-control mt-3" maxlength="50" placeholder="เช่น ShibaN5" autocomplete="off">
+          <button id="g-guest-go" class="btn btn-warning fw-bold w-100 mt-2" disabled>เริ่มเล่นแบบแขก</button></section></div>
+        <div class="col-md-6"><section class="g-box blue h-100">
+          <h2>🔐 สมาชิก RyuClass</h2>
+          {% if user.is_authenticated %}
+            <p class="t12">คุณเข้าสู่ระบบแล้ว คะแนนจะแสดงในชื่อสมาชิกบน Ranking Board</p>
+            <button id="g-member-go" class="btn btn-primary fw-bold w-100 mt-4" style="background:#1e40af">เล่นในชื่อ {{ member_name }}</button>
+          {% else %}
+            <p class="t12">ล็อกอินด้วย Username/Password เพื่อใช้ชื่อสมาชิกใน Ranking Board</p>
+            <a href="{% url 'portal:home' %}?auth=login&next=/games/" class="btn btn-primary fw-bold w-100 mt-4" style="background:#1e40af">เข้าสู่ระบบ / สมัครสมาชิก</a>
+          {% endif %}</section></div>
+      </div>
+      <div class="bg-white border rounded p-3 mt-3"><p class="fw-bold mb-2">2. เลือกระดับก่อนเริ่ม</p>
+        <div id="g-levels" class="d-flex flex-wrap gap-2"></div>
+        <p class="t12 text-secondary mt-2 mb-0">เกมในระดับที่เลือกจะเรียงจากง่ายไปยาก และ Ranking Board จะนับคะแนนเฉพาะระดับนั้น</p></div>
+    </div>
+  </section>
+
+  <!-- Arcade -->
+  <div id="g-app" class="d-none g-app">
+    <div class="g-panel g-bevel g-head">
+      <div class="d-flex align-items-center gap-3">
+        <div class="g-dog">🐕</div>
+        <div><div class="d-flex align-items-center gap-2 flex-wrap"><h1 class="mb-0" style="font-size:20px;font-weight:700;color:#1e3a8a">Ryu Games Arcade Center</h1>
+            <span class="g-ver">v3.5 Enterprise</span></div>
+          <p class="mb-0 t12 text-secondary">ศูนย์รวมเกมส์เรียนภาษาญี่ปุ่นและทดสอบคันจิ (Playable Mini-Games)</p></div>
+      </div>
+      <div class="g-xp">
+        <div><div class="t12 fw-bold text-secondary">ผู้เล่น: <span id="g-name" style="color:#1e40af"></span></div><div class="t12 fw-bold" style="color:#d97706" id="g-lvl"></div></div>
+        <div class="g-xpbar"><div></div></div><div class="t12 fw-bold font-monospace" id="g-xp"></div>
+      </div>
+    </div>
+    <section id="g-rank" class="g-panel g-bevel d-none"></section>
+    <div id="g-tabs" class="g-tabs"></div>
+    <div id="g-stage"></div>
+    <div class="text-center mt-3"><a href="{% url 'portal:home' %}" class="g-back">⬅️ กลับสู่หน้าหลัก Desktop</a></div>
+  </div>
+</main>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'vendor/confetti/confetti.browser.js' %}"></script>
+<script type="importmap">{"imports":{"three":"{{ three_url }}"}}</script>
+<script src="{% static 'js/games/core.js' %}"></script>
+<script src="{% static 'js/games/restaurant.js' %}"></script>
+<script src="{% static 'js/games/memory.js' %}"></script>
+<script src="{% static 'js/games/boss.js' %}"></script>
+<script src="{% static 'js/games/survival.js' %}"></script>
+<script src="{% static 'js/games/sentence.js' %}"></script>
+<script type="module" src="{% static 'js/games/speedquiz.js' %}"></script>
+<script src="{% static 'js/games/boot.js' %}"></script>
+{% endblock %}

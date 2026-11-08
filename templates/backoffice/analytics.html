@@ -1,0 +1,11 @@
+{% extends "backoffice/base_admin.html" %}
+{% block title %}สถิติการเรียน{% endblock %}{% block heading %}สถิติการเรียนและ Engagement{% endblock %}
+{% block content %}
+<p class="small text-secondary">ตัวเลขทั้งหมดคำนวณจากข้อมูลจริงในฐานข้อมูล (ความคืบหน้า, บันทึกเวลาเรียน, ผลสอบ Quiz) ไม่ใช่ตัวเลขตัวอย่าง</p>
+<div class="row g-3 mb-3">{% for m in a.metrics %}
+  <div class="col-6 col-lg-4"><div class="adm-card stat"><div><div class="l">{{ m.label }}</div><div class="v">{{ m.value }}</div></div><div class="ic">{{ m.icon }}</div></div></div>{% endfor %}</div>
+<div class="adm-card"><div class="card-h"><span>อัตราการเรียนจบต่อคอร์ส</span><span class="small text-secondary">บทเรียนที่เปิดอยู่ทั้งหมด {{ a.lessons_total }} บท</span></div>
+  <div class="p-3 d-flex flex-column gap-3">
+  {% for c in a.per_course %}<div><div class="d-flex justify-content-between small mb-1"><span><b>{{ c.level }}</b> · {{ c.title }} <span class="text-secondary">({{ c.learners }} ผู้เรียน · {{ c.lessons }} บท)</span></span><b>{{ c.pct }}%</b></div><div class="progress-thin"><i style="width:{{ c.pct }}%"></i></div></div>
+  {% empty %}<div class="text-center text-secondary py-3">ยังไม่มีคอร์สที่เปิดอยู่</div>{% endfor %}</div></div>
+{% endblock %}

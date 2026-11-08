@@ -1,0 +1,68 @@
+{% load static ryu %}
+<section id="win-welcome" class="xp-window xp-win-main {% if user.is_authenticated %}hidden{% endif %}" aria-label="RyuClass Dashboard">
+  <div class="xp-titlebar">
+    <div class="title"><span>💻</span><span>RyuClass Japanese Academy — ห้องเรียนภาษาญี่ปุ่นออนไลน์</span></div>
+    <div class="d-flex align-items-center gap-1">
+      <button type="button" class="xp-btn-min" data-act="min-main">_</button>
+      <button type="button" class="xp-btn-close" data-act="close-main">✕</button>
+    </div>
+  </div>
+  <div class="xp-win-content">
+    <div class="xp-panel d-flex flex-column gap-3">
+      <!-- Hero -->
+      <div class="bevel-out hero-banner border">
+        <div class="d-flex flex-column gap-2">
+          <div class="hero-pill"><i></i><span>เรียนสดทุกสัปดาห์ผ่าน Zoom + ดูย้อนหลังได้ตลอดชีพ</span></div>
+          <h1 class="fw-black mb-0" style="font-size:clamp(1.5rem,3vw,1.875rem);font-weight:900;color:#111827;line-height:1.2">เรียนภาษาญี่ปุ่น <span style="color:#d97706">กับพี่ริว</span></h1>
+          <p class="t12 fw-medium mb-0" style="color:#374151;max-width:36rem;line-height:1.6">เริ่มจาก 0 จนถึง N1 ด้วยการสอนสด + คลิปย้อนหลังบนระบบ Teachable เข้าใจง่าย จำได้จริง ใช้ได้ทันที สนุกเหมือนดูอนิเมะ!</p>
+          <div class="row g-2 pt-2">
+            <div class="col-12 col-sm-4"><div class="hero-feature"><span style="font-size:16px">📹</span><div><b>เรียนสด + ย้อนหลัง</b><small>ดูซ้ำได้ตลอดชีพ</small></div></div></div>
+            <div class="col-12 col-sm-4"><a class="hero-feature line" href="{{ LINE_SUPPORT_URL }}" target="_blank" rel="noopener noreferrer"><span style="font-size:16px">💬</span><div><b>ถามตอบได้ตลอด</b><small>LINE Support พี่ริว ↗</small></div></a></div>
+            <div class="col-12 col-sm-4"><div class="hero-feature"><span style="font-size:16px">👍</span><div><b>เทคนิคจำง่าย</b><small>จำแม่น ใช้ได้จริง</small></div></div></div>
+          </div>
+        </div>
+        <div class="hero-card-side d-none d-lg-block">
+          <img src="{% static 'assets/ryu_logo.jpg' %}" alt="พี่ริว"><div class="fw-bold t12" style="color:#172554">Ryuso Sense</div><div class="t10 fw-bold" style="color:#b45309">JLPT N5 → N1</div>
+        </div>
+      </div>
+
+      <div class="pt-1">
+        <h2 class="fw-bold mb-0" style="font-size:16px;color:#1e3a8a">📚 หลักสูตรคอร์สเรียนภาษาญี่ปุ่น</h2>
+        <p class="t11 mb-0" style="color:#6b7280">เลือกระดับที่เหมาะกับคุณ เรียนตั้งแต่พื้นฐานจนถึงระดับมืออาชีพ</p>
+      </div>
+
+      <div class="row g-2 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-5">
+        {% for c in courses %}
+        <div class="col">
+          <div class="bevel-out course-card">
+            <div>
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="badge-jlpt">JLPT {{ c.level }}</span>
+                {% if user.is_authenticated %}{% if c.has_access %}<span class="pill-ok">🟢 มีสิทธิ์</span>{% else %}<span class="pill-no">🔒 ไม่มีสิทธิ์</span>{% endif %}{% endif %}
+              </div>
+              <div class="thumb bevel-in">
+                <img src="{% if c.thumbnail and c.thumbnail|slice:':1' == '/' %}{{ c.thumbnail }}{% else %}{% static 'assets/course/' %}{{ c.level }}.png{% endif %}"
+                     alt="{{ c.title }}" onerror="this.onerror=null;this.src='{% static 'assets/course/' %}{{ c.level }}.png'">
+              </div>
+              <h4 title="{{ c.title }}">{{ c.title }}</h4>
+              <p>{{ c.description }}</p>
+              {% if user.is_authenticated and c.has_access %}
+              <div class="mb-2">
+                <div class="d-flex justify-content-between t10" style="color:#4b5563"><span>ความคืบหน้าเรียน:</span><span>{{ c.progress_percent }}% ({{ c.completed_lessons }}/{{ c.total_lessons }})</span></div>
+                <div class="mini-progress"><div style="width:{{ c.progress_percent }}%"></div></div>
+              </div>{% endif %}
+            </div>
+            <div class="d-flex justify-content-between align-items-center border-top pt-2 mt-2" style="border-color:#d1d5db !important">
+              <span class="t12 fw-bold" style="color:#1e3a8a">฿{{ c.price|baht }}.-/ด</span>
+              <button type="button" class="xp-btn-green" data-course-url="{% url 'portal:course' c.id %}">{% if user.is_authenticated and c.has_access %}เข้าเรียน{% else %}ดูบทเรียน{% endif %}</button>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="col-12"><div class="xp-info text-center">ยังไม่มีข้อมูลคอร์ส กรุณาลองใหม่อีกครั้ง</div></div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="xp-statusbar"><span>สถานะฐานข้อมูล ปลอดภัยดี</span><span>🔒 เชื่อมต่อแบบ Ryu Security ปลอดภัย 100%</span></div>
+</section>

@@ -1,0 +1,23 @@
+{% extends "backoffice/base_admin.html" %}{% load ryu %}
+{% block title %}ยอดขาย{% endblock %}{% block heading %}รายงานยอดขายและรายได้{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <p class="small text-secondary mb-0">วิเคราะห์แนวโน้มยอดขายคอร์สเรียน สถิติการชำระเงิน และเป้าหมายรายได้สะสม (นับเฉพาะรายการที่อนุมัติแล้ว)</p>
+  <a class="btn btn-dark btn-sm" href="{% url 'backoffice:export_payments' %}">⬇️ Export Sales CSV</a>
+</div>
+<div class="row g-3 mb-3">
+  <div class="col-6 col-lg-3"><div class="adm-card stat"><div><div class="l">รายได้สะสมรวม</div><div class="v">฿{{ r.revenue|baht }}</div></div><div class="ic">💰</div></div></div>
+  <div class="col-6 col-lg-3"><div class="adm-card stat"><div><div class="l">จำนวนรายการที่อนุมัติ</div><div class="v">{{ r.count }}</div></div><div class="ic">🧾</div></div></div>
+  <div class="col-6 col-lg-3"><div class="adm-card stat"><div><div class="l">ยอดเฉลี่ยต่อรายการ</div><div class="v">฿{{ r.avg|baht }}</div></div><div class="ic">📐</div></div></div>
+  <div class="col-6 col-lg-3"><div class="adm-card stat"><div><div class="l">ยอดต่ออายุ ({{ r.renewal_n }} รายการ)</div><div class="v">฿{{ r.renewal|baht }}</div></div><div class="ic">🔁</div></div></div>
+</div>
+<div class="adm-card p-3 mb-3"><div class="d-flex justify-content-between small mb-2"><b>เป้าหมายรายได้ ฿{{ r.target|baht }}</b><span>{{ r.target_pct }}%</span></div><div class="progress-thin"><i style="width:{{ r.target_pct }}%"></i></div></div>
+<div class="row g-3">
+  <div class="col-lg-8"><div class="adm-card"><div class="card-h">รายได้รายเดือน (12 เดือนล่าสุด)</div><div class="p-3"><div class="bar-chart">
+    {% for b in r.series %}<div class="b"><span class="mb-1">{{ b.amount|baht }}</span><i style="height:{{ b.pct }}%"></i><span class="mt-1">{{ b.label }}</span></div>{% endfor %}</div></div></div></div>
+  <div class="col-lg-4"><div class="adm-card h-100"><div class="card-h">สัดส่วนตามแพ็กเกจ</div><ul class="list-group list-group-flush">
+    {% for p in r.packages %}<li class="list-group-item d-flex justify-content-between small"><span>{% if p.duration_days >= 999 %}ตลอดชีพ{% else %}{{ p.duration_days }} วัน{% endif %} <span class="text-secondary">· {{ p.n }} รายการ</span></span><b>฿{{ p.total|baht }}</b></li>{% empty %}<li class="list-group-item small text-secondary">ยังไม่มีข้อมูล</li>{% endfor %}</ul></div></div>
+  <div class="col-12"><div class="adm-card"><div class="card-h">คอร์สขายดี</div><div class="table-responsive"><table class="table adm-table"><thead><tr><th>คอร์ส</th><th class="text-end">รายการ</th><th class="text-end">รายได้</th></tr></thead><tbody>
+    {% for c in r.top_courses %}<tr><td>{{ c.course__title }}</td><td class="text-end">{{ c.n }}</td><td class="text-end fw-semibold">฿{{ c.total|baht }}</td></tr>{% empty %}<tr><td colspan="3" class="text-center text-secondary py-4">ยังไม่มีข้อมูล</td></tr>{% endfor %}</tbody></table></div></div></div>
+</div>
+{% endblock %}

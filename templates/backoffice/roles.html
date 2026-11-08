@@ -1,0 +1,16 @@
+{% extends "backoffice/base_admin.html" %}
+{% block title %}สิทธิ์การใช้งาน{% endblock %}{% block heading %}สิทธิ์การใช้งานฝั่งผู้ดูแล{% endblock %}
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-md-4"><div class="adm-card p-4"><span class="badge text-bg-dark mb-2">ADMIN</span><h6 class="mb-1">ผู้ดูแลระบบ</h6><p class="small text-secondary mb-2">เข้าหลังบ้านได้ ตรวจสลิป จัดการคอร์ส/บทเรียน นักเรียน และบรอดแคสต์อีเมล</p><div class="fw-bold">{{ o.counts.admins }} บัญชี</div></div></div>
+  <div class="col-md-4"><div class="adm-card p-4"><span class="badge text-bg-secondary mb-2">STUDENT</span><h6 class="mb-1">นักเรียน</h6><p class="small text-secondary mb-2">เรียนตามสิทธิ์ที่ได้รับ ทำแบบทดสอบ ใช้ชุมชน เกม และ AI</p><div class="fw-bold">{{ o.counts.students }} บัญชี</div></div></div>
+  <div class="col-md-4"><div class="adm-card p-4"><span class="badge text-bg-danger mb-2">SUSPENDED</span><h6 class="mb-1">บัญชีที่ถูกระงับ</h6><p class="small text-secondary mb-2">เข้าสู่ระบบไม่ได้ จนกว่าแอดมินจะเปิดใช้งานอีกครั้ง</p><div class="fw-bold">{{ o.counts.suspended }} บัญชี</div></div></div>
+</div>
+<div class="adm-card mb-3"><div class="card-h">ตารางสิทธิ์ (Permission Matrix)</div><div class="table-responsive"><table class="table adm-table"><thead><tr><th>ความสามารถ</th><th class="text-center">Student</th><th class="text-center">Admin</th></tr></thead><tbody>
+  {% for label, student, admin in matrix %}<tr><td>{{ label }}</td><td class="text-center">{% if student %}✅{% else %}—{% endif %}</td><td class="text-center">{% if admin %}✅{% else %}—{% endif %}</td></tr>{% endfor %}</tbody></table></div></div>
+<div class="adm-card"><div class="card-h"><span>รายชื่อผู้ดูแลระบบ</span><a class="small" href="{% url 'backoffice:users' %}?role=admin">จัดการในหน้านักเรียน →</a></div><div class="table-responsive"><table class="table adm-table"><thead><tr><th>#</th><th>ผู้ดูแล</th><th>ประเภท</th><th>สถานะ</th><th>สร้างเมื่อ</th></tr></thead><tbody>
+  {% for u in o.admins %}<tr><td>{{ u.id }}</td><td>{{ u.name|default:"-" }}<div class="small text-secondary">{{ u.email }}</div></td><td>{% if u.is_superuser %}<span class="badge text-bg-dark">Super Admin</span>{% else %}<span class="badge text-bg-secondary">Admin</span>{% endif %}</td>
+    <td>{% if u.is_active %}<span class="st-pill st-approved">active</span>{% else %}<span class="st-pill st-rejected">suspended</span>{% endif %}</td><td class="small">{{ u.created_at|date:"d/m/Y" }}</td></tr>
+  {% empty %}<tr><td colspan="5" class="text-center text-secondary py-4">ยังไม่มีผู้ดูแล</td></tr>{% endfor %}</tbody></table></div></div>
+<p class="small text-secondary mt-3">ระบบมี 2 บทบาท (student / admin) ตามฐานข้อมูลเดิม ถ้าต้องการแยกสิทธิ์ละเอียดกว่านี้ (เช่น เจ้าหน้าที่ตรวจสลิปอย่างเดียว) ต้องเพิ่มฟิลด์บทบาทใหม่ในโมเดลผู้ใช้ก่อน</p>
+{% endblock %}

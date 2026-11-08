@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}RyuCommunity ชุมชนถาม-ตอบภาษาญี่ปุ่น | RyuClass ริวคลาส{% endblock %}
+{% block description %}ถามคำถามไวยากรณ์ แชร์เทคนิคการสอบ JLPT หรือแบ่งปันประสบการณ์ในญี่ปุ่นกับเพื่อนนักเรียน RyuClass{% endblock %}
+{% block body_class %}xp-desktop community-page{% endblock %}
+{% block body %}
+{% include "partials/topbar.html" %}
+<main class="container py-3" style="max-width:72rem">
+  <div class="xp-window shadow-lg">
+    <div class="xp-titlebar" style="cursor:default">
+      <div class="title"><span>💬</span><span>RyuCommunity — ชุมชนถาม-ตอบ และแชร์ประสบการณ์เรียนภาษาญี่ปุ่น</span></div>
+      <a href="{% url 'portal:home' %}" class="xp-btn-close text-decoration-none">✕</a>
+    </div>
+    <div class="p-3 xp-body t12 d-flex flex-column gap-3" id="forum" data-logged-in="{{ user.is_authenticated|yesno:'1,0' }}">
+      <div class="bg-white border rounded p-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0" style="width:48px;height:48px;background:#0053e1;font-size:24px">💬</div>
+          <div><h1 class="mb-0 fw-bold" style="font-size:16px;color:#00227a;font-weight:800">RyuCommunity Forum (ชุมชนออนไลน์เด็กสายภาษา) 🇯🇵</h1>
+            <p class="mb-0 t11 fw-medium" style="color:#4b5563">ถามคำถามไวยากรณ์ แชร์เทคนิคการสอบ JLPT หรือแบ่งปันประสบการณ์ในญี่ปุ่น (คัดกรองความสุภาพโดย RyusoAI)</p></div>
+        </div>
+        <button type="button" class="xp-btn-green fw-bold px-3 py-2" id="btn-new-post">✍️ ตั้งกระทู้ใหม่</button>
+      </div>
+
+      <div class="bg-white border rounded p-2 d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <div class="d-flex gap-1 overflow-auto scrollbar-none py-1" id="cat-tabs">
+          {% for id, label in tabs %}<button type="button" class="cat-tab {% if forloop.first %}active{% endif %}" data-cat="{{ id }}">{{ label }}</button>{% endfor %}
+        </div>
+        <form id="search-form" class="d-flex gap-1">
+          <input class="form-control form-control-sm" id="search-q" placeholder="ค้นหากระทู้..." maxlength="100" style="width:11rem">
+          <button class="xp-btn-gray px-2" type="submit">🔍 ค้นหา</button>
+        </form>
+      </div>
+
+      <div id="post-list" class="d-flex flex-column gap-3" aria-live="polite"></div>
+    </div>
+  </div>
+</main>
+
+<!-- Create post (Bootstrap modal, XP skin) -->
+<div class="modal fade xp-modal" id="postModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width:42rem">
+    <div class="modal-content">
+      <div class="modal-header"><div class="xp-titlebar w-100"><div class="title"><span>✍️</span><span>ตั้งกระทู้ใหม่ (RyuCommunity Forum)</span></div>
+        <button type="button" class="xp-btn-close" data-bs-dismiss="modal" aria-label="ปิด">✕</button></div></div>
+      <div class="modal-body p-3 xp-form">
+        <div id="post-msg" class="d-none mb-2"></div>
+        <form id="post-form" class="d-flex flex-column gap-2" enctype="multipart/form-data">
+          <div class="bg-white border rounded p-2"><label>หมวดหมู่กระทู้</label>
+            <select class="form-select" name="category"><option value="GENERAL">🎌 พูดคุยทั่วไป</option><option value="QNA">❓ สอบถามภาษาญี่ปุ่น</option><option value="TECHNIQUE">💡 แชร์เทคนิคการเรียน</option><option value="JAPAN_EXP">✈️ ประสบการณ์ญี่ปุ่น</option></select></div>
+          <div class="bg-white border rounded p-2"><label>หัวข้อกระทู้ *</label>
+            <input class="form-control" name="title" maxlength="150" required placeholder="เช่น เทคนิคจำคันจิ N5 ให้อยู่หมัด หรือ สอบถามไวยากรณ์ は กับ が..."></div>
+          <div class="bg-white border rounded p-2"><div class="d-flex justify-content-between"><label>รายละเอียดกระทู้ *</label><span class="t10 text-secondary">คลิกอิโมจิเพื่อเพิ่มในเนื้อหา</span></div>
+            <div class="d-flex flex-wrap gap-1 p-1 border rounded mb-1" style="background:#f9fafb">{% for e in emojis %}<button type="button" class="emoji-btn" data-emoji="{{ e }}">{{ e }}</button>{% endfor %}</div>
+            <textarea class="form-control" name="content" rows="4" required placeholder="เขียนรายละเอียด อธิบายคำถาม หรือประสบการณ์ของคุณที่นี่..."></textarea></div>
+          <div class="bg-white border rounded p-2"><div class="d-flex justify-content-between"><label>แนบรูปภาพ (2 ถึง 5 ภาพ)</label><span class="t10 fw-bold" style="color:#1d4ed8">แนบได้ 2-5 รูป (ยังไม่รองรับวิดีโอ)</span></div>
+            <input class="form-control form-control-sm" type="file" name="images" id="post-images" accept="image/*" multiple>
+            <div id="post-previews" class="d-flex flex-wrap gap-2 mt-2"></div></div>
+          <div class="xp-info t11">🛡️ <b>ระบบคัดกรองเนื้อหาอัตโนมัติ (RyusoAI Safety Guard):</b> โพสต์จะถูกตรวจความสุภาพ หากพบคำไม่เหมาะสม AI จะช่วยปรับแต่งให้สุภาพ หรือปฏิเสธหากมีเนื้อหารุนแรง</div>
+          <div class="d-flex justify-content-end gap-2"><button type="button" class="xp-btn-gray px-3 py-1" data-bs-dismiss="modal">ยกเลิก</button>
+            <button type="submit" class="xp-btn-green px-4 py-1" id="post-submit">🚀 โพสต์กระทู้</button></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/community.js' %}"></script>{% endblock %}

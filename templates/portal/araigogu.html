@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Araigogu AI — ระบบเรียนภาษาอัจฉริยะ | RyuClass{% endblock %}
+{% block body_class %}xp-desktop{% endblock %}
+{% block body %}
+<main class="container-fluid d-flex justify-content-center p-2 p-sm-3" style="min-height:100vh">
+  <div class="xp-window w-100 shadow-lg d-flex flex-column" style="max-width:72rem;min-height:85vh">
+    <div class="xp-titlebar" style="cursor:default">
+      <div class="title"><span>🤖</span><span>Araigogu AI — ระบบเรียนภาษาอัจฉริยะ</span></div>
+      <div class="d-flex align-items-center gap-1">
+        <button type="button" class="ara-toggle" id="ara-toggle-side" title="สลับประวัติสนทนา">📖 ซ่อนประวัติ</button>
+        <a href="{% url 'portal:home' %}" class="xp-btn-close text-decoration-none">✕</a>
+      </div>
+    </div>
+    <div class="flex-grow-1 xp-body-gray p-2 p-sm-3 d-flex flex-column gap-2 t12" style="min-height:0" id="ara-app">
+      <div class="bg-white border rounded p-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0" style="width:40px;height:40px;background:linear-gradient(135deg,#2563eb,#3730a3);font-size:20px">🤖</div>
+          <div><h1 class="mb-0 fw-bold" style="font-size:15px;color:#00227a;font-weight:800">Araigogu AI Engine</h1>
+            <p class="mb-0 t11" style="color:#4b5563">ระบบผู้ช่วยสอนภาษา ค้นคว้าไวยากรณ์ ตรวจทานข้อความ และจำลองสอบสัมภาษณ์</p></div>
+        </div>
+        <div class="d-flex flex-wrap gap-2" id="ara-langs">
+          <button type="button" class="ara-lang active" data-lang="JA" data-color="blue">🇯🇵 日本語 (ญี่ปุ่น)</button>
+          <button type="button" class="ara-lang" data-lang="ZH" data-color="red">🇨🇳 中文 (จีน)</button>
+          <button type="button" class="ara-lang" data-lang="TH" data-color="green">🇹🇭 ภาษาไทย</button>
+        </div>
+      </div>
+
+      <div class="d-flex gap-1 p-1 rounded-top overflow-auto scrollbar-none" style="background:rgba(229,231,235,.8);border-bottom:1px solid #d1d5db" id="ara-modes">
+        <button type="button" class="ara-mode active" data-mode="chat">💬 สนทนาเรียนภาษา (Tutor Mode)</button>
+        <button type="button" class="ara-mode" data-mode="checker">📝 ตรวจทานไวยากรณ์ (Grammar Checker)</button>
+        <button type="button" class="ara-mode" data-mode="interview">🎙️ จำลองสอบสัมภาษณ์ (Interview Practice)</button>
+      </div>
+
+      <div class="flex-grow-1 d-flex flex-column flex-sm-row gap-2" style="min-height:450px">
+        <aside class="bg-white border rounded d-flex flex-column flex-shrink-0 ara-side" id="ara-side" style="overflow:hidden">
+          <div class="d-flex justify-content-between align-items-center p-2 border-bottom fw-bold" style="background:#f0f0e8;color:#1e3a8a"><span>📜 ประวัติสนทนา</span>
+            <button type="button" class="xp-btn-green px-2 py-0 t10" id="ara-new">➕ สนทนาใหม่</button></div>
+          <div class="flex-grow-1 p-1 d-flex flex-column gap-1" style="overflow-y:auto" id="ara-history"></div>
+        </aside>
+        <section class="flex-grow-1 bg-white border rounded d-flex flex-column" style="overflow:hidden;min-width:0">
+          <div class="flex-grow-1 p-3 d-flex flex-column gap-2 ara-log" id="ara-log" aria-live="polite"></div>
+          <div class="p-2 border-top" style="background:#f0f0e8">
+            <form id="ara-form" class="d-flex gap-2">
+              <textarea class="form-control ara-input" id="ara-input" rows="2" maxlength="2000" required></textarea>
+              <button type="submit" class="xp-btn-green px-4 fw-bold align-self-stretch" id="ara-send">ส่งข้อความ 💬</button>
+            </form>
+            <div class="d-flex justify-content-between t10 pt-1 px-1" style="color:#6b7280"><span id="ara-hint"></span><span>บันทึกประวัติการสนทนาอัตโนมัติในฐานข้อมูล</span></div>
+          </div>
+        </section>
+      </div>
+
+      <div class="pt-2 border-top"><a href="{% url 'portal:home' %}" class="xp-btn-gray py-1 px-3 text-decoration-none">⬅️ กลับสู่หน้าหลัก Desktop</a></div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+{% block mobile_nav %}{% endblock %}
+{% block scripts %}<script src="{% static 'js/araigogu.js' %}"></script>{% endblock %}

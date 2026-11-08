@@ -1,0 +1,52 @@
+{% extends "backoffice/base_admin.html" %}{% load static ryu %}
+{% block title %}นักเรียน{% endblock %}{% block heading %}จัดการนักเรียนและสิทธิ์{% endblock %}
+{% block content %}
+<div class="d-flex gap-2 mb-3 flex-wrap align-items-center">
+  <form class="d-flex gap-2 flex-wrap" method="get"><input class="form-control form-control-sm" style="max-width:320px" name="q" value="{{ q }}" placeholder="ค้นหา ชื่อ/อีเมล/เบอร์/ชื่อเล่น">
+    <select class="form-select form-select-sm" style="max-width:160px" name="role"><option value="">ทุกบทบาท</option><option value="student" {% if role == 'student' %}selected{% endif %}>Student</option><option value="admin" {% if role == 'admin' %}selected{% endif %}>Admin</option></select><select class="form-select form-select-sm" style="width:auto" name="per_page" onchange="this.form.submit()">{% for n in sizes %}<option value="{{ n }}" {% if n == per_page %}selected{% endif %}>{{ n }} รายการต่อหน้า</option>{% endfor %}</select><button class="btn btn-sm btn-dark">ค้นหา</button></form>
+  <div class="ms-auto d-flex gap-2"><button class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#importModal">📥 นำเข้า CSV</button>
+    <button class="btn btn-sm btn-dark" data-bs-toggle="modal" data-bs-target="#createModal">➕ เพิ่มนักเรียน</button></div>
+</div>
+<div class="adm-card"><div class="table-responsive"><table class="table adm-table"><thead><tr><th>#</th><th>ผู้ใช้</th><th>บทบาท</th><th class="text-end">ยอดสะสม</th><th>คอร์ส</th><th>สถานะ</th><th>สมัคร</th><th></th></tr></thead><tbody>
+{% for u in page %}<tr><td>{{ u.id }}</td><td>{{ u.name|default:"-" }}<div class="small text-secondary">{{ u.email }} · {{ u.phone|default:"-" }}</div></td>
+<td><span class="badge text-bg-{% if u.role == 'admin' %}dark{% else %}secondary{% endif %}">{{ u.role }}</span></td><td class="text-end">฿{{ u.total_spent|baht }}</td><td>{{ u.active_courses }}</td>
+<td>{% if u.is_active %}<span class="st-pill st-approved">active</span>{% else %}<span class="st-pill st-rejected">suspended</span>{% endif %}</td><td class="small">{{ u.created_at|date:"d/m/Y" }}</td>
+<td><button class="btn btn-sm btn-outline-dark" data-edit-user="{{ u.id }}">แก้ไข / สิทธิ์</button></td></tr>
+{% empty %}<tr><td colspan="8" class="text-center text-secondary py-5">ไม่พบผู้ใช้</td></tr>{% endfor %}
+</tbody></table></div></div>
+{% include "backoffice/_pager.html" %}
+
+<!-- create student -->
+<div class="modal fade" id="createModal" tabindex="-1"><div class="modal-dialog modal-lg"><form class="modal-content" data-ajax-url="{% url 'backoffice:create_user' %}" data-created="1">
+  <div class="modal-header"><h6 class="modal-title">เพิ่มนักเรียนใหม่</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body"><div class="row g-2">
+    <div class="col-md-6"><label class="form-label small fw-semibold">อีเมล *</label><input class="form-control form-control-sm" type="email" name="email" required></div>
+    <div class="col-md-6"><label class="form-label small fw-semibold">รหัสผ่าน (ว่าง = สุ่มให้)</label><input class="form-control form-control-sm" name="password" autocomplete="off"></div>
+    <div class="col-md-6"><label class="form-label small fw-semibold">ชื่อ-นามสกุล</label><input class="form-control form-control-sm" name="name"></div>
+    <div class="col-md-3"><label class="form-label small fw-semibold">ชื่อเล่น</label><input class="form-control form-control-sm" name="nickname"></div>
+    <div class="col-md-3"><label class="form-label small fw-semibold">เบอร์โทร</label><input class="form-control form-control-sm" name="phone"></div>
+    <div class="col-md-4"><label class="form-label small fw-semibold">ยอดสะสม (บาท)</label><input class="form-control form-control-sm" name="total_spent" value="0"></div>
+    <div class="col-md-4"><label class="form-label small fw-semibold">คะแนนสะสม</label><input class="form-control form-control-sm" name="points" value="0"></div>
+    <div class="col-md-4"><label class="form-label small fw-semibold">ราคาต่ออายุเฉพาะบุคคล</label><input class="form-control form-control-sm" name="custom_renewal_price"></div>
+    <div class="col-md-6"><label class="form-label small fw-semibold">เปิดคอร์สให้ทันที (ไม่บังคับ)</label><select class="form-select form-select-sm" name="course_id"><option value="">— ไม่เปิดคอร์ส —</option>{% for c in courses %}<option value="{{ c.id }}">{{ c.level }} · {{ c.title }}</option>{% endfor %}</select></div>
+    <div class="col-md-3"><label class="form-label small fw-semibold">ระยะเวลา (วัน, 999 = ตลอดชีพ)</label><input class="form-control form-control-sm" name="duration_days" value="30"></div>
+    <div class="col-md-3"><label class="form-label small fw-semibold">หรือวันหมดอายุ</label><input class="form-control form-control-sm" type="date" name="expires_at"></div>
+    <div class="col-12"><label class="form-label small fw-semibold">บันทึกจากแอดมิน</label><textarea class="form-control form-control-sm" name="admin_remark" rows="2"></textarea></div>
+  </div></div><div class="modal-footer"><button class="btn btn-dark btn-sm">สร้างบัญชี</button></div></form></div></div>
+
+<!-- import CSV -->
+<div class="modal fade" id="importModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content">
+  <div class="modal-header"><h6 class="modal-title">นำเข้านักเรียนจากไฟล์ CSV</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body d-flex flex-column gap-2">
+    <div class="alert alert-info small mb-0">แถวแรกต้องเป็นหัวคอลัมน์: <code>email,name,phone,nickname,password,total_spent,points,custom_renewal_price,admin_remark,lifetime_levels</code> (มีแค่ <code>email</code> ก็ได้) · อีเมลที่มีอยู่แล้วจะถูกอัปเดต · <code>lifetime_levels</code> เช่น <code>N5,N4</code> · สูงสุด 5,000 แถว ประมวลผลเบื้องหลัง</div>
+    <input type="file" class="form-control form-control-sm" id="csv-file" accept=".csv,text/csv">
+    <div class="small text-secondary" id="csv-info"></div><pre class="small bg-light border rounded p-2 mb-0 d-none" id="csv-result" style="max-height:200px;overflow:auto"></pre>
+  </div><div class="modal-footer"><button class="btn btn-dark btn-sm" id="csv-go" disabled>นำเข้า</button></div></div></div></div>
+
+<!-- edit student -->
+<div class="modal fade" id="editModal" tabindex="-1"><div class="modal-dialog modal-xl modal-dialog-scrollable"><form class="modal-content" id="edit-form">
+  <div class="modal-header"><h6 class="modal-title" id="edit-title">แก้ไขนักเรียน</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+  <div class="modal-body" id="edit-body"><div class="text-center text-secondary py-5">กำลังโหลด…</div></div>
+  <div class="modal-footer"><button class="btn btn-dark btn-sm" id="edit-save" disabled>บันทึก</button></div></form></div></div>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/admin_users.js' %}"></script>{% endblock %}

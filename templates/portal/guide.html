@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}คู่มือการเรียน | RyuClass ริวคลาส{% endblock %}
+{% block body %}
+<main class="xp-desktop d-flex align-items-center justify-content-center p-3" style="min-height:100vh">
+  <div class="xp-window w-100 shadow-lg" style="max-width:48rem">
+    <div class="xp-titlebar" style="cursor:default">
+      <div class="title"><span>📖</span><span>RyuClass Manual — คู่มือการใช้งานและเข้าเรียนภาษาญี่ปุ่น</span></div>
+      <a href="{% url 'portal:home' %}" class="xp-btn-close text-decoration-none">✕</a>
+    </div>
+    <div class="p-4 xp-body t12 d-flex flex-column gap-3" style="max-height:85vh;overflow-y:auto">
+      <div class="d-flex align-items-center gap-3 border-bottom pb-3">
+        <div class="rounded-circle d-flex align-items-center justify-content-center text-white flex-shrink-0" style="width:64px;height:64px;background:#1d4ed8;font-size:30px">📘</div>
+        <div><h1 class="fw-bold mb-1" style="font-size:20px;color:#00227a;font-weight:800">คู่มือขั้นตอนการสมัครและการเข้าเรียน (Student Guide)</h1>
+          <p class="t12 fw-semibold mb-0" style="color:#4b5563">คำแนะนำทีละขั้นตอนสำหรับนักเรียนใหม่และนักเรียนเดิมในระบบ RyuClass</p></div>
+      </div>
+      {% for n, title, body in steps %}
+      <div class="bg-white border rounded p-3">
+        <div class="fw-bold d-flex align-items-center gap-2" style="font-size:14px;color:#1e3a8a;font-weight:800">
+          <span class="rounded-circle d-inline-flex align-items-center justify-content-center text-white t12" style="width:20px;height:20px;background:#1e40af">{{ n }}</span><span>{{ title }}</span></div>
+        <p class="mb-0 ps-4 mt-1" style="color:#4b5563;line-height:1.6">{{ body|safe }}</p>
+      </div>
+      {% endfor %}
+      <div class="pt-3 d-flex justify-content-between align-items-center border-top">
+        <a href="{% url 'portal:home' %}" class="xp-btn-gray py-2">⬅️ กลับสู่หน้าหลัก Desktop</a>
+        <a href="{{ LINE_SUPPORT_URL }}" target="_blank" rel="noopener" class="xp-btn-green px-4 py-2">เข้ากลุ่ม LINE ชุมชนผู้เรียน →</a>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
