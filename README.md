@@ -52,8 +52,17 @@ Query: catalogue = 3 queries ไม่ว่ามีกี่คอร์ส (a
 รัน `celery -A config worker -l info` **และ** `celery -A config beat -l info` — beat ส่งอีเมลเตือนต่ออายุทุกวัน 09:00 (เหลือ 3/2/1 วัน, กันส่งซ้ำรายวัน; ควรตั้ง CACHES เป็น Redis ให้ทุก worker ใช้ร่วมกัน)
 สั่งมือ: `python manage.py send_renewal_reminders [--days 3 2 1] [--include-expired] [--dry-run]`
 
+## ย้ายระบบเดิม (ฐานข้อมูลและไฟล์เดิม ไม่สร้างใหม่)
+1. **หยุดเขียนข้อมูลที่เว็บเก่า** (หน้า maintenance) แล้ว dump ฐานข้อมูลที่ *ใช้งานจริงตอนนี้*: `mysqldump --single-transaction --default-character-set=utf8mb4 -u USER -p DB > live.sql`
+2. สำรองไฟล์ที่ผู้ใช้อัปโหลด (สลิป / PDF / รูปชุมชน) แล้ว `rsync` ไปที่ `storage/slips`, `storage/protected_pdfs`, `storage/community` (หรือชี้ `SLIPS_STORAGE_DIR` / `PDF_STORAGE_DIR` / `COMMUNITY_STORAGE_DIR` ใน `.env` ไปโฟลเดอร์เดิมถ้าอยู่เครื่องเดียวกัน)
+3. `mysql -u USER -p DB < live.sql` แล้วดูว่าฐานข้อมูลมี `django_migrations` ไหม
+   - **มี** (Django เก่าดูแลอยู่): `python manage.py migrate` ได้เลย
+   - **ไม่มี** (ฐานข้อมูลยุค PHP): `python manage.py adopt_legacy_db` (ดูแผน) → `python manage.py adopt_legacy_db --apply` → `python manage.py migrate`
+     คำสั่งนี้ *เพิ่มอย่างเดียว* (ตาราง/คอลัมน์ที่ขาด, level/ราคาแพ็กเกจเริ่มต้น, is_staff ของแอดมิน, บันทึก migration ว่าทำแล้ว) ไม่ลบ/แก้ข้อมูลเดิม; `--import-legacy-extras` คัดลอก `student_notes`/`game_history` เก่า
+4. ตรวจ: ล็อกอินด้วยบัญชีเก่า (รหัสผ่านแบบ PHP bcrypt ใช้ได้และอัปเกรดตอนล็อกอิน), เปิดสลิปเก่าในหน้าแอดมิน, เปิดคอร์ส/PDF, ตรวจราคาแพ็กเกจในหน้า "จัดการคอร์สและราคา"
+
 ## ทดสอบ
-`DB_ENGINE=sqlite python manage.py test` (68 เทสต์: สิทธิ์, XSS, ราคา, N+1 ด้วย assertNumQueries, moderation mock, ownership ของ Araigogu,
+`DB_ENGINE=sqlite python manage.py test` (73 เทสต์: สิทธิ์, XSS, ราคา, N+1 ด้วย assertNumQueries, moderation mock, ownership ของ Araigogu,
 กันคะแนนเกมปลอม, CSV import/export, upload PDF) · `python manage.py seed_demo` สร้าง admin@test.local / student@test.local (รหัส demo12345, เฉพาะ DEBUG)
 Python 3.14 + Django 5.0: เทสต์ที่ render template ใช้ shim `core/testing.py` (ไม่กระทบ production)
 
