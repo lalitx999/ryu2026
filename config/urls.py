@@ -1,9 +1,18 @@
-from django.urls import include, path
+from django.http import HttpResponseRedirect
+from django.urls import include, path, re_path
 
 from community import views as community_views
 from courses import game_views, pdf_views
 from django.views.generic import RedirectView
 from support import araigogu_views
+
+def legacy_admin(request, rest=None):
+    """The old Next.js site kept its admin at /admin/login, /admin/payments, ... - keep those bookmarks working."""
+    rest = (rest or "").strip("/")
+    target = f"/admin-panel/{rest}/" if rest else "/admin-panel/"
+    query = request.META.get("QUERY_STRING")
+    return HttpResponseRedirect(f"{target}?{query}" if query else target)
+
 
 urlpatterns = [
     path("api/auth/", include("users.urls")),
@@ -22,5 +31,6 @@ urlpatterns = [
     path("storage/community/<str:filename>", community_views.community_image, name="community_image"),
     path("community/", include("community.page_urls")),
     path("admin-panel/", include("backoffice.urls")),
+    re_path(r"^admin(?:/(?P<rest>.*))?$", legacy_admin),   # legacy URLs -> /admin-panel/...
     path("", include("portal.urls")),
 ]
