@@ -59,6 +59,9 @@ Query: catalogue = 3 queries ไม่ว่ามีกี่คอร์ส (a
    - **มี** (Django เก่าดูแลอยู่): `python manage.py migrate` ได้เลย
    - **ไม่มี** (ฐานข้อมูลยุค PHP): `python manage.py adopt_legacy_db` (ดูแผน) → `python manage.py adopt_legacy_db --apply` → `python manage.py migrate`
      คำสั่งนี้ *เพิ่มอย่างเดียว* (ตาราง/คอลัมน์ที่ขาด, level/ราคาแพ็กเกจเริ่มต้น, is_staff ของแอดมิน, บันทึก migration ว่าทำแล้ว) ไม่ลบ/แก้ข้อมูลเดิม; `--import-legacy-extras` คัดลอก `student_notes`/`game_history` เก่า
+   - dump จาก MariaDB 11 → MySQL 8.4: แทนที่ collation `utf8mb4_uca1400_ai_ci` ด้วย `utf8mb4_unicode_ci` ในไฟล์ dump ก่อน import
+   - ฐานข้อมูลที่ django_migrations ไม่ตรงกับ repo: เพิ่มแถว migration ที่ขาด + `migrate courses 0009 --fake` + `migrate --fake-initial`
+   - **โหลดตารางเขตเวลาเข้า MySQL ครั้งเดียว** (ไม่งั้นหน้าสรุปยอดตามวัน เช่น `/admin-panel/sales/` ขึ้น 500 "invalid datetime value"): `mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql`
 4. ตรวจ: ล็อกอินด้วยบัญชีเก่า (รหัสผ่านแบบ PHP bcrypt ใช้ได้และอัปเกรดตอนล็อกอิน), เปิดสลิปเก่าในหน้าแอดมิน, เปิดคอร์ส/PDF, ตรวจราคาแพ็กเกจในหน้า "จัดการคอร์สและราคา"
 
 ## ทดสอบ

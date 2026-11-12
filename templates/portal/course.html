@@ -5,7 +5,7 @@
 {% block head %}<link rel="stylesheet" href="{% static 'css/course.css' %}">{% endblock %}
 {% block body %}
 <main class="xp-desktop d-flex flex-column align-items-center p-2 p-sm-3 pb-4" style="min-height:100vh">
-  <div class="xp-window w-100 my-2 shadow-lg" style="max-width:64rem">
+  <div class="xp-window w-100 my-2 shadow-lg" style="max-width:90rem">
     <div class="xp-titlebar" style="cursor:default">
       <div class="title"><span>📚</span><span>วิชาเรียน: {{ outline.course_title }}</span></div>
       <a href="{% url 'portal:home' %}" class="xp-btn-close text-decoration-none" title="กลับหน้าหลัก">✕</a>
@@ -40,7 +40,7 @@
 
       <div class="row g-3">
         <!-- curriculum -->
-        <div class="col-lg-4 order-2 order-lg-1 d-none d-lg-block" id="curr">
+        <div class="col-lg-4 col-xl-3 order-2 order-lg-1 d-none d-lg-block" id="curr">
           <div class="cp-curr">
             <h3 class="cp-curr-h"><span>📚 สารบัญบทเรียนทั้งหมด</span><span class="cp-count"><span class="done-n">0</span>/<span class="all-n">0</span> เสร็จแล้ว</span></h3>
             {% for m in outline.modules %}
@@ -60,7 +60,7 @@
         </div>
 
         <!-- player column -->
-        <div class="col-lg-8 order-1 order-lg-2">
+        <div class="col-lg-8 col-xl-9 order-1 order-lg-2">
           <div id="player-empty" class="bevel-in p-5 text-center t12" style="background:#f9fafb;color:#6b7280">👈 กรุณาเลือกบทเรียนจากด้านซ้ายมือเพื่อเริ่มต้นเข้าเรียนวิดีโอค่ะ</div>
 
           <div id="player" class="cp-panel d-none">

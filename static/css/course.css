@@ -19,6 +19,7 @@
 @media (min-width:576px){ .cp-panel { padding:16px; } }
 @media (min-width:992px){ .cp-panel { max-height:85vh; overflow-y:auto; } }
 .cp-panel.d-none { display:none !important; }
+.cp-panel > * { flex-shrink:0; }   /* the panel is a height-capped flex column: never squash the 16:9 video / controls, scroll instead */
 .cp-head { display:flex; flex-direction:column; gap:8px; border-bottom:1px solid #e5e7eb; padding-bottom:8px; }
 @media (min-width:576px){ .cp-head { flex-direction:row; justify-content:space-between; align-items:center; } }
 .cp-lesson-title { font-size:14px; font-weight:bold; color:#111827; margin:0; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
