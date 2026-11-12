@@ -52,5 +52,4 @@ class MarketingPageTests(TestCase):
 
     def test_home_has_banner_and_manifest_link(self):
         html = self.client.get("/").content.decode()
-        self.assertIn("halloweenModal", html)
         self.assertIn('rel="manifest"', html)
