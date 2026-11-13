@@ -64,7 +64,9 @@ def course_page(request, course_id):
     outline = course_selector.course_outline(course_id, request.user)
     # the sign-in / payment dialogs on this page read the same #ryu-boot payload as the desktop
     boot = {"loggedIn": request.user.is_authenticated, "profile": None, "courses": course_selector.catalog(request.user if request.user.is_authenticated else None)}
-    return render(request, "portal/course.html", {"outline": outline, "course_id": course_id, "boot": boot})
+    mine = next((c for c in boot["courses"] if c["id"] == course_id), None)
+    access = mine if mine and (mine["access_lifetime"] or mine["access_until"]) else None   # expiry shown in the banner
+    return render(request, "portal/course.html", {"outline": outline, "course_id": course_id, "boot": boot, "access": access})
 
 
 # ───────────────────────────── sale page / SEO / PWA ─────────────────────────────

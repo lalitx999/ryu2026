@@ -3,6 +3,7 @@ import os
 from urllib.parse import quote
 
 from django.db.models import Count, Q
+from django.utils import timezone
 
 from courses.models import Course, Enrollment, Lesson, Module, Progress
 from courses.pricing import package_prices
@@ -17,7 +18,7 @@ def catalog(user=None):
         .annotate(total_lessons=Count("lessons", filter=Q(lessons__is_active=True), distinct=True))
         .only("id", "level", "title", "description", "price", "price_180", "price_365", "price_lifetime", "thumbnail")
     )
-    done, enrollments, rank = {}, {}, 0
+    done, enrollments, rank, active, today = {}, {}, 0, [], timezone.localdate()
     if user is not None and user.is_authenticated:
         done = dict(
             Progress.objects.filter(user=user, is_completed=True, lesson__course__in=courses)
@@ -32,6 +33,7 @@ def catalog(user=None):
     for c in courses:
         completed = done.get(c.id, 0)
         enrollment = enrollments.get(c.id)
+        window = AccessService.access_window(active, c.level, today) if active else None
         result.append({
             "id": c.id, "level": c.level, "title": c.title, "description": c.description or "",
             "price": str(c.price), "packages": package_prices(c), "thumbnail": c.thumbnail or "",
@@ -39,6 +41,9 @@ def catalog(user=None):
             "has_access": rank >= AccessService.LEVEL_RANK.get(c.level, 99) > 0,
             "is_lifetime": bool(enrollment and enrollment.is_lifetime_video),
             "expires_at": enrollment.video_expires_at if enrollment else None,
+            # what the student actually has for this level (own enrollment or a higher tier that covers it)
+            "access_lifetime": bool(window and window[0]), "access_until": window[1] if window else None,
+            "days_left": window[2] if window else None,
             "total_lessons": c.total_lessons, "completed_lessons": completed,
             "progress_percent": int(completed / c.total_lessons * 100) if c.total_lessons else 0,
         })

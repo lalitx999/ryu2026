@@ -54,6 +54,25 @@ class AccessService:
         return best
 
     @staticmethod
+    def access_window(enrollments, level, today=None):
+        """How long the student can watch a course of `level`: (is_lifetime, valid_until, days_left) or None.
+
+        Any valid enrollment of the same or a higher level covers it (a higher tier unlocks the lower ones);
+        lifetime wins, otherwise the latest expiry.  Computed in memory from already-loaded enrollments.
+        """
+        today = today or timezone.localdate()
+        need = AccessService.LEVEL_RANK.get(level, 99)
+        cover = [e for e in enrollments
+                 if e.status != "BANNED" and AccessService.LEVEL_RANK.get(e.course.level, 0) >= need
+                 and (e.is_lifetime_video or (e.status == "ACTIVE" and e.video_expires_at and e.video_expires_at >= today))]
+        if any(e.is_lifetime_video for e in cover):
+            return True, None, None
+        if cover:
+            until = max(e.video_expires_at for e in cover)
+            return False, until, (until - today).days
+        return None
+
+    @staticmethod
     def user_video_rank(user_id) -> int:
         enrollments = Enrollment.objects.filter(user_id=user_id, is_active=True).select_related("course").only(
             "status", "is_lifetime_video", "video_expires_at", "course__level")

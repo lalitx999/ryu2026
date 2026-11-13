@@ -47,3 +47,22 @@ def get_item(mapping, key):
     except AttributeError:
         return None
 
+
+
+THAI_MONTHS = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."]
+
+
+@register.filter
+def thai_date(value):
+    """date / ISO string -> '12 ธ.ค. 2569' (Buddhist-era year)."""
+    import datetime
+    if isinstance(value, str):
+        try:
+            value = datetime.date.fromisoformat(value[:10])
+        except ValueError:
+            return value
+    if isinstance(value, datetime.datetime):
+        value = value.date()
+    if not isinstance(value, datetime.date):
+        return value
+    return f"{value.day} {THAI_MONTHS[value.month - 1]} {value.year + 543}"

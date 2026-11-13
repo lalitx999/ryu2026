@@ -69,6 +69,8 @@
                 <div class="d-flex justify-content-between align-items-start mb-2"><span class="badge-jlpt rounded">JLPT {{ c.level }}</span><span class="pill-ok">🟢 พร้อมเรียน</span></div>
                 <div class="thumb bevel-in rounded"><img src="{% static 'assets/course/' %}{{ c.level }}.png" alt="{{ c.title }}" onerror="this.onerror=null;this.src='{% static 'assets/Ryupro.png' %}'"></div>
                 <h4>{{ c.title }}</h4><p>{{ c.description }}</p>
+                {% if c.access_lifetime %}<div class="t11 fw-bold mb-2 px-2 py-1 rounded" style="background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd">⭐ สิทธิ์เรียนตลอดชีพ</div>
+                {% elif c.access_until %}<div class="t11 fw-bold mb-2 px-2 py-1 rounded" style="{% if c.days_left <= 3 %}background:#fee2e2;color:#991b1b;border:1px solid #fca5a5{% elif c.days_left <= 7 %}background:#fef3c7;color:#92400e;border:1px solid #fcd34d{% else %}background:#ecfdf5;color:#065f46;border:1px solid #6ee7b7{% endif %}">⏳ ใช้ได้ถึง {{ c.access_until|thai_date }} · {% if c.days_left == 0 %}หมดอายุวันนี้{% else %}เหลือ {{ c.days_left }} วัน{% endif %}</div>{% endif %}
                 <div class="bg-white p-2 border rounded mb-3">
                   <div class="d-flex justify-content-between t10 fw-semibold" style="color:#374151"><span>ความคืบหน้าเรียน:</span><span class="fw-bold" style="color:#1e40af">{{ c.progress_percent }}% ({{ c.completed_lessons }}/{{ c.total_lessons }} บท)</span></div>
                   <div class="mini-progress" style="height:8px"><div style="width:{{ c.progress_percent }}%;background:#2563eb"></div></div>

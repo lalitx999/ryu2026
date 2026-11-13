@@ -32,6 +32,7 @@
           <h1 class="cp-title">{{ outline.course_title }}</h1>
           <p class="cp-desc">{{ outline.course_description|default:"บทเรียนคุณภาพโดย Ryuso Sense ครบทั้งคันจิ ไวยากรณ์ และคำศัพท์สำหรับสอบ JLPT" }}</p>
           <p class="cp-price">฿{{ outline.price|baht }}.- / 30 วัน</p>
+          {% if access %}{% if access.access_lifetime %}<p class="cp-expiry life">⭐ สิทธิ์เรียนตลอดชีพ</p>{% else %}<p class="cp-expiry{% if access.days_left <= 3 %} urgent{% elif access.days_left <= 7 %} soon{% endif %}">⏳ สิทธิ์เข้าเรียนใช้ได้ถึง {{ access.access_until|thai_date }} · {% if access.days_left == 0 %}หมดอายุวันนี้{% else %}เหลือ {{ access.days_left }} วัน{% endif %}</p>{% endif %}{% endif %}
         </div>
         {% if not outline.has_access %}<button type="button" class="xp-btn-green px-4 py-2 fw-bold flex-shrink-0" style="font-size:14px" id="buy-btn">🚀 สมัครเรียนวิชานี้</button>{% endif %}
       </div>

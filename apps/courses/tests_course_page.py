@@ -143,3 +143,61 @@ class CustomRenewalPriceTests(CoursePageBase):
         self.assertIsNone(course_selector.catalog(self.student)[0]["renewal_price"])
         User.objects.filter(pk=self.student.pk).update(custom_renewal_price=Decimal("65.00"))
         self.assertEqual(course_selector.catalog(User.objects.get(pk=self.student.pk))[0]["renewal_price"], "65.00")
+
+
+class ExpiryDisplayTests(CoursePageBase):
+    """Students asked where their expiry date is: it must show on the course banner and on the profile course cards."""
+
+    def enroll(self, user, course, days=None, lifetime=False, status="ACTIVE"):
+        return Enrollment.objects.create(user=user, course=course, is_active=True, status=status, is_lifetime_video=lifetime,
+                                         video_expires_at=None if lifetime else timezone.localdate() + timedelta(days=days))
+
+    def card(self, user, course_id=1):
+        return next(c for c in course_selector.catalog(user) if c["id"] == course_id)
+
+    def test_own_enrollment_window(self):
+        c = self.card(self.student)
+        self.assertEqual((c["access_lifetime"], c["access_until"], c["days_left"]), (False, timezone.localdate() + timedelta(days=10), 10))
+
+    def test_higher_tier_covers_lower_level_and_latest_expiry_wins(self):
+        self.enroll(self.other, self.n5, days=5)
+        self.enroll(self.other, self.n4, days=40)
+        self.assertEqual(self.card(self.other, 1)["days_left"], 40)      # N4 tier also unlocks N5, longer than its own N5 days
+        self.assertEqual(self.card(self.other, 2)["days_left"], 40)
+
+    def test_lifetime_and_expired_and_banned(self):
+        self.enroll(self.other, self.n5, lifetime=True)
+        c = self.card(self.other)
+        self.assertEqual((c["access_lifetime"], c["access_until"], c["days_left"]), (True, None, None))
+        Enrollment.objects.filter(user=self.other).delete()
+        self.enroll(self.other, self.n5, days=-2)                         # expired: nothing to show
+        self.assertEqual((self.card(self.other)["access_lifetime"], self.card(self.other)["access_until"]), (False, None))
+        Enrollment.objects.filter(user=self.other).delete()
+        self.enroll(self.other, self.n5, days=9, status="BANNED")
+        self.assertIsNone(self.card(self.other)["access_until"])
+
+    def test_catalog_query_count_unchanged_by_expiry_fields(self):
+        with self.assertNumQueries(3):   # courses, progress, enrollments - nothing per course
+            course_selector.catalog(self.student)
+
+    def test_course_page_and_profile_show_the_date(self):
+        until = timezone.localdate() + timedelta(days=10)
+        thai = f"{until.day} {['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'][until.month - 1]} {until.year + 543}"
+        self.client.force_login(self.student)
+        for url in ("/courses/1/", "/"):
+            html = self.client.get(url).content.decode()
+            self.assertIn(f"ใช้ได้ถึง {thai}", html, url)
+            self.assertIn("เหลือ 10 วัน", html, url)
+        self.client.logout()
+        self.assertNotIn("ใช้ได้ถึง", self.client.get("/courses/1/").content.decode())     # guests see no expiry line
+
+    def test_lifetime_banner(self):
+        self.enroll(self.other, self.n5, lifetime=True)
+        self.client.force_login(self.other)
+        self.assertIn("สิทธิ์เรียนตลอดชีพ", self.client.get("/courses/1/").content.decode())
+
+    def test_thai_date_filter(self):
+        from datetime import date
+        from core.templatetags.ryu import thai_date
+        self.assertEqual(thai_date(date(2026, 12, 12)), "12 ธ.ค. 2569")
+        self.assertEqual(thai_date("2027-01-05"), "5 ม.ค. 2570")

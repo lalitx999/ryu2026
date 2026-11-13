@@ -9,6 +9,10 @@
 .cp-title { font-size:24px; font-weight:900; margin:0; }
 .cp-desc { color:#dbeafe; font-size:12px; margin:4px 0 0; max-width:42rem; font-weight:500; white-space:pre-line; }
 .cp-price { margin:8px 0 0; font-size:14px; font-weight:900; color:#fde047; }
+.cp-expiry { display:inline-block; margin:8px 0 0; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:800; background:rgba(16,185,129,.25); border:1px solid #34d399; color:#d1fae5; }
+.cp-expiry.soon { background:rgba(245,158,11,.25); border-color:#fbbf24; color:#fef3c7; }
+.cp-expiry.urgent { background:rgba(239,68,68,.3); border-color:#f87171; color:#fee2e2; }
+.cp-expiry.life { background:rgba(167,139,250,.3); border-color:#c4b5fd; color:#ede9fe; }
 .cp-curr-toggle { width:100%; display:flex; justify-content:space-between; align-items:center; border:1px solid #1d4ed8; border-radius:4px; background:#1e40af; color:#fff; padding:10px 16px; font-weight:bold; }
 .cp-curr { background:#fff; border:1px solid #9ca3af; padding:12px; border-radius:4px; display:flex; flex-direction:column; gap:12px; }
 @media (min-width:992px){ .cp-curr { max-height:85vh; overflow-y:auto; } }
