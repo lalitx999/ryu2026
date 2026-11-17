@@ -49,6 +49,10 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# Django's default ("same-origin") sends no Referer to youtube.com, and embedded YouTube players then
+# refuse to load ("Error 153"). Use the browser default instead: other sites see only our origin.
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
 

@@ -53,3 +53,11 @@ class MarketingPageTests(TestCase):
     def test_home_has_banner_and_manifest_link(self):
         html = self.client.get("/").content.decode()
         self.assertIn('rel="manifest"', html)
+
+
+class YouTubeEmbedReferrerTests(TestCase):
+    """YouTube embeds fail with "Error 153" when the browser sends them no Referer."""
+
+    def test_pages_let_embeds_see_our_origin(self):
+        resp = self.client.get("/robots.txt")
+        self.assertEqual(resp.headers["Referrer-Policy"], "strict-origin-when-cross-origin")

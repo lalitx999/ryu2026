@@ -21,7 +21,7 @@
           {% endfor %}
         </div></div></aside>
       <section class="col-lg-8 order-1 order-lg-2">
-        <div class="ratio ratio-16x9 rounded overflow-hidden bg-black" style="border:2px solid #111827"><iframe id="rt-frame" src="{{ lessons.0.video_url }}" title="{{ lessons.0.title }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+        <div class="ratio ratio-16x9 rounded overflow-hidden bg-black" style="border:2px solid #111827"><iframe id="rt-frame" src="{{ lessons.0.video_url }}" title="{{ lessons.0.title }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
         <h2 id="rt-title" class="mt-3 fw-bold" style="font-size:18px;color:#111827">{{ lessons.0.title }}</h2>
         <p class="t12 fw-bold mb-0" style="color:#b91c1c">ทดลองเรียนจาก <span id="rt-course">{{ lessons.0.course_title }}</span></p>
         <p id="rt-desc" class="mt-3" style="white-space:pre-line;color:#374151">{{ lessons.0.description }}</p>
