@@ -16,6 +16,11 @@
   const P = { lesson: null, playing: false, time: 0, duration: 0, volume: 100, muted: false, rate: 1, cc: false, tab: 'notes' };
   const frame = $('#p-frame');
   let beat = null, noteTimer = null, lastSent = 0;
+  // iOS / iPadOS (iPadOS reports itself as a Mac) refuse to start a YouTube video from our own buttons:
+  // the first start must be a tap inside the player, so until it has played we let taps through to it.
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  let started = false, playTimer = null;
+  function tapThrough(on) { $('#video-player-container').classList.toggle('tap-through', on); $('#p-taphint').classList.toggle('d-none', !on); }
 
   /* ---------- helpers ---------- */
   const mmss = (sec) => { if (!sec || isNaN(sec)) return '00:00'; const m = Math.floor(sec / 60), s = Math.floor(sec % 60); return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0'); };
@@ -48,6 +53,8 @@
     if (typeof d.info.currentTime === 'number') P.time = d.info.currentTime;
     if (typeof d.info.duration === 'number' && d.info.duration > 0) P.duration = d.info.duration;
     if (typeof d.info.playerState === 'number') {
+      if (d.info.playerState === 1 || d.info.playerState === 3) clearTimeout(playTimer);   // playing / buffering: the start was accepted
+      if (d.info.playerState === 1 && !started) { started = true; tapThrough(false); }
       const was = P.playing; P.playing = d.info.playerState === 1;
       if (was && !P.playing) flush();               // paused or ended: save where the student stopped
     }
@@ -67,7 +74,17 @@
     $('#cb-rate').value = String(P.rate);
     stamps();
   }
-  function togglePlay() { if (P.playing) { yt('pauseVideo'); P.playing = false; flush(); } else { yt('playVideo'); P.playing = true; } paintBar(); }
+  function togglePlay() {
+    if (P.playing) { yt('pauseVideo'); P.playing = false; flush(); }
+    else {
+      yt('playVideo'); P.playing = true;
+      if (!started) {   // the browser may block a scripted first start: fall back to "tap the video"
+        clearTimeout(playTimer);
+        playTimer = setTimeout(() => { if (!started) { P.playing = false; tapThrough(true); paintBar(); } }, 2500);
+      }
+    }
+    paintBar();
+  }
   function seek(sec) { P.time = Math.max(0, Math.min(P.duration || 9999, sec)); yt('seekTo', [P.time, true]); paintBar(); }
   $('#cb-play').addEventListener('click', togglePlay);
   $('#p-shield').addEventListener('click', togglePlay);
@@ -82,10 +99,27 @@
     if (P.cc) { yt('loadModule', ['captions']); yt('setOption', ['captions', 'track', { languageCode: 'th' }]); } else yt('unloadModule', ['captions']);
     paintBar();
   });
+  /* full screen: the stage (video + control bar).  iPhone has no element full screen API, so there (or if the
+     browser refuses) the stage just covers the whole viewport instead. */
+  const stage = $('#p-stage');
+  const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
+  const isFull = () => !!fsEl() || stage.classList.contains('cp-full');
+  function paintFull() {
+    $('#cb-full').textContent = isFull() ? '↙️ ออกจากเต็มจอ' : '🖥️ เต็มจอ';
+    if (!fsEl()) { try { screen.orientation.unlock(); } catch (e) { /* not supported */ } }
+  }
+  function fakeFull(on) { stage.classList.toggle('cp-full', on); document.body.classList.toggle('cp-noscroll', on); paintFull(); }
+  function lockLandscape() { try { screen.orientation.lock('landscape').catch(() => {}); } catch (e) { /* phones only */ } }
   $('#cb-full').addEventListener('click', () => {
-    const box = $('#video-player-container');
-    if (!document.fullscreenElement) box.requestFullscreen && box.requestFullscreen().catch(() => {}); else document.exitFullscreen().catch(() => {});
+    if (stage.classList.contains('cp-full')) return fakeFull(false);
+    if (fsEl()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
+    const req = stage.requestFullscreen || stage.webkitRequestFullscreen;
+    if (!req) return fakeFull(true);
+    try { const r = req.call(stage); if (r && r.then) r.then(lockLandscape, () => fakeFull(true)); else lockLandscape(); } catch (e) { fakeFull(true); }
   });
+  document.addEventListener('fullscreenchange', paintFull);
+  document.addEventListener('webkitfullscreenchange', paintFull);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && stage.classList.contains('cp-full')) fakeFull(false); });
   $('#video-player-container').addEventListener('contextmenu', (e) => e.preventDefault());
 
   /* ---------- progress (real playback time, saved while playing, on pause and when leaving) ---------- */
@@ -131,6 +165,7 @@
     frame.classList.toggle('d-none', !has); $('#p-shield').classList.toggle('d-none', !has);
     $('#p-lock').classList.toggle('d-none', has || !l.locked); $('#p-novideo').classList.toggle('d-none', has || l.locked);
     frame.src = has ? secureUrl(l.video_url) : 'about:blank';
+    started = false; clearTimeout(playTimer); tapThrough(has && isIOS);   // a new player needs a new first tap on iOS
     // handout + prev/next + complete toggle
     const pdf = $('#p-pdf'); pdf.classList.toggle('d-none', !l.pdf_url);
     if (l.pdf_url) { pdf.href = l.pdf_url; pdf.lastElementChild.textContent = l.pdf_title || 'เปิดเอกสาร PDF'; }

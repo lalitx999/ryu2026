@@ -78,8 +78,11 @@
 
             <div id="p-descbox" class="cp-descbox d-none"><span class="fw-bold d-block mb-1" style="color:#1e3a8a">📖 รายละเอียดบทเรียน</span><div id="p-desc"></div></div>
 
+            <!-- video + control bar together: this whole stage is what goes full screen -->
+            <div id="p-stage" class="cp-stage">
             <!-- secure video: the YouTube chrome is hidden (controls=0), the iframe ignores the mouse and a shield sits on top -->
             <div id="video-player-container" class="cp-video">
+              <div id="p-taphint" class="cp-taphint d-none">👆 แตะที่วิดีโอเพื่อเริ่มเล่น</div>
               <iframe id="p-frame" class="d-none" title="video" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
               <div id="p-shield" class="cp-shield d-none" title="คลิกเพื่อ เล่น/หยุด วิดีโอ (คุ้มครองลิขสิทธิ์ - ปิดการแชร์วิดีโอภายนอก)"><div class="cp-bigplay" id="p-bigplay"><span>▶</span></div></div>
               <div id="p-lock" class="cp-msg d-none"><div style="font-size:28px">🔒</div><div class="fw-bold" style="font-size:14px">บทเรียนนี้เฉพาะผู้เรียนที่สมัครคอร์สเรียบร้อยแล้วค่ะ</div>
@@ -109,6 +112,7 @@
                   <button type="button" class="cp-btn" id="cb-full" title="ขยายเต็มจอ">🖥️ เต็มจอ</button>
                 </div>
               </div>
+            </div>
             </div>
 
             <!-- lesson actions -->
