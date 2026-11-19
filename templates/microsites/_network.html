@@ -1,0 +1,19 @@
+<section class="ms-network" aria-labelledby="ryu-network-title">
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-3">
+      <div><h2 id="ryu-network-title" class="h5 fw-bold mb-1">เครือข่าย RYU</h2>
+        <p class="mb-0 small">เว็บในเครือ RYU CLASS ใช้ฟรี ไม่ต้องสมัครสมาชิก</p></div>
+      <a class="small fw-semibold" href="{{ main_site_url }}">ไปที่ ryusosense.online →</a>
+    </div>
+    <div class="row g-2 row-cols-2 row-cols-md-4">
+      {% for item in network %}
+      <div class="col">
+        <a class="ms-net-card{% if item.current %} current{% endif %}" href="{{ item.href }}" style="--c:{{ item.site.accent }}"{% if item.current %} aria-current="page"{% endif %}>
+          <span class="ic">{{ item.site.icon }}</span>
+          <span class="txt"><b>{{ item.site.domain }}</b><small>{{ item.site.tagline }}{% if not item.site.live %} · เร็ว ๆ นี้{% endif %}</small></span>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

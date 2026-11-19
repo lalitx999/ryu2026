@@ -1,0 +1,104 @@
+{% extends "microsites/base.html" %}
+{% load static ryu %}
+{% block nav %}<a href="#goal">เป้าหมาย</a><a href="#myths">ยากไหม?</a><a href="#path">เรียนฟรี</a><a href="#course">คอร์ส</a>{% endblock %}
+{% block header_cta %}<a class="ms-btn ms-btn-sm" href="#path">เริ่มฟรี</a>{% endblock %}
+{% block main %}
+<section class="ms-hero ms-hero-jp">
+  <div class="container">
+    <div class="row align-items-center g-4 g-lg-5">
+      <div class="col-lg-7">
+        <span class="ms-chip">สำหรับคนที่อยากเริ่ม แต่ไม่รู้จะเริ่มตรงไหน</span>
+        <h1 class="ms-h1">ภาษาญี่ปุ่น<br><span class="ms-accent-text">เริ่มจากศูนย์</span> ก็เก่งได้</h1>
+        <p class="ms-lead">บอกเราว่าอยากใช้ภาษาญี่ปุ่นทำอะไร แล้วดูว่าควรไปถึงระดับไหน เริ่มต้นด้วยเครื่องมือฟรีของเครือ RYU ได้ทันที ไม่ต้องสมัคร ไม่ต้องจ่าย</p>
+        <div class="d-flex flex-wrap gap-2 mt-4">
+          <a class="ms-btn" href="#goal">หาระดับที่ใช่</a>
+          <a class="ms-btn ms-btn-ghost" href="#path">เริ่มเรียนฟรี</a>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="ms-kana-art" aria-hidden="true">
+          <span>あ<small>a</small></span><span>ア<small>a</small></span><span>日<small>nichi</small></span>
+          <span>本<small>hon</small></span><span>語<small>go</small></span><span>い<small>i</small></span>
+          <span>カ<small>ka</small></span><span>学<small>gaku</small></span><span>ね<small>ne</small></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ms-sec" id="goal">
+  <div class="container" style="max-width:60rem">
+    <div class="text-center mb-4"><h2 class="ms-h2">อยากใช้ภาษาญี่ปุ่นทำอะไร?</h2><p class="ms-sub">เลือกเป้าหมาย แล้วดูระดับที่ควรไปให้ถึง</p></div>
+    <div class="ms-goals" role="tablist">
+      {% for g in goals %}
+      <button type="button" class="ms-goal{% if forloop.first %} active{% endif %}" role="tab" aria-selected="{{ forloop.first|yesno:'true,false' }}" data-goal="{{ g.key }}"><span>{{ g.icon }}</span>{{ g.label }}</button>
+      {% endfor %}
+    </div>
+    {% for g in goals %}
+    <div class="ms-goal-result{% if not forloop.first %} d-none{% endif %}" data-goal-panel="{{ g.key }}" role="tabpanel">
+      <div class="ms-goal-level"><small>เป้าหมายแนะนำ</small><b>{{ g.level }}</b></div>
+      <div><p class="mb-3">{{ g.text }}</p><a class="ms-link" href="#path">เริ่มจากเครื่องมือฟรี →</a></div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="ms-sec ms-sec-alt" id="myths">
+  <div class="container">
+    <div class="text-center mb-4 mb-md-5"><h2 class="ms-h2">ภาษาญี่ปุ่นยากไหม?</h2><p class="ms-sub">3 ความเชื่อที่ทำให้หลายคนไม่กล้าเริ่ม</p></div>
+    <div class="row g-3">
+      {% for myth, truth in myths %}
+      <div class="col-md-4"><div class="ms-card h-100"><p class="ms-myth">“{{ myth }}”</p><p class="mb-0">{{ truth }}</p></div></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="ms-sec" id="path">
+  <div class="container">
+    <div class="text-center mb-4 mb-md-5"><h2 class="ms-h2">เส้นทางเรียนฟรีของเครือ RYU</h2><p class="ms-sub">ทุกขั้นใช้ได้ทันที ไม่ต้องสมัครสมาชิก</p></div>
+    <ol class="ms-path">
+      {% for p in free_path %}
+      <li><a href="{{ p.href }}" style="--c:{{ p.site.accent }}">
+        <span class="no">{{ forloop.counter }}</span>
+        <span class="ic">{{ p.site.icon }}</span>
+        <span class="txt"><b>{{ p.title }}</b><small>{{ p.text }}</small><em>{{ p.site.domain }}{% if not p.site.live %} · เร็ว ๆ นี้{% endif %}</em></span>
+      </a></li>
+      {% endfor %}
+      <li><a href="{{ free_trial_url }}" style="--c:#f59e0b">
+        <span class="no">5</span><span class="ic">▶️</span>
+        <span class="txt"><b>ลองเรียนกับครูจริง</b><small>บทเรียนทดลองฟรีของพี่ริว</small><em>Ryutube · ryusosense.online</em></span>
+      </a></li>
+    </ol>
+  </div>
+</section>
+
+<section class="ms-sec ms-sec-alt" id="course">
+  <div class="container" style="max-width:60rem">
+    <div class="ms-course-box">
+      <div>
+        <span class="ms-chip">อยากมีครูพาเรียน?</span>
+        <h2 class="ms-h2 mt-2">เรียนสดกับพี่ริว{% if pricing.from_monthly %} เริ่มต้นเดือนละ ฿{{ pricing.from_monthly|baht }}{% endif %}</h2>
+        <p class="mb-3">เรียนสดผ่าน Zoom ทุกสัปดาห์ ดูคลิปย้อนหลังได้ไม่จำกัด มีเอกสาร แบบฝึกหัด และกลุ่ม LINE ถามตอบ</p>
+        <div class="ms-level-chips">
+          {% for r in pricing.rows %}<a href="{{ register_url }}&amp;level={{ r.level }}"><b>{{ r.level }}</b>฿{{ r.monthly|baht }}/ด.</a>{% endfor %}
+        </div>
+      </div>
+      <div class="d-flex flex-column gap-2">
+        <a class="ms-btn" href="{{ register_url }}">สมัครเรียน</a>
+        <a class="ms-btn ms-btn-ghost" href="{{ course_site }}">ดูหลักสูตรเต็ม</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+document.querySelectorAll('[data-goal]').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    document.querySelectorAll('[data-goal]').forEach(function (b) { b.classList.toggle('active', b === btn); b.setAttribute('aria-selected', b === btn); });
+    document.querySelectorAll('[data-goal-panel]').forEach(function (p) { p.classList.toggle('d-none', p.dataset.goalPanel !== btn.dataset.goal); });
+  });
+});
+</script>
+{% endblock %}

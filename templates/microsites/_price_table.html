@@ -1,0 +1,15 @@
+{% load ryu %}
+<div class="ms-table-wrap">
+  <table class="ms-table">
+    <thead><tr><th>ระดับ</th><th>รายเดือน</th><th>6 เดือน</th><th>12 เดือน</th><th>ตลอดชีพ</th></tr></thead>
+    <tbody>
+    {% for r in pricing.rows %}
+      <tr><th scope="row">{{ r.level }}</th><td>{{ r.monthly|baht }} ฿</td>
+        <td>{% if r.six %}{{ r.six|baht }} ฿{% if r.six_saving and r.six_saving > 0 %}<small>ประหยัด {{ r.six_saving|baht }}</small>{% endif %}{% else %}-{% endif %}</td>
+        <td>{% if r.twelve %}{{ r.twelve|baht }} ฿{% if r.twelve_saving and r.twelve_saving > 0 %}<small>ประหยัด {{ r.twelve_saving|baht }}</small>{% endif %}{% else %}-{% endif %}</td>
+        <td class="life">{% if r.lifetime %}{{ r.lifetime|baht }} ฿<small>เรียน {{ r.label }}</small>{% else %}-{% endif %}</td></tr>
+    {% empty %}<tr><td colspan="5" class="text-secondary py-4">ยังไม่มีแพ็กเกจที่เปิดจำหน่าย</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+<p class="ms-note text-center mt-2 mb-0">ราคาอาจเปลี่ยนแปลงตามโปรโมชั่น · สิทธิ์ตลอดชีพสะสมเลเวลตามยอดที่ชำระ</p>

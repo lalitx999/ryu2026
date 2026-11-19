@@ -106,3 +106,48 @@ sudo systemctl restart ryu-web ryu-worker
 1. Cloudflare: `ryusosense.online` A → `76.76.21.21`, ลบ A ของ `www` แล้วสร้าง CNAME `www` → `cname.vercel-dns.com`
 2. homeserver: `docker start ryuclass_backend`
 > ข้อมูลที่เกิดบน VPS หลังปล่อยจะไม่ย้อนกลับไปเว็บเก่าเอง ถ้าต้องถอยหลังมีคนใช้ไปแล้ว ให้ dump จาก VPS ก่อน (`sudo /usr/local/bin/ryu-backup.sh`)
+
+## 6) RYU Network — โดเมนเครือข่าย 8 ชื่อ (เสิร์ฟจากโปรเจกต์เดียวกัน)
+แอป `apps/microsites` ดู Host แล้วเลือกหน้าของโดเมนนั้นเอง (ไม่ redirect ไป ryusosense) รายชื่อโดเมนอยู่ที่ `apps/microsites/registry.py`
+และ `production.py` เติมโดเมนเหล่านี้เข้า `ALLOWED_HOSTS` ให้อัตโนมัติ **ไม่ต้องแก้ .env**
+
+| โดเมน | punycode (ใช้ใน DNS / nginx / certbot) | สถานะ |
+|---|---|---|
+| เรียนภาษาญี่ปุ่น.online | `xn--e3cxbhxkg5c9db1ah4b2g4fc.online` | เซลเพจ (หลักสูตร) |
+| ภาษาญี่ปุ่น.online | `xn--e3cyfs9bzcbz2a2nc.online` | เซลเพจ (ผู้เริ่มต้น) |
+| เรียนภาษาญี่ปุ่นกับพี่ริว.online | `xn--12cx9abgdykqjj2cs0jjb6bdhg1d3j0hcg.online` | เซลเพจ (พี่ริว) |
+| อักษรภาษาญี่ปุ่น.online | `xn--12cyzbhxr5bc5a4bpb4b5b4qc.online` | เร็ว ๆ นี้ (เฟส 2) |
+| คันจิ.online | `xn--42ci4c5era.online` | เร็ว ๆ นี้ (เฟส 3) |
+| พจนานุกรมภาษาญี่ปุ่น.online | `xn--12cnq0cacnswjv8evffb3c2bk61ac.online` | เร็ว ๆ นี้ (เฟส 4) |
+| แปลภาษาญี่ปุ่น.online | `xn--e3cyebx3a3a5eb5a8a6gtec.online` | เร็ว ๆ นี้ (เฟส 5) |
+| วัดระดับภาษาญี่ปุ่น.online | `xn--e3cnavdh7av8aza7ejeqb3cyc8sc.online` | เร็ว ๆ นี้ (เฟส 6) |
+
+**พรีวิวก่อนต่อ DNS**: ล็อกอินแอดมินบน www.ryusosense.online แล้วเปิด `https://www.ryusosense.online/?site=learn`
+(`learn` / `japanese` / `ryu` / `kana` / `kanji` / `dictionary` / `translator` / `jlpt`) · ออกจากพรีวิว: `?site=off` · หน้าพรีวิวเป็น noindex
+
+**6.1 DNS** — เพิ่มแต่ละโดเมนเป็น zone ใน Cloudflare (เปลี่ยน nameserver ที่ Hostinger ตามที่ Cloudflare บอก) แล้วสร้าง A record
+`@` และ `www` → `72.60.199.62` ตั้ง proxy แบบเดียวกับ ryusosense.online
+
+**6.2 nginx + HTTPS** (บน VPS หลังจาก DNS ชี้มาแล้ว)
+```bash
+HOSTS="xn--e3cxbhxkg5c9db1ah4b2g4fc.online xn--e3cyfs9bzcbz2a2nc.online xn--12cx9abgdykqjj2cs0jjb6bdhg1d3j0hcg.online xn--12cyzbhxr5bc5a4bpb4b5b4qc.online xn--42ci4c5era.online xn--12cnq0cacnswjv8evffb3c2bk61ac.online xn--e3cyebx3a3a5eb5a8a6gtec.online xn--e3cnavdh7av8aza7ejeqb3cyc8sc.online"
+NAMES="$(for h in $HOSTS; do printf '%s www.%s ' "$h" "$h"; done)"
+sudo tee /etc/nginx/sites-available/ryu-network >/dev/null <<NGINX
+server {
+    listen 80;
+    server_name $NAMES;
+    client_max_body_size 10m;
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+}
+NGINX
+sudo ln -sf /etc/nginx/sites-available/ryu-network /etc/nginx/sites-enabled/ryu-network && sudo nginx -t && sudo systemctl reload nginx
+sudo certbot --nginx $(for n in $NAMES; do printf -- '-d %s ' "$n"; done) --redirect
+```
+ทำเฉพาะโดเมนที่ DNS พร้อมก่อนก็ได้ (ใส่เฉพาะตัวนั้นใน `HOSTS`) แล้วรันซ้ำพร้อม `--expand` เมื่อเพิ่มโดเมน
+
+**6.3 ตรวจ**: `curl -sI https://xn--42ci4c5era.online/ | head -1` ต้องได้ `200` · เปิด `/robots.txt` ของแต่ละโดเมน · ส่ง sitemap ของแต่ละโดเมนเข้า Google Search Console

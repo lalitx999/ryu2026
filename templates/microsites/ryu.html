@@ -1,0 +1,86 @@
+{% extends "microsites/base.html" %}
+{% load static ryu %}
+{% block og_image %}{% static 'assets/images/salepage/ryuuu.png' %}{% endblock %}
+{% block nav %}<a href="#style">สไตล์การสอน</a><a href="#videos">ตัวอย่างคลิป</a><a href="#pricing">ราคา</a><a href="#contact">คุยกับพี่ริว</a>{% endblock %}
+{% block header_cta %}<a class="ms-btn ms-btn-sm" href="{{ LINE_SUPPORT_URL }}" target="_blank" rel="noopener">ทัก LINE</a>{% endblock %}
+{% block main %}
+<section class="ms-hero ms-hero-ryu">
+  <div class="container">
+    <div class="row align-items-center g-4 g-lg-5 flex-lg-row-reverse">
+      <div class="col-lg-5 text-center">
+        <div class="ms-portrait"><img src="{% static 'assets/images/salepage/ryuuu.png' %}" alt="พี่ริว ครูสอนภาษาญี่ปุ่น Ryuso Sense" fetchpriority="high"></div>
+        <div class="ms-portrait-tag">Ryuso Sense · JLPT N5 → N1</div>
+      </div>
+      <div class="col-lg-7">
+        <span class="ms-chip">ครูสอนภาษาญี่ปุ่นออนไลน์</span>
+        <h1 class="ms-h1">เรียนภาษาญี่ปุ่น<br><span class="ms-accent-text">กับพี่ริว</span></h1>
+        <p class="ms-lead">สอนสนุก เข้าใจง่าย จำได้จริง ใช้ได้ทันที เริ่มจาก 0 จนถึง N1 ทั้งสอนและติวสอบ เรียนสดกับพี่ริวทุกสัปดาห์ และถามได้ตลอดทาง LINE</p>
+        <div class="d-flex flex-wrap gap-2 mt-4">
+          <a class="ms-btn" href="#videos">ดูตัวอย่างการสอน</a>
+          <a class="ms-btn ms-btn-ghost" href="{{ register_url }}">สมัครเรียนกับพี่ริว</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ms-sec" id="style">
+  <div class="container">
+    <div class="text-center mb-4 mb-md-5"><h2 class="ms-h2">ทำไมนักเรียนชอบเรียนกับพี่ริว</h2><p class="ms-sub">สไตล์การสอนที่ทำให้ภาษาญี่ปุ่นไม่น่ากลัวอีกต่อไป</p></div>
+    <div class="row g-3">
+      {% for icon, title, text in style %}
+      <div class="col-sm-6 col-lg-3"><div class="ms-card ms-card-center h-100"><span class="ms-card-ic">{{ icon }}</span><h3 class="h6 fw-bold mb-1">{{ title }}</h3><p class="mb-0">{{ text }}</p></div></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="ms-sec ms-sec-alt" id="videos">
+  <div class="container" style="max-width:68rem">
+    <div class="text-center mb-4 mb-md-5"><h2 class="ms-h2">ลองฟังพี่ริวสอนก่อน</h2><p class="ms-sub">ดูตัวอย่างบทเรียนจริงก่อนตัดสินใจ</p></div>
+    <div class="row g-4">
+      {% for vid, label in videos %}
+      <div class="col-md-6">
+        <div class="ratio ratio-16x9 ms-video"><iframe src="https://www.youtube-nocookie.com/embed/{{ vid }}" title="{{ label }}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+        <p class="text-center small fw-semibold mt-2 mb-0">{{ label }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-4"><a class="ms-link" href="{{ free_trial_url }}">ดูบทเรียนทดลองฟรีเพิ่มเติมบน Ryutube →</a></div>
+  </div>
+</section>
+
+<section class="ms-sec">
+  <div class="container" style="max-width:60rem">
+    <div class="text-center mb-4"><h2 class="ms-h2">ในคลาสของพี่ริวมีอะไรบ้าง</h2></div>
+    <ul class="ms-checklist">
+      {% for icon, title, text in included %}<li><span>{{ icon }}</span><div><b>{{ title }}</b><small>{{ text }}</small></div></li>{% endfor %}
+    </ul>
+  </div>
+</section>
+
+<section class="ms-sec ms-sec-alt" id="pricing">
+  <div class="container" style="max-width:64rem">
+    <div class="text-center mb-4"><h2 class="ms-h2">ค่าเรียนกับพี่ริว</h2><p class="ms-sub">เลือกระดับและระยะเวลาที่เหมาะกับคุณ</p></div>
+    {% include "microsites/_price_table.html" %}
+    <div class="text-center mt-4"><a class="ms-btn" href="{{ register_url }}">สมัครเรียน</a></div>
+  </div>
+</section>
+
+<section class="ms-sec" id="contact">
+  <div class="container" style="max-width:64rem">
+    <div class="row g-4 align-items-center">
+      <div class="col-md-6">
+        <h2 class="ms-h2">คุยกับพี่ริวได้โดยตรง</h2>
+        <p class="ms-sub mb-4">ไม่แน่ใจว่าควรเริ่มระดับไหน หรืออยากถามรายละเอียดคอร์ส ทัก LINE OA ได้เลย</p>
+        <a class="ms-line" href="{{ LINE_SUPPORT_URL }}" target="_blank" rel="noopener"><b>ทัก LINE พี่ริว</b><small>LINE ID : @ryusosense</small></a>
+        <h3 class="h6 fw-bold mt-4 mb-2">ติดตามเทคนิคภาษาญี่ปุ่นฟรี</h3>
+        <div class="d-flex flex-wrap gap-2">
+          {% for name, url, color, glyph in socials %}<a class="ms-social" style="--c:{{ color }}" href="{{ url }}" target="_blank" rel="noopener"><span>{{ glyph }}</span>{{ name }}</a>{% endfor %}
+        </div>
+      </div>
+      <div class="col-md-6"><img class="ms-shot" src="{% static 'assets/images/salepage/line_oa_chat_250822_080345.jpg' %}" alt="ตัวอย่างการแชท LINE OA กับพี่ริว" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+{% endblock %}

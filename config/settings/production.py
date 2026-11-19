@@ -3,6 +3,10 @@ from .base import *  # noqa: F401,F403
 DEBUG = False
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")  # noqa: F405  (required)
 
+# The RYU Network domains (punycode, apex + www) are answered by this same project.
+from microsites.registry import all_hosts  # noqa: E402
+ALLOWED_HOSTS += [h for h in all_hosts() if h not in ALLOWED_HOSTS]
+
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = True
 SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=True)  # noqa: F405

@@ -11,6 +11,7 @@ urlpatterns = [
     path("ryutube/", views.ryutube, name="ryutube"),
     path("courses/<int:course_id>/", views.course_page, name="course"),
     path("salepage/", views.salepage, name="salepage"),
+    path("network/", views.network, name="network"),
     path("free-course/", RedirectView.as_view(pattern_name="portal:ryutube", permanent=True)),
     path("auth/register/", views.register_redirect),
     path("register/", views.register_redirect),

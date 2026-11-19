@@ -7,7 +7,7 @@ from django.templatetags.static import static
 SITE_NAME = "RyuClass"
 SITEMAP_ROUTES = [("/", "daily", "1.0"), ("/ryutube/", "weekly", "0.9"), ("/salepage/", "weekly", "0.8"),
                   ("/araigogu/", "weekly", "0.8"), ("/community/", "weekly", "0.8"), ("/games/", "weekly", "0.8"),
-                  ("/guide/", "weekly", "0.8")]
+                  ("/guide/", "weekly", "0.8"), ("/network/", "weekly", "0.7")]
 COURSES = [("N5", "พื้นฐานตัวอักษร ฮิรางานะ คาตากานะ คันจิ และไวยากรณ์", "PT40H"),
            ("N4", "รูปประโยคเงื่อนไข การฟังสนทนา และคันจิ N4", "PT45H"),
            ("N3", "ไวยากรณ์ระดับกลาง Keigo และการอ่านจับใจความยาว", "PT50H"),

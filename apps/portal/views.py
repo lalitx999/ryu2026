@@ -70,24 +70,22 @@ def course_page(request, course_id):
 
 
 # ───────────────────────────── sale page / SEO / PWA ─────────────────────────────
-LIFETIME_LABELS = {"N5": "N5", "N4": "N5-N4", "N3": "N5-N4-N3", "N2": "N5-N4-N3-N2", "N1": "N5-N4-N3-N2-N1"}
-
-
 def salepage(request):
     """Public landing page.  The price table is read from the live course prices (one query)."""
-    rows = []
-    for c in Course.objects.filter(is_active=True).only("level", "price", "price_180", "price_365", "price_lifetime").order_by("sort_order", "id"):
-        monthly = c.price or 0
-        rows.append({
-            "level": c.level, "monthly": monthly, "six": c.price_180, "twelve": c.price_365, "lifetime": c.price_lifetime,
-            "six_saving": monthly * 6 - c.price_180 if c.price_180 else None,
-            "twelve_saving": monthly * 12 - c.price_365 if c.price_365 else None,
-            "label": LIFETIME_LABELS.get(c.level, c.level),
-        })
+    rows = course_selector.price_table()
     return render(request, "portal/salepage.html", {
         "rows": rows, "levels": ["N1", "N2", "N3", "N4"],
         "features": [("sa.png", "ระบบการสอนแบบ Zoom", "เรียนสดผ่าน Zoom"), ("sss.png", "ระบบการเรียนบน Teachable", "ระบบ Teachable"),
                      ("asasa.png", "กลุ่ม LINE ส่วนตัว", "กลุ่ม LINE เฉพาะ"), ("86-1-1024x1024.png", "ครบทุกคอร์ส JLPT", "ครบทุกเลเวล")],
+    })
+
+
+def network(request):
+    """RYU Network hub: one card per domain (คันจิ.online, เรียนภาษาญี่ปุ่น.online, ...), each a site of its own."""
+    from microsites import registry
+    return render(request, "portal/network.html", {
+        "tools": [s for s in registry.SITES if s.kind == "tool"],
+        "sales": [s for s in registry.SITES if s.kind == "sales"],
     })
 
 

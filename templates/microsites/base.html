@@ -1,0 +1,69 @@
+{% load static %}<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="{{ site.accent }}">
+  <title>{% block title %}{{ site.title }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}{{ site.description }}{% endblock %}">
+  {% if site.keywords %}<meta name="keywords" content="{{ site.keywords|join:', ' }}">{% endif %}
+  <link rel="canonical" href="{{ canonical }}">
+  {% if preview %}<meta name="robots" content="noindex, nofollow">{% endif %}
+  <link rel="icon" href="{% static 'favicon.ico' %}">
+  <link rel="apple-touch-icon" href="{% static 'assets/ryu_logo.jpg' %}">
+  <meta property="og:type" content="website"><meta property="og:locale" content="th_TH">
+  <meta property="og:site_name" content="{{ site.name }}">
+  <meta property="og:title" content="{{ site.title }}">
+  <meta property="og:description" content="{{ site.description }}">
+  <meta property="og:url" content="{{ canonical }}">
+  <meta property="og:image" content="{{ SITE_URL }}{% block og_image %}{% static 'assets/images/salepage/cover.png' %}{% endblock %}">
+  <meta name="twitter:card" content="summary_large_image">
+  {% for block in jsonld %}<script type="application/ld+json">{{ block|safe }}</script>{% endfor %}
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/microsite.css' %}">
+  <style>:root{--ms-accent:{{ site.accent }}}</style>
+</head>
+<body class="ms ms-{{ site.key }}">
+{% if preview %}
+<div class="ms-preview">โหมดพรีวิว: <b>{{ site.domain }}</b> · <a href="?site=off">ออกจากพรีวิว</a></div>
+{% endif %}
+<header class="ms-header">
+  <div class="container d-flex align-items-center justify-content-between gap-3">
+    <a class="ms-brand" href="/">
+      <img src="{% static 'assets/ryu_logo.jpg' %}" alt="" width="36" height="36">
+      <span><b>{{ site.name }}</b><small>{{ site.domain }}</small></span>
+    </a>
+    <nav class="ms-nav d-none d-md-flex">{% block nav %}{% endblock %}</nav>
+    {% block header_cta %}<a class="ms-btn ms-btn-sm" href="{{ register_url }}">สมัครเรียน</a>{% endblock %}
+  </div>
+</header>
+
+<main>{% block main %}{% endblock %}</main>
+
+{% if faq %}
+<section class="ms-sec" id="faq">
+  <div class="container" style="max-width:52rem">
+    <h2 class="ms-h2 text-center">คำถามที่พบบ่อย</h2>
+    <div class="accordion ms-faq" id="faq-list">
+      {% for q, a in faq %}
+      <div class="accordion-item">
+        <h3 class="accordion-header"><button class="accordion-button{% if not forloop.first %} collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#faq-{{ forloop.counter }}" aria-expanded="{{ forloop.first|yesno:'true,false' }}">{{ q }}</button></h3>
+        <div id="faq-{{ forloop.counter }}" class="accordion-collapse collapse{% if forloop.first %} show{% endif %}" data-bs-parent="#faq-list"><div class="accordion-body">{{ a }}</div></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% include "microsites/_network.html" %}
+<footer class="ms-foot">
+  <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
+    <span>© {% now "Y" %} RYU CLASS · เรียนภาษาญี่ปุ่นกับพี่ริว</span>
+    <span><a href="{{ main_site_url }}">ryusosense.online</a> · <a href="{{ LINE_SUPPORT_URL }}" target="_blank" rel="noopener">LINE @ryusosense</a></span>
+  </div>
+</footer>
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

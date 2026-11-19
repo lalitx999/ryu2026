@@ -27,6 +27,9 @@
     <button type="button" class="xp-desktop-icon" data-act="goto-library">
       <div class="emoji">📚</div><span>Ryu-Library</span>
     </button>
+    <a class="xp-desktop-icon text-decoration-none" href="{% url 'portal:network' %}">
+      <div class="emoji">🌐</div><span>RYU Network<br>เครื่องมือฟรี</span>
+    </a>
   </div>
 
   {% if user.is_authenticated %}{% include "portal/_profile_window.html" %}{% endif %}
@@ -64,6 +67,7 @@
       </div>
       <div class="right">
         <button class="xp-menu-item" style="color:#00156e" data-act="open-public">📂 หลักสูตรคอร์สทั้งหมด</button>
+        <a class="xp-menu-item" style="color:#00156e" href="{% url 'portal:network' %}">🌐 RYU Network (เครื่องมือฟรี)</a>
         {% if IS_ADMIN_USER %}<a class="xp-menu-item" style="color:#8b0000" href="{% url 'backoffice:dashboard' %}" target="_blank" rel="noreferrer">🛠️ AdminCN Portal (หลังบ้าน)</a>{% endif %}
       </div>
     </div>

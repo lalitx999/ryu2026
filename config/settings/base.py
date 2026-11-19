@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "community.apps.CommunityConfig",
     "portal.apps.PortalConfig",
     "backoffice.apps.BackofficeConfig",
+    "microsites.apps.MicrositesConfig",
 ]
 # NOTE: django.contrib.admin is intentionally NOT installed - end users get the custom
 # Bootstrap dashboard in `backoffice` instead (rule #4).
@@ -47,6 +48,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # RYU Network: คันจิ.online, เรียนภาษาญี่ปุ่น.online, ... are served by this project (after auth: staff can preview)
+    "microsites.middleware.MicrositeMiddleware",
 ]
 
 # Django's default ("same-origin") sends no Referer to youtube.com, and embedded YouTube players then

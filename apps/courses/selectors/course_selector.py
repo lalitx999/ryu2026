@@ -97,3 +97,21 @@ def free_trial_lessons():
         "course_title": l.course.title, "module_title": l.module.title if l.module else "",
         "duration_seconds": l.duration, "video_url": to_embed_url(decrypt_video_url(l.video_url)),
     } for l in qs if l.video_url]
+
+
+LIFETIME_LABELS = {"N5": "N5", "N4": "N5-N4", "N3": "N5-N4-N3", "N2": "N5-N4-N3-N2", "N1": "N5-N4-N3-N2-N1"}
+
+
+def price_table():
+    """Live package prices of every active course, with savings vs. paying monthly (one query).
+    Shared by the RyuClass sale page and the RYU Network sales sites."""
+    rows = []
+    for c in Course.objects.filter(is_active=True).only("level", "price", "price_180", "price_365", "price_lifetime").order_by("sort_order", "id"):
+        monthly = c.price or 0
+        rows.append({
+            "level": c.level, "monthly": monthly, "six": c.price_180, "twelve": c.price_365, "lifetime": c.price_lifetime,
+            "six_saving": monthly * 6 - c.price_180 if c.price_180 else None,
+            "twelve_saving": monthly * 12 - c.price_365 if c.price_365 else None,
+            "label": LIFETIME_LABELS.get(c.level, c.level),
+        })
+    return rows
