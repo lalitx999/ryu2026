@@ -91,3 +91,23 @@ class MicrositeRoutingTests(TestCase):
             self.assertIn('class="ms-ic', html)
         hub = self.client.get("/network/").content.decode()     # the hub's own content (the XP topbar is the legacy look)
         self.assertEqual(EMOJI.findall(hub[hub.index("<main"):hub.index("</main>")]), [])
+
+    def test_kana_site_renders_both_charts_without_db(self):
+        host = registry.BY_KEY["kana"].host
+        with self.assertNumQueries(0):
+            html = self.client.get("/", HTTP_HOST=host).content.decode()
+        self.assertEqual(html.count('class="kn-cell"'), 208)          # 104 sounds x hiragana + katakana
+        self.assertIn('data-key="きゃ"', html)
+        self.assertIn(">キャ<", html)                                 # katakana derived from hiragana
+        self.assertIn('id="kana-data"', html)
+        self.assertIn(registry.BY_KEY["kanji"].url, html)            # next step: คันจิ.online
+        self.assertNotIn("เร็ว ๆ นี้</span>\n    <h1", html)
+
+
+class KanaDataTests(TestCase):
+    def test_chart_shape_and_examples(self):
+        from microsites import kana
+        self.assertEqual([g["count"] for g in kana.chart("hiragana")], [46, 25, 33])
+        self.assertEqual(kana.to_katakana("きょう"), "キョウ")
+        basic = [c for c in kana.flat("katakana") if c["group"] == "basic"]
+        self.assertEqual(sum(1 for c in basic if "example" in c), 45)  # every basic sound except ヲ

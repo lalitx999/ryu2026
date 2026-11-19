@@ -116,7 +116,7 @@ sudo systemctl restart ryu-web ryu-worker
 | เรียนภาษาญี่ปุ่น.online | `xn--e3cxbhxkg5c9db1ah4b2g4fc.online` | เซลเพจ (หลักสูตร) |
 | ภาษาญี่ปุ่น.online | `xn--e3cyfs9bzcbz2a2nc.online` | เซลเพจ (ผู้เริ่มต้น) |
 | เรียนภาษาญี่ปุ่นกับพี่ริว.online | `xn--12cx9abgdykqjj2cs0jjb6bdhg1d3j0hcg.online` | เซลเพจ (พี่ริว) |
-| อักษรภาษาญี่ปุ่น.online | `xn--12cyzbhxr5bc5a4bpb4b5b4qc.online` | เร็ว ๆ นี้ (เฟส 2) |
+| อักษรภาษาญี่ปุ่น.online | `xn--12cyzbhxr5bc5a4bpb4b5b4qc.online` | ตารางฮิรางานะ/คาตากานะ (เฟส 2) |
 | คันจิ.online | `xn--42ci4c5era.online` | เร็ว ๆ นี้ (เฟส 3) |
 | พจนานุกรมภาษาญี่ปุ่น.online | `xn--12cnq0cacnswjv8evffb3c2bk61ac.online` | เร็ว ๆ นี้ (เฟส 4) |
 | แปลภาษาญี่ปุ่น.online | `xn--e3cyebx3a3a5eb5a8a6gtec.online` | เร็ว ๆ นี้ (เฟส 5) |

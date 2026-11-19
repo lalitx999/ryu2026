@@ -64,7 +64,8 @@
 .ms-note { font-size: 12px; color: var(--ms-muted); }
 
 /* ── page structure: white panels on a dark page ─────────────────────────────── */
-.ms-panel { background: #fff; border-radius: var(--ms-panel-radius); margin: 0 12px 12px; position: relative; overflow: hidden; }
+/* overflow: clip (not hidden) keeps rounded corners without breaking position: sticky inside the panel */
+.ms-panel { background: #fff; border-radius: var(--ms-panel-radius); margin: 0 12px 12px; position: relative; overflow: hidden; overflow: clip; }
 .ms-panel-first { border-top-left-radius: 0; border-top-right-radius: 0; margin-top: 0; }
 .ms-sec { padding: 88px 0; }
 .ms-dark-sec { color: #c9ced8; }
@@ -298,3 +299,95 @@
 }
 .ms-dark-sec .ms-step { border-color: #fff; }
 .ms-dark-sec .ms-step-no { color: #8b93a1; }
+
+/* ── อักษรภาษาญี่ปุ่น.online (RYU KANA) ─────────────────────────────── */
+.kn-progress { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 34rem; margin: 0 auto; }
+.kn-progress > div { display: flex; align-items: center; gap: 10px; background: var(--ms-soft); border-radius: 999px; padding: 8px 16px; font-size: 13px; }
+.kn-progress b { color: var(--ms-ink); font-size: 13px; white-space: nowrap; }
+.kn-bar { flex: 1; height: 6px; border-radius: 3px; background: #e2e4e9; overflow: hidden; }
+.kn-bar i { display: block; height: 100%; width: 0; background: var(--ms-grad); transition: width .4s; }
+.kn-switch { display: inline-flex; background: var(--ms-soft); border-radius: 999px; padding: 4px; }
+.kn-switch button { border: 0; background: transparent; border-radius: 999px; padding: 8px 20px; font-weight: 600; color: var(--ms-text); }
+.kn-switch button.active { background: var(--ms-ink); color: #fff; }
+.kn-group { margin-bottom: 28px; }
+.kn-group-title { font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
+.kn-group-title small { font-weight: 500; color: var(--ms-muted); margin-left: 6px; }
+.kn-grid { display: grid; gap: 8px; }
+.kn-cols-5 { grid-template-columns: repeat(5, 1fr); }
+.kn-cols-3 { grid-template-columns: repeat(3, 1fr); max-width: 75%; }
+.kn-cell { position: relative; border: 1px solid var(--ms-line); background: #fff; border-radius: 16px; padding: 10px 4px 8px; display: flex; flex-direction: column;
+  align-items: center; gap: 2px; transition: transform .12s, border-color .12s, box-shadow .12s; }
+.kn-cell .ms-jp { font-size: clamp(1.5rem, 3.4vw, 2.1rem); font-weight: 600; color: var(--ms-ink); line-height: 1.2; }
+.kn-cell small { font-size: 12px; color: var(--ms-muted); }
+.kn-cell:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -18px rgba(15,23,42,.5); }
+.kn-cell.active { border-color: var(--ms-ink); box-shadow: 0 0 0 2px var(--ms-ink) inset; }
+.kn-cell.learned { background: var(--ms-accent-soft); border-color: transparent; }
+.kn-done { position: absolute; top: 5px; right: 6px; font-size: 12px; color: var(--ms-accent); display: none; font-style: normal; }
+.kn-cell.learned .kn-done { display: block; }
+.kn-empty { visibility: hidden; }
+.kn-detail { position: sticky; top: 86px; background: var(--ms-soft); border-radius: 26px; padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+.kn-detail-glyph { font-size: clamp(5rem, 12vw, 7.5rem); line-height: 1; font-weight: 600; color: var(--ms-ink); text-align: center; background: #fff;
+  border-radius: 20px; padding: 22px 0; box-shadow: 0 16px 36px -28px rgba(15,23,42,.5); }
+.kn-detail-read { display: flex; align-items: baseline; gap: 12px; }
+.kn-detail-read b { font-size: 1.9rem; color: var(--ms-ink); }
+.kn-detail-other { font-size: 14px; color: var(--ms-muted); }
+.kn-detail-other .ms-jp { color: var(--ms-ink); font-weight: 600; font-size: 1.1rem; }
+.kn-detail-ex { background: #fff; border-radius: 16px; padding: 12px 14px; margin-top: 10px; }
+.kn-detail-ex small { color: var(--ms-muted); font-size: 12px; }
+.kn-detail-ex .ms-jp { font-size: 1.3rem; font-weight: 600; color: var(--ms-ink); }
+.kn-ex-meaning { font-size: 14px; }
+.kn-learn[aria-pressed="true"] { background: var(--ms-ink); color: #fff !important; border-color: var(--ms-ink); }
+.kn-quiz { background: var(--ms-dark-2); border: 1px solid rgba(255,255,255,.08); border-radius: 28px; padding: 28px; }
+.kn-opt { margin-bottom: 16px; }
+.kn-opt > span { display: block; font-size: 13px; color: #9aa1ad; margin-bottom: 8px; }
+.kn-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.kn-pills button { border: 1px solid rgba(255,255,255,.18); background: transparent; color: #e5e7eb; border-radius: 999px; padding: 7px 16px; font-size: 14px; }
+.kn-pills button.active { background: #fff; color: var(--ms-ink); border-color: #fff; font-weight: 600; }
+.kn-quiz-count, .kn-quiz-score { font-size: 13px; color: #9aa1ad; }
+.kn-quiz-score { color: #86efac; font-weight: 600; }
+.kn-quiz-prompt { text-align: center; font-size: clamp(4rem, 14vw, 6rem); font-weight: 600; color: #fff; line-height: 1.2; margin: 6px 0 22px;
+  font-family: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif; }
+.kn-quiz-prompt.romaji { font-family: inherit; font-size: clamp(3rem, 10vw, 4.2rem); }
+.kn-quiz-choices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.kn-quiz-choices button { border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.04); color: #fff; border-radius: 18px; padding: 16px 8px;
+  font-size: 1.25rem; font-weight: 600; transition: background .12s; }
+.kn-quiz-choices button.jp { font-family: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif; font-size: 1.8rem; }
+.kn-quiz-choices button:hover:not(:disabled) { background: rgba(255,255,255,.1); }
+.kn-quiz-choices button.right { background: #16a34a; border-color: #16a34a; }
+.kn-quiz-choices button.wrong { background: #dc2626; border-color: #dc2626; }
+.kn-quiz-feedback { min-height: 28px; text-align: center; margin-top: 14px; font-size: 14px; color: #c9ced8; }
+.kn-quiz-result { text-align: center; }
+.kn-result-score { color: #fff; margin-bottom: 4px; }
+.kn-result-score b { font-size: 4rem; line-height: 1; }
+.kn-result-score span { font-size: 1.4rem; color: #9aa1ad; }
+.kn-result-miss { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.kn-result-miss span { background: rgba(255,255,255,.08); border-radius: 12px; padding: 6px 12px; color: #fff; }
+.kn-result-miss .ms-jp { font-size: 1.2rem; margin-right: 6px; }
+.kn-pad { position: relative; max-width: 420px; margin: 0 auto; background: #fff; border: 1px solid var(--ms-line); border-radius: 26px; padding: 14px;
+  box-shadow: 0 30px 60px -40px rgba(15,23,42,.5); }
+.kn-pad canvas { display: block; width: 100%; aspect-ratio: 1; border-radius: 18px; touch-action: none; cursor: crosshair;
+  background: linear-gradient(var(--ms-line), var(--ms-line)) center / 100% 1px no-repeat, linear-gradient(var(--ms-line), var(--ms-line)) center / 1px 100% no-repeat, var(--ms-soft); }
+.kn-pad-label { position: absolute; top: 24px; left: 26px; font-size: 14px; color: var(--ms-muted); z-index: 1; }
+.kn-pad-label .ms-jp { color: var(--ms-ink); font-weight: 700; }
+.kn-plan ol { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; counter-reset: d; }
+.kn-plan li { border-top: 2px solid var(--ms-ink); padding-top: 12px; display: flex; flex-direction: column; }
+.kn-plan b { font-size: 13px; color: var(--ms-muted); }
+.kn-plan .ms-jp { color: var(--ms-ink); font-weight: 600; }
+@media (max-width: 991.98px) {
+  .kn-detail-col { position: sticky; top: 70px; z-index: 5; }   /* on phones the whole column sticks above the chart */
+  .kn-detail { position: static; flex-direction: row; align-items: center; padding: 14px; gap: 14px; box-shadow: 0 16px 30px -24px rgba(15,23,42,.5); }
+  .kn-detail-glyph { font-size: 3.6rem; padding: 10px 16px; flex-shrink: 0; }
+  .kn-detail-main { min-width: 0; }
+  .kn-detail-read b { font-size: 1.4rem; }
+  .kn-detail-ex { padding: 8px 10px; margin-top: 6px; }
+  .kn-detail .ms-btn-sm { padding: 6px 12px; font-size: 13px; }
+}
+@media (max-width: 767.98px) {
+  .kn-progress { grid-template-columns: 1fr; }
+  .kn-grid { gap: 6px; }
+  .kn-cell { border-radius: 12px; padding: 8px 2px 6px; }
+  .kn-cols-3 { max-width: none; }
+  .kn-detail-other { display: none; }
+  .kn-quiz { padding: 20px; }
+  .kn-plan ol { grid-template-columns: 1fr 1fr; }
+}

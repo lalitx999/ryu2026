@@ -4,7 +4,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.templatetags.static import static
 
-from microsites import content, registry
+from microsites import content, kana, registry
 from microsites.selectors import sales_selector
 from microsites.services import links, seo
 
@@ -71,7 +71,19 @@ def _ryu(request, site):
             "floaters": HERO_FLOATERS}
 
 
-SALES_PAGES = {"learn": _learn, "japanese": _japanese, "ryu": _ryu}
+def _kana(request, site):
+    preview = request.microsite_preview
+    data = {script: kana.flat(script) for script in ("hiragana", "katakana")}
+    return {**_base_context(request, site, content.KANA_FAQ),
+            "charts": [("hiragana", "ฮิรางานะ", kana.chart("hiragana")), ("katakana", "คาตากานะ", kana.chart("katakana"))],
+            "kana_data": data, "total": len(data["hiragana"]),
+            "uses": content.KANA_USES, "plan": content.KANA_PLAN,
+            "kanji_url": links.sibling_url(registry.BY_KEY["kanji"], preview),
+            "course_url": links.sibling_url(registry.BY_KEY["learn"], preview),
+            "free_trial_url": links.main_url(site, "/ryutube/"), "final_images": FINAL_COLLAGE}
+
+
+SALES_PAGES = {"learn": _learn, "japanese": _japanese, "ryu": _ryu, "kana": _kana}
 
 
 def site_home(request):

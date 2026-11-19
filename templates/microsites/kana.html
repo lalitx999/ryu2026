@@ -1,0 +1,150 @@
+{% extends "microsites/base.html" %}
+{% load static ryu_icons %}
+{% block nav %}<a href="#chart">ตารางอักษร</a><a href="#quiz">แบบทดสอบ</a><a href="#write">ฝึกเขียน</a><a href="#faq">คำถาม</a>{% endblock %}
+{% block header_cta %}<a class="ms-btn ms-btn-sm" href="#quiz">ทดสอบตัวเอง</a>{% endblock %}
+{% block main %}
+<section class="ms-panel ms-panel-first ms-hero">
+  <figure class="ms-float kana ms-jp" aria-hidden="true">あ<small>a</small></figure>
+  <figure class="ms-float kana alt ms-jp" aria-hidden="true">カ<small>ka</small></figure>
+  <figure class="ms-float kana alt ms-jp" aria-hidden="true">さ<small>sa</small></figure>
+  <figure class="ms-float kana ms-jp" aria-hidden="true">ナ<small>na</small></figure>
+  <figure class="ms-float kana ms-jp" aria-hidden="true">ま<small>ma</small></figure>
+  <figure class="ms-float kana alt ms-jp" aria-hidden="true">リ<small>ri</small></figure>
+  <div class="container" style="max-width:50rem">
+    <span class="ms-chip">ฟรี · ไม่ต้องสมัครสมาชิก</span>
+    <h1 class="ms-h1">อ่าน<span class="ms-scribble">ฮิรางานะ<svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8 C 40 2, 120 1, 198 6"/></svg></span><br>คาตากานะ ให้<span class="ms-grad">ออก</span></h1>
+    <p class="ms-lead">ตารางอักษรญี่ปุ่นครบ {{ total }} เสียงต่อชุด กดฟังเสียงอ่าน ดูคำศัพท์ตัวอย่าง ฝึกเขียน และทำแบบทดสอบ ระบบจำว่าคุณจำตัวไหนได้แล้ว</p>
+    <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+      <a class="ms-btn" href="#chart">เริ่มดูตาราง</a>
+      <a class="ms-btn ms-btn-ghost" href="#quiz">ทดสอบตัวเอง</a>
+    </div>
+    <div class="kn-progress mt-4" aria-live="polite">
+      <div><span>ฮิรางานะ</span><div class="kn-bar"><i data-progress-bar="hiragana"></i></div><b data-progress-text="hiragana">0/{{ total }}</b></div>
+      <div><span>คาตากานะ</span><div class="kn-bar"><i data-progress-bar="katakana"></i></div><b data-progress-text="katakana">0/{{ total }}</b></div>
+    </div>
+  </div>
+  <a class="ms-scroll-hint" href="#chart">เลื่อนลง {% icon "chevron-down" %}</a>
+</section>
+
+<section class="ms-panel" id="chart">
+  <div class="container ms-sec">
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+      <div><h2 class="ms-h2 mb-1">ตารางอักษรญี่ปุ่น</h2><p class="ms-sub">กดที่ตัวอักษรเพื่อฟังเสียงและดูคำศัพท์ตัวอย่าง</p></div>
+      <div class="kn-switch" role="tablist" aria-label="เลือกชุดอักษร">
+        {% for key, label, groups in charts %}<button type="button" role="tab" class="{% if forloop.first %}active{% endif %}" aria-selected="{{ forloop.first|yesno:'true,false' }}" data-script-tab="{{ key }}">{{ label }}</button>{% endfor %}
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-lg-4 order-lg-2 kn-detail-col">
+        <aside class="kn-detail" id="kn-detail" aria-live="polite">
+          <div class="kn-detail-glyph ms-jp" data-d="kana">あ</div>
+          <div class="kn-detail-main">
+            <div class="kn-detail-read"><b data-d="romaji">a</b><span>อ่านว่า <span data-d="thai">อะ</span></span></div>
+            <div class="kn-detail-other">อีกชุด: <span class="ms-jp" data-d="other">ア</span></div>
+            <div class="kn-detail-ex" data-d="example-box">
+              <small>คำศัพท์ตัวอย่าง</small>
+              <div><span class="ms-jp" data-d="ex-word">あめ</span> <span data-d="ex-romaji">ame</span></div>
+              <div class="kn-ex-meaning" data-d="ex-meaning">ฝน</div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mt-3">
+              <button type="button" class="ms-btn ms-btn-sm" data-act="speak">{% icon "volume" %} ฟังเสียง</button>
+              <button type="button" class="ms-btn ms-btn-sm ms-btn-ghost" data-act="speak-ex">{% icon "volume" %} คำตัวอย่าง</button>
+              <button type="button" class="ms-btn ms-btn-sm ms-btn-ghost kn-learn" data-act="learn" aria-pressed="false">{% icon "check" %} <span>จำได้แล้ว</span></button>
+            </div>
+            <p class="kn-voice-note ms-note mb-0 mt-2" hidden>อุปกรณ์นี้ไม่มีเสียงอ่านภาษาญี่ปุ่น ลองเปิดด้วย Chrome หรือ Safari</p>
+          </div>
+        </aside>
+      </div>
+      <div class="col-lg-8 order-lg-1">
+        {% for key, label, groups in charts %}
+        <div class="kn-chart{% if not forloop.first %} d-none{% endif %}" data-script="{{ key }}">
+          {% for g in groups %}
+          <div class="kn-group">
+            <h3 class="kn-group-title">{{ g.title }} <small>{{ g.count }} ตัว</small></h3>
+            <div class="kn-grid kn-cols-{{ g.rows.0|length }}">
+              {% for row in g.rows %}{% for c in row %}{% if c %}<button type="button" class="kn-cell" data-script="{{ key }}" data-key="{{ c.key }}"><span class="ms-jp">{{ c.kana }}</span><small>{{ c.romaji }}</small><i class="kn-done">{% icon "check" %}</i></button>{% else %}<span class="kn-empty" aria-hidden="true"></span>{% endif %}{% endfor %}{% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ms-sec ms-dark-sec" id="quiz">
+  <div class="container" style="max-width:46rem">
+    <div class="text-center mb-4"><h2 class="ms-h2">ทดสอบตัวเอง <span class="ms-grad">10 ข้อ</span></h2><p class="ms-sub">เลือกชุดอักษรและรูปแบบ แล้วเริ่มได้เลย</p></div>
+    <div class="kn-quiz">
+      <div class="kn-quiz-setup" data-quiz="setup">
+        <div class="kn-opt"><span>ชุดอักษร</span>
+          <div class="kn-pills" data-name="script"><button type="button" class="active" data-v="hiragana">ฮิรางานะ</button><button type="button" data-v="katakana">คาตากานะ</button><button type="button" data-v="mix">ผสม</button></div></div>
+        <div class="kn-opt"><span>ตัวอักษร</span>
+          <div class="kn-pills" data-name="set"><button type="button" class="active" data-v="basic">พื้นฐาน 46 ตัว</button><button type="button" data-v="all">ทั้งหมด</button><button type="button" data-v="todo">ที่ยังไม่ได้จำ</button></div></div>
+        <div class="kn-opt"><span>รูปแบบ</span>
+          <div class="kn-pills" data-name="mode"><button type="button" class="active" data-v="read">ดูอักษร เลือกเสียงอ่าน</button><button type="button" data-v="find">ดูเสียงอ่าน เลือกอักษร</button></div></div>
+        <button type="button" class="ms-btn ms-btn-light w-100 mt-2" data-act="quiz-start">{% icon "shuffle" %} เริ่มทำแบบทดสอบ</button>
+      </div>
+      <div class="kn-quiz-run" data-quiz="run" hidden>
+        <div class="d-flex justify-content-between align-items-center mb-3"><span class="kn-quiz-count" data-q="count">ข้อ 1/10</span><span class="kn-quiz-score" data-q="score">ถูก 0</span></div>
+        <div class="kn-quiz-prompt" data-q="prompt">あ</div>
+        <div class="kn-quiz-choices" data-q="choices"></div>
+        <div class="kn-quiz-feedback" data-q="feedback" aria-live="polite"></div>
+      </div>
+      <div class="kn-quiz-result" data-quiz="result" hidden>
+        <div class="kn-result-score"><b data-q="final">0</b><span>/10</span></div>
+        <p class="mb-3" data-q="verdict"></p>
+        <div class="kn-result-miss" data-q="misses"></div>
+        <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
+          <button type="button" class="ms-btn ms-btn-light" data-act="quiz-start">{% icon "refresh" %} ทำอีกรอบ</button>
+          <button type="button" class="ms-btn ms-btn-outline-light" data-act="quiz-setup">เปลี่ยนการตั้งค่า</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ms-panel" id="write">
+  <div class="container ms-sec">
+    <div class="row g-4 g-lg-5 align-items-center">
+      <div class="col-lg-5">
+        <span class="ms-kicker">ฝึกเขียน</span>
+        <h2 class="ms-h2 mt-1">เขียนตาม<span class="ms-grad">เส้นจาง ๆ</span></h2>
+        <p>ใช้นิ้วหรือเมาส์เขียนทับตัวอักษร เขียนซ้ำหลาย ๆ รอบจนจำรูปได้ กดตัวอักษรในตารางเพื่อเปลี่ยนตัวที่จะฝึก หรือสุ่มตัวใหม่</p>
+        <div class="d-flex flex-wrap gap-2">
+          <button type="button" class="ms-btn ms-btn-sm" data-act="write-random">{% icon "shuffle" %} สุ่มตัวใหม่</button>
+          <button type="button" class="ms-btn ms-btn-sm ms-btn-ghost" data-act="write-clear">{% icon "refresh" %} ล้าง</button>
+          <button type="button" class="ms-btn ms-btn-sm ms-btn-ghost" data-act="write-guide" aria-pressed="true">{% icon "eye" %} เส้นนำ</button>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="kn-pad">
+          <div class="kn-pad-label"><span class="ms-jp" data-w="kana">あ</span> <span data-w="romaji">a</span></div>
+          <canvas id="kn-canvas" width="600" height="600" aria-label="พื้นที่ฝึกเขียนตัวอักษร"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ms-panel">
+  <div class="container ms-sec">
+    <div class="text-center mb-5"><h2 class="ms-h2">ภาษาญี่ปุ่นมีอักษร 3 ชุด</h2><p class="ms-sub">อ่านคานะให้คล่องก่อน แล้วค่อยต่อคันจิ</p></div>
+    <div class="row g-3">
+      {% for glyph, title, text in uses %}
+      <div class="col-md-4"><div class="ms-card h-100"><span class="ms-card-ic ms-jp fw-bold">{{ glyph }}</span><h3 class="h6 fw-bold mb-1">{{ title }}</h3><p class="mb-0">{{ text }}</p></div></div>
+      {% endfor %}
+    </div>
+    <div class="kn-plan mt-5">
+      <h3 class="h5 fw-bold mb-3">แผนจำฮิรางานะใน 7 วัน</h3>
+      <ol>{% for day, what in plan %}<li><b>{{ day }}</b><span class="ms-jp">{{ what }}</span></li>{% endfor %}</ol>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block final %}{% include "microsites/_final_cta.html" with final_title="อ่านคานะได้แล้ว <span class='ms-grad'>ไปต่อคันจิ</span>" final_text="คลังคันจิ N5–N1 พร้อมคำอ่าน ความหมาย และคำศัพท์ตัวอย่าง หรือเรียนเป็นลำดับกับพี่ริว" final_primary="ไปเรียนคันจิ" final_primary_url=kanji_url final_secondary="ดูคอร์สเรียน" final_secondary_url=course_url %}{% endblock %}
+{% block scripts %}
+{{ kana_data|json_script:"kana-data" }}
+<script src="{% static 'js/kana.js' %}"></script>
+{% endblock %}
