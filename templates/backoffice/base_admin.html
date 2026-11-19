@@ -19,6 +19,7 @@
     <h6>งานดูแลระบบ</h6>
     <a href="{% url 'backoffice:renewals' %}" class="{% if nav == 'renewals' %}active{% endif %}">🔔 <span>แจ้งเตือนต่ออายุ</span></a>
     <a href="{% url 'backoffice:community' %}" class="{% if nav == 'community' %}active{% endif %}">💬 <span>ตรวจเนื้อหาชุมชน</span></a>
+    <a href="{% url 'backoffice:kanji' %}" class="{% if nav == 'kanji' %}active{% endif %}">漢 <span>ตรวจคันจิ (คันจิ.online)</span></a>
     <a href="{% url 'backoffice:tickets' %}" class="{% if nav == 'tickets' %}active{% endif %}">🎫 <span>คำร้องช่วยเหลือ</span></a>
     <a href="{% url 'backoffice:migrations' %}" class="{% if nav == 'migrations' %}active{% endif %}">🔄 <span>คำขอย้ายระบบ</span></a>
     <a href="{% url 'backoffice:slips' %}" class="{% if nav == 'slips' %}active{% endif %}">🛡️ <span>กฎ/ประวัติตรวจสลิป</span></a>

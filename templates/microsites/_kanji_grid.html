@@ -1,0 +1,3 @@
+<div class="kj-grid">
+  {% for r in grid %}<a class="kj-tile" href="/kanji/{{ r.char|urlencode }}/" data-char="{{ r.char }}"><span class="ms-jp">{{ r.char }}</span><small>{% if r.th_meaning %}{{ r.th_meaning|truncatechars:18 }}{% else %}{{ r.meanings_en.0|default:""|truncatechars:18 }}{% endif %}</small></a>{% endfor %}
+</div>

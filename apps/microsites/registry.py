@@ -60,7 +60,7 @@ SITES = (
         keywords=("ฮิรางานะ", "คาตากานะ", "อักษรภาษาญี่ปุ่น", "ตารางฮิรางานะ"),
     ),
     Microsite(
-        key="kanji", domain="คันจิ.online", kind="tool", name="RYU KANJI", live=False,
+        key="kanji", domain="คันจิ.online", kind="tool", name="RYU KANJI",
         title="คลังคันจิ N5–N1 คำอ่าน ความหมาย ลำดับขีด คำศัพท์ตัวอย่าง | RYU KANJI",
         description="ค้นหาคันจิ JLPT N5 ถึง N1 พร้อมคำอ่านอง/คุง คำอ่านภาษาไทย ความหมาย ลำดับขีด คำศัพท์ตัวอย่าง และแบบฝึกหัด ฟรี ไม่ต้องสมัครสมาชิก",
         tagline="คลังคันจิ N5 → N1 ฟรี", icon="漢", accent="#7c3aed",

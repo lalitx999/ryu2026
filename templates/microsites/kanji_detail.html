@@ -1,0 +1,74 @@
+{% extends "microsites/base.html" %}
+{% load static ryu_icons %}
+{% block title %}{{ k.char }} คันจิ {{ k.level }}{% if k.th_meaning %} แปลว่า {{ k.th_meaning }}{% endif %} คำอ่าน ลำดับขีด | RYU KANJI{% endblock %}
+{% block description %}คันจิ {{ k.char }} (JLPT {{ k.level }}, {{ k.stroke_count }} ขีด){% if k.th_meaning %} ความหมาย {{ k.th_meaning }}{% endif %} คำอ่านอง {% for r in on %}{{ r.kana }}{% if not forloop.last %}・{% endif %}{% empty %}-{% endfor %} คำอ่านคุง {% for r in kun %}{{ r.kana }}{% if not forloop.last %}・{% endif %}{% empty %}-{% endfor %} พร้อมลำดับขีดและคำศัพท์ตัวอย่าง{% endblock %}
+{% block nav %}<a href="/">หน้าแรก</a><a href="/level/{{ k.level|lower }}/">คันจิ {{ k.level }}</a><a href="#examples">คำศัพท์</a>{% endblock %}
+{% block header_cta %}<a class="ms-btn ms-btn-sm" href="/level/{{ k.level|lower }}/#quiz">ทดสอบ {{ k.level }}</a>{% endblock %}
+{% block main %}
+<section class="ms-panel ms-panel-first">
+  <div class="container ms-sec" style="padding-top:110px;max-width:68rem">
+    <nav class="kj-crumb"><a href="/">RYU KANJI</a> <span>/</span> <a href="/level/{{ k.level|lower }}/">{{ k.level }}</a> <span>/</span> <span class="ms-jp">{{ k.char }}</span></nav>
+    <div class="row g-4 g-lg-5 align-items-start">
+      <div class="col-lg-5">
+        <div class="kj-stroke-card">
+          <svg class="kj-svg" viewBox="0 0 109 109" role="img" aria-label="ลำดับขีดของ {{ k.char }}" data-strokes>
+            <g class="kj-guide">{% for d in k.stroke_paths %}<path d="{{ d }}"/>{% endfor %}</g>
+            <g class="kj-ink">{% for d in k.stroke_paths %}<path d="{{ d }}"/>{% endfor %}</g>
+          </svg>
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <span class="kj-meta">{{ k.stroke_count }} ขีด · JLPT {{ k.level }}{% if k.grade %} · ชั้นประถม {{ k.grade }}{% endif %}</span>
+            <button type="button" class="ms-btn ms-btn-sm" data-act="play-strokes">{% icon "play-outline" %} เล่นลำดับขีด</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <h1 class="kj-char ms-jp mb-0">{{ k.char }}</h1>
+          <div>
+            {% if k.th_meaning %}<div class="kj-th">{{ k.th_meaning }}</div>{% endif %}
+            <div class="kj-en">{{ k.meanings_en|join:", " }}</div>
+          </div>
+        </div>
+        {% if k.ai_status == "draft" %}<div class="kj-draft">{% icon "bot" %} ภาษาไทยในหน้านี้ร่างโดย AI รอผู้สอนตรวจ</div>{% elif k.ai_status == "approved" %}<div class="kj-approved">{% icon "check-circle" %} ผู้สอนตรวจแล้ว</div>{% endif %}
+        <div class="kj-readings">
+          <div><span class="kj-label">อง (On)</span><div class="kj-chips">{% for r in on %}<button type="button" class="kj-reading" data-say="{{ r.kana }}"><span class="ms-jp">{{ r.kana }}</span><small>{{ r.thai }}</small></button>{% empty %}<span class="ms-note">-</span>{% endfor %}</div></div>
+          <div><span class="kj-label">คุง (Kun)</span><div class="kj-chips">{% for r in kun %}<button type="button" class="kj-reading" data-say="{{ r.kana|cut:'.' }}"><span class="ms-jp">{{ r.kana }}</span><small>{{ r.thai }}</small></button>{% empty %}<span class="ms-note">-</span>{% endfor %}</div></div>
+          <p class="ms-note mb-0">คำอ่านภาษาไทยเป็นการถอดเสียงโดยประมาณ · จุด (.) แบ่งส่วนที่เขียนด้วยฮิรางานะต่อท้าย</p>
+        </div>
+        {% if k.th_note %}<div class="kj-note"><span class="kj-label">{% icon "bulb" %} เทคนิคช่วยจำ</span><p class="mb-0">{{ k.th_note }}</p></div>{% endif %}
+        <div class="d-flex flex-wrap gap-2 mt-3">
+          <button type="button" class="ms-btn ms-btn-sm ms-btn-ghost kn-learn" data-act="kj-learn" data-char="{{ k.char }}" aria-pressed="false">{% icon "check" %} <span>จำได้แล้ว</span></button>
+          <a class="ms-btn ms-btn-sm ms-btn-ghost" href="{{ dictionary_url }}">{% icon "book" %} เปิดพจนานุกรม</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if k.examples %}
+<section class="ms-panel" id="examples">
+  <div class="container ms-sec" style="max-width:68rem">
+    <h2 class="ms-h2 mb-4">คำศัพท์ที่ใช้ <span class="ms-jp">{{ k.char }}</span></h2>
+    <div class="row g-3">
+      {% for e in k.examples %}
+      <div class="col-md-4"><button type="button" class="kj-example" data-say="{{ e.reading }}">
+        <span class="kj-ex-word ms-jp">{{ e.word }}</span><span class="kj-ex-read ms-jp">{{ e.reading }}</span><span class="kj-ex-th">{{ e.th }}</span>
+        <span class="kj-ex-play">{% icon "volume" %}</span></button></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="ms-panel">
+  <div class="container ms-sec py-5" style="max-width:68rem">
+    <div class="kj-pager">
+      {% if prev %}<a href="/kanji/{{ prev|urlencode }}/">{% icon "arrow-left" %} <span class="ms-jp">{{ prev }}</span></a>{% else %}<span></span>{% endif %}
+      <span class="ms-note">ตัวที่ {{ position }} จาก {{ level_total }} ใน {{ k.level }}</span>
+      {% if next %}<a href="/kanji/{{ next|urlencode }}/"><span class="ms-jp">{{ next }}</span> {% icon "arrow-right" %}</a>{% else %}<span></span>{% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block final %}{% include "microsites/_final_cta.html" with final_title="เรียนคันจิ<span class='ms-grad'>อย่างเป็นระบบ</span>กับพี่ริว" final_text="คอร์สเรียนสด N5–N1 สอนคันจิพร้อมคำศัพท์และไวยากรณ์ ดูย้อนหลังได้ไม่จำกัด" final_primary="ดูคอร์สเรียน" final_primary_url=course_url final_secondary="กลับไปหน้าคันจิ" final_secondary_url="/" %}{% endblock %}
+{% block scripts %}<script src="{% static 'js/kanji.js' %}"></script>{% endblock %}

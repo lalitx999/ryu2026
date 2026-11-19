@@ -27,6 +27,7 @@ def robots_txt(site):
     return "\n".join(["User-agent: *", "Allow: /", "", f"Sitemap: {site.url}sitemap.xml", ""])
 
 
-def sitemap_xml(site):
-    return ('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-            f"<url><loc>{site.url}</loc><changefreq>weekly</changefreq><priority>1.0</priority></url></urlset>")
+def sitemap_xml(site, extra_paths=()):
+    urls = [f"<url><loc>{site.url}</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>"]
+    urls += [f"<url><loc>{site.url}{p}</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>" for p in extra_paths]
+    return '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + "".join(urls) + "</urlset>"

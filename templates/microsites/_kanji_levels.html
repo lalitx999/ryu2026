@@ -1,0 +1,3 @@
+<nav class="kj-levels" aria-label="ระดับ JLPT">
+  {% for lv, n in levels %}<a href="/level/{{ lv|lower }}/" class="{% if lv == level %}active{% endif %}"><b>{{ lv }}</b><small>{{ n }} ตัว</small></a>{% endfor %}
+</nav>

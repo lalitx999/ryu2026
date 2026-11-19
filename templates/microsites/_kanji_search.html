@@ -1,0 +1,6 @@
+{% load ryu_icons %}
+<form class="kj-search" role="search" action="#" data-search-url="{% url 'kanji_search' %}" onsubmit="return false">
+  <span class="kj-search-ic">{% icon "search" %}</span>
+  <input type="search" name="q" placeholder="ค้นหา: 日 / にち / ニチ / วัน / day" autocomplete="off" aria-label="ค้นหาคันจิ">
+  <div class="kj-results" hidden></div>
+</form>

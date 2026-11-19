@@ -48,6 +48,45 @@
     synth.speak(u);
   }
 
+  /* ---------- stroke order (KanjiVG) ---------- */
+  var STROKES = null, strokesWanted = false;
+  var strokesUrl = document.getElementById('kana-js').dataset.strokesUrl;
+  function loadStrokes() {
+    if (STROKES) return Promise.resolve(STROKES);
+    return fetch(strokesUrl).then(function (r) { return r.json(); }).then(function (d) { STROKES = d; return d; });
+  }
+  function drawStrokes(text) {
+    var svg = D('strokes'), glyph = D('kana'), chars = text.split('');
+    var have = STROKES && chars.every(function (ch) { return STROKES[ch]; });
+    var show = !!(strokesWanted && have);
+    svg.toggleAttribute('hidden', !show);   // SVG elements have no .hidden property: use the attribute
+    glyph.hidden = show;
+    if (!show) return;
+    svg.setAttribute('viewBox', '0 0 ' + (109 * chars.length) + ' 109');
+    var guide = '', ink = '';
+    chars.forEach(function (ch, i) {
+      var g = '<g transform="translate(' + (109 * i) + ',0)">';
+      var paths = STROKES[ch].map(function (d) { return '<path d="' + d + '"/>'; }).join('');
+      guide += g + paths + '</g>'; ink += g + paths + '</g>';
+    });
+    svg.innerHTML = '<g class="kj-guide">' + guide + '</g><g class="kj-ink">' + ink + '</g>';
+    var plan = [];
+    Array.prototype.forEach.call(svg.querySelectorAll('.kj-ink path'), function (p) {
+      var len = p.getTotalLength();
+      p.style.transition = 'none'; p.style.opacity = 0;
+      p.style.strokeDasharray = len + ' ' + len; p.style.strokeDashoffset = len;
+      plan.push([p, Math.max(260, len * 9)]);
+    });
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      var delay = 0;
+      plan.forEach(function (x) {
+        x[0].style.transition = 'stroke-dashoffset ' + x[1] + 'ms ease ' + delay + 'ms, opacity 0s linear ' + delay + 'ms';
+        x[0].style.opacity = 1; x[0].style.strokeDashoffset = 0;
+        delay += x[1] + 120;
+      });
+    }); });
+  }
+
   /* ---------- chart + detail ---------- */
   var current = null;
   var D = function (name) { return $('[data-d="' + name + '"]'); };
@@ -67,6 +106,7 @@
     if (cell) cell.classList.add('active');
     paintProgress();
     setWriting(c);
+    if (strokesWanted) drawStrokes(c.kana);
     if (opts && opts.speak) speak(c.kana);
   }
   function showScript(script) {
@@ -78,6 +118,10 @@
   $$('.kn-cell').forEach(function (b) { b.addEventListener('click', function () { select(b.dataset.script, b.dataset.key, { speak: true }); }); });
   $('[data-act="speak"]').addEventListener('click', function () { if (current) speak(current.cell.kana); });
   $('[data-act="speak-ex"]').addEventListener('click', function () { if (current && current.cell.example) speak(current.cell.example.word); });
+  $('[data-act="strokes"]').addEventListener('click', function () {
+    strokesWanted = true;   // from now on every selected kana shows (and replays) its stroke order
+    loadStrokes().then(function () { if (current) drawStrokes(current.cell.kana); }).catch(function () { /* offline */ });
+  });
   $('[data-act="learn"]').addEventListener('click', function () { if (current) toggleLearned(current.script, current.key); });
 
   /* ---------- quiz ---------- */

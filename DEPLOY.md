@@ -117,7 +117,7 @@ sudo systemctl restart ryu-web ryu-worker
 | ภาษาญี่ปุ่น.online | `xn--e3cyfs9bzcbz2a2nc.online` | เซลเพจ (ผู้เริ่มต้น) |
 | เรียนภาษาญี่ปุ่นกับพี่ริว.online | `xn--12cx9abgdykqjj2cs0jjb6bdhg1d3j0hcg.online` | เซลเพจ (พี่ริว) |
 | อักษรภาษาญี่ปุ่น.online | `xn--12cyzbhxr5bc5a4bpb4b5b4qc.online` | ตารางฮิรางานะ/คาตากานะ (เฟส 2) |
-| คันจิ.online | `xn--42ci4c5era.online` | เร็ว ๆ นี้ (เฟส 3) |
+| คันจิ.online | `xn--42ci4c5era.online` | คลังคันจิ N5–N1 (เฟส 3) |
 | พจนานุกรมภาษาญี่ปุ่น.online | `xn--12cnq0cacnswjv8evffb3c2bk61ac.online` | เร็ว ๆ นี้ (เฟส 4) |
 | แปลภาษาญี่ปุ่น.online | `xn--e3cyebx3a3a5eb5a8a6gtec.online` | เร็ว ๆ นี้ (เฟส 5) |
 | วัดระดับภาษาญี่ปุ่น.online | `xn--e3cnavdh7av8aza7ejeqb3cyc8sc.online` | เร็ว ๆ นี้ (เฟส 6) |
@@ -151,3 +151,15 @@ sudo certbot --nginx $(for n in $NAMES; do printf -- '-d %s ' "$n"; done) --redi
 ทำเฉพาะโดเมนที่ DNS พร้อมก่อนก็ได้ (ใส่เฉพาะตัวนั้นใน `HOSTS`) แล้วรันซ้ำพร้อม `--expand` เมื่อเพิ่มโดเมน
 
 **6.3 ตรวจ**: `curl -sI https://xn--42ci4c5era.online/ | head -1` ต้องได้ `200` · เปิด `/robots.txt` ของแต่ละโดเมน · ส่ง sitemap ของแต่ละโดเมนเข้า Google Search Console
+
+**6.4 ข้อมูลคันจิ (ครั้งแรก และทุกครั้งที่อัปเดตไฟล์ใน `apps/microsites/data/`)** — หลัง `git pull`:
+```bash
+cd /srv/ryu2026
+P="sudo -u ryu env DJANGO_SETTINGS_MODULE=config.settings.production .venv/bin/python manage.py"
+$P migrate
+$P import_kanji      # 2,211 ตัว + ร่างภาษาไทยจาก AI (ไม่ทับตัวที่ผู้สอนตรวจแล้ว)
+$P collectstatic --noinput
+sudo systemctl restart ryu-web ryu-worker
+```
+ผู้สอนตรวจ/แก้/อนุมัติที่ แอดมิน → "ตรวจคันจิ (คันจิ.online)" · ปุ่ม "ให้ AI ร่าง 24 ตัวถัดไป" ใช้ Celery (ต้องมีคีย์ DeepSeek/Groq ใน `.env`)
+แหล่งข้อมูลเปิดและสัญญาอนุญาต: `apps/microsites/data/README.md` และหน้า `/credits/` ของ คันจิ.online

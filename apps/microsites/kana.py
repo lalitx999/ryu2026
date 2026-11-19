@@ -126,3 +126,51 @@ def chart(script):
 def flat(script):
     """Every cell of one script, for the quiz."""
     return [dict(c, group=g["key"]) for g in chart(script) for row in g["rows"] for c in row if c]
+
+
+def to_hiragana(text):
+    return "".join(chr(ord(c) - 0x60) if "ァ" <= c <= "ヶ" else c for c in text)
+
+
+_THAI = {e[0]: e[2] for rows in (BASIC, DAKUTEN, YOON) for row in rows for e in row if e}
+_THAI["を"] = "โวะ"
+
+
+_ROMAJI = {e[0]: e[1] for rows in (BASIC, DAKUTEN, YOON) for row in rows for e in row if e}
+
+
+def _close_with_n(syllable):
+    """Thai syllable + final ん: "คะ" -> "คัน", "เสะ" -> "เส็น", "จิ" -> "จิน"."""
+    if syllable.endswith("ะ"):
+        base = syllable[:-1]
+        if "ีย" in base:
+            return base + "น"                          # เคียะ -> เคียน
+        if base[:1] == "เ":
+            return base + "็น"                         # เสะ -> เส็น
+        if base[:1] == "โ":
+            return base[1:] + "น"                      # โคะ -> คน
+        return base[:1] + "ั" + base[1:] + "น"         # คะ -> คัน
+    return syllable + "น"
+
+
+def reading_to_thai(reading):
+    """Approximate Thai transcription of a kana reading ("ひと.つ" -> "ฮิโทะทสึ", "きょう" -> "เคียว").
+    Long vowels (おう, うう) are shortened, ん closes the previous syllable, small っ and KANJIDIC2 punctuation
+    are dropped: a reading aid, not a strict romanisation."""
+    text = to_hiragana(reading).replace(".", "").replace("-", "").replace("!", "")
+    out, last, i = [], "", 0
+    while i < len(text):
+        pair = text[i:i + 2]
+        unit = pair if pair in _THAI else text[i]
+        i += len(unit)
+        if unit == "ん" and out:
+            out[-1] = _close_with_n(out[-1]); last = "n"; continue
+        if unit == "う" and last[-1:] in ("o", "u"):
+            continue                                   # long vowel: こう -> โค(ะ), きょう -> เคียว
+        if unit in _THAI:
+            out.append(_THAI[unit]); last = _ROMAJI.get(unit, "")
+    return "".join(out)
+
+
+def to_katakana_reading(reading):
+    return to_katakana(reading.replace("-", ""))

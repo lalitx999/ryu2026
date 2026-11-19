@@ -4,7 +4,7 @@
     <div class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-3">
       <div><h2 id="ryu-network-title" class="h5 fw-bold mb-1">เครือข่าย RYU</h2>
         <p class="mb-0 small">เว็บในเครือ RYU CLASS ใช้ฟรี ไม่ต้องสมัครสมาชิก</p></div>
-      <a class="small fw-semibold" href="{{ main_site_url }}">ไปที่ ryusosense.online {% icon "arrow-right" %}</a>
+      <span class="small d-flex gap-3">{% if site.key == "kanji" or site.key == "kana" %}<a href="/credits/">แหล่งข้อมูล</a>{% endif %}<a class="fw-semibold" href="{{ main_site_url }}">ไปที่ ryusosense.online {% icon "arrow-right" %}</a></span>
     </div>
     <div class="row g-2 row-cols-2 row-cols-md-4">
       {% for item in network %}

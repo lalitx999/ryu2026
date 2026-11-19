@@ -1,0 +1,68 @@
+{% extends "backoffice/base_admin.html" %}
+{% block title %}ตรวจคันจิ{% endblock %}{% block heading %}ตรวจคันจิ · คันจิ.online{% endblock %}
+{% block content %}
+<div class="adm-card p-3 mb-3">
+  <form class="d-flex flex-wrap gap-2 align-items-center" method="get">
+    <div class="btn-group btn-group-sm">
+      <a class="btn {% if not level %}btn-secondary{% else %}btn-outline-secondary{% endif %}" href="?status={{ status }}">ทุกระดับ</a>
+      {% for lv in levels %}<a class="btn {% if level == lv %}btn-secondary{% else %}btn-outline-secondary{% endif %}" href="?level={{ lv }}&status={{ status }}">{{ lv }}</a>{% endfor %}
+    </div>
+    <input type="hidden" name="level" value="{{ level }}"><input type="hidden" name="status" value="{{ status }}">
+    <input class="form-control form-control-sm" style="max-width:220px" name="q" value="{{ q }}" placeholder="ค้นหาคันจิ / ความหมายไทย">
+    <button class="btn btn-sm btn-outline-secondary">ค้นหา</button>
+    <button type="button" class="btn btn-sm btn-primary ms-auto" data-post="{% url 'backoffice:kanji_ai_draft' %}" data-body='{"level":"{{ level }}"}' data-confirm="ให้ AI ร่างภาษาไทยของคันจิ 24 ตัวถัดไปที่ยังไม่มีภาษาไทย{% if level %} (ระดับ {{ level }}){% endif %}?">ให้ AI ร่าง 24 ตัวถัดไป</button>
+  </form>
+  <div class="d-flex flex-wrap gap-2 mt-2">
+    <a class="btn btn-sm {% if not status %}btn-secondary{% else %}btn-outline-secondary{% endif %}" href="?level={{ level }}">ทั้งหมด</a>
+    {% for key, label, n in tabs %}<a class="btn btn-sm {% if status == key %}btn-secondary{% else %}btn-outline-secondary{% endif %}" href="?level={{ level }}&status={{ key }}">{{ label }} <span class="badge text-bg-light">{{ n }}</span></a>{% endfor %}
+  </div>
+</div>
+<p class="small text-secondary">ตัวอย่างคำศัพท์ 1 บรรทัดต่อ 1 คำ: <code>คำศัพท์ | คำอ่าน | ความหมาย</code> เช่น <code>日本 | にほん | ประเทศญี่ปุ่น</code> · กด "อนุมัติ" แล้วป้าย "ร่างโดย AI" บนหน้าเว็บจะหายไป</p>
+{% for k in page %}
+<form class="adm-card p-3 mb-3 kanji-form" data-url="{% url 'backoffice:kanji_save' k.id %}">
+  <div class="row g-3">
+    <div class="col-md-3">
+      <div class="d-flex align-items-center gap-3">
+        <div style="font-size:56px;line-height:1;font-family:'Hiragino Sans','Noto Sans JP',sans-serif">{{ k.char }}</div>
+        <div class="small"><b>{{ k.level }}</b> · {{ k.stroke_count }} ขีด<br>
+          <span class="st-pill st-{% if k.ai_status == 'approved' %}approved{% elif k.ai_status == 'draft' %}pending{% else %}rejected{% endif %}">{{ k.get_ai_status_display }}</span></div>
+      </div>
+      <div class="small text-secondary mt-2">อง: {{ k.on_readings|join:"、"|default:"-" }}<br>คุง: {{ k.kun_readings|join:"、"|default:"-" }}<br>EN: {{ k.meanings_en|join:", " }}</div>
+      <a class="small" href="/kanji/{{ k.char|urlencode }}/?site=kanji" target="_blank" rel="noopener">ดูบนเว็บ (พรีวิว)</a>
+    </div>
+    <div class="col-md-9">
+      <div class="row g-2">
+        <div class="col-md-5"><label class="form-label small mb-1">ความหมายไทย</label><input class="form-control form-control-sm" name="th_meaning" value="{{ k.th_meaning }}" maxlength="255"></div>
+        <div class="col-md-7"><label class="form-label small mb-1">เทคนิคช่วยจำ</label><input class="form-control form-control-sm" name="th_note" value="{{ k.th_note }}" maxlength="400"></div>
+        <div class="col-12"><label class="form-label small mb-1">คำศัพท์ตัวอย่าง</label><textarea class="form-control form-control-sm" name="examples" rows="3" style="font-family:'Hiragino Sans','Noto Sans JP',sans-serif">{{ k.examples_text }}</textarea></div>
+      </div>
+      <div class="d-flex gap-2 mt-2 justify-content-end align-items-center">
+        {% if k.ai_model %}<span class="small text-secondary me-auto">ร่างโดย {{ k.ai_model }}</span>{% endif %}
+        <button type="submit" class="btn btn-sm btn-outline-secondary" data-approve="0">บันทึกเป็นร่าง</button>
+        <button type="submit" class="btn btn-sm btn-success" data-approve="1">บันทึก + อนุมัติ</button>
+      </div>
+    </div>
+  </div>
+</form>
+{% empty %}<div class="adm-card p-5 text-center text-secondary">ไม่พบคันจิ{% if not level and not status and not q %} — รันคำสั่ง <code>python manage.py import_kanji</code> บนเซิร์ฟเวอร์ก่อน{% endif %}</div>{% endfor %}
+{% include "backoffice/_pager.html" %}
+{% endblock %}
+{% block scripts %}
+<script>
+document.addEventListener('submit', async (e) => {
+  const form = e.target.closest('.kanji-form'); if (!form) return;
+  e.preventDefault();
+  const btn = e.submitter, approve = btn && btn.dataset.approve === '1';
+  const body = { th_meaning: form.elements.th_meaning.value, th_note: form.elements.th_note.value, examples: form.elements.examples.value, approve };
+  btn.disabled = true;
+  try {
+    const r = await window.Ryu.ajax.post(form.dataset.url, body);
+    window.Ryu.toast(r.message || 'บันทึกแล้ว');
+    const pill = form.querySelector('.st-pill');
+    pill.className = 'st-pill st-' + (r.data.ai_status === 'approved' ? 'approved' : r.data.ai_status === 'draft' ? 'pending' : 'rejected');
+    pill.textContent = r.data.ai_status === 'approved' ? 'ผู้สอนตรวจแล้ว' : r.data.ai_status === 'draft' ? 'ร่างจาก AI รอตรวจ' : 'ยังไม่มีภาษาไทย';
+  } catch (err) { window.Ryu.toast(err.message, 'err'); }
+  finally { btn.disabled = false; }
+});
+</script>
+{% endblock %}

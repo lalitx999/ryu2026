@@ -111,3 +111,76 @@ class KanaDataTests(TestCase):
         self.assertEqual(kana.to_katakana("きょう"), "キョウ")
         basic = [c for c in kana.flat("katakana") if c["group"] == "basic"]
         self.assertEqual(sum(1 for c in basic if "example" in c), 45)  # every basic sound except ヲ
+
+
+@override_settings(DEBUG=False, ALLOWED_HOSTS=["testserver", *registry.all_hosts()], SITE_URL="https://www.ryusosense.online")
+class KanjiSiteTests(TestCase):
+    HOST = registry.BY_KEY["kanji"].host
+
+    @classmethod
+    def setUpTestData(cls):
+        from microsites.models import Kanji
+        from microsites.services.kanji_import import import_kanji
+        rows = [{"c": "日", "lv": "N5", "sc": 4, "fr": 1, "gr": 1, "on": ["にち", "じつ"], "kun": ["ひ", "-び"], "en": ["day", "sun"], "sp": ["M1 1L2 2"] * 4},
+                {"c": "本", "lv": "N5", "sc": 5, "fr": 10, "gr": 1, "on": ["ほん"], "kun": ["もと"], "en": ["book"], "sp": ["M1 1L2 2"] * 5},
+                {"c": "議", "lv": "N3", "sc": 20, "fr": 50, "gr": 4, "on": ["ぎ"], "kun": [], "en": ["deliberation"], "sp": []}]
+        import_kanji(rows)
+        Kanji.objects.filter(char="日").update(th_meaning="วัน, ดวงอาทิตย์", ai_status=Kanji.AI_DRAFT,
+                                              examples=[{"word": "毎日", "reading": "まいにち", "th": "ทุกวัน"}])
+        cls.staff = User.objects.create(email="k@test.local", role="admin", is_staff=True)
+
+    def get(self, path):
+        return self.client.get(path, HTTP_HOST=self.HOST)
+
+    def test_home_level_detail_search_and_sitemap(self):
+        home = self.get("/").content.decode()
+        self.assertIn('href="/kanji/%E6%97%A5/"', home)
+        self.assertIn("วัน, ดวงอาทิตย์", home)
+        level = self.get("/level/n5/").content.decode()
+        self.assertIn('id="kj-quiz-data"', level)
+        self.assertEqual(self.get("/level/n9/").status_code, 404)
+        detail = self.get("/kanji/日/").content.decode()
+        self.assertIn("ニチ", detail)                       # on reading shown in katakana
+        self.assertIn("นิจิ", detail)                       # with an approximate Thai reading
+        self.assertIn("ร่างโดย AI", detail)                 # draft label until a teacher approves
+        self.assertIn('href="/kanji/%E6%9C%AC/"', detail)   # next kanji in the level
+        self.assertEqual(self.get("/kanji/X/").status_code, 404)
+        self.assertEqual(self.get("/search/?q=にち").json()["results"][0]["char"], "日")
+        self.assertEqual(self.get("/search/?q=ดวงอาทิตย์").json()["results"][0]["char"], "日")
+        self.assertEqual(self.get("/search/?q=book").json()["results"][0]["char"], "本")
+        sitemap = self.get("/sitemap.xml").content.decode()
+        self.assertIn(f"https://{self.HOST}/kanji/%E6%97%A5/", sitemap)
+        self.assertEqual(EMOJI.findall(detail), [])
+
+    def test_kanji_paths_do_not_exist_on_other_domains(self):
+        self.assertEqual(self.client.get("/kanji/日/", HTTP_HOST=LEARN).status_code, 404)
+        self.assertEqual(self.client.get("/credits/", HTTP_HOST=LEARN).status_code, 404)
+        self.assertEqual(self.client.get("/credits/", HTTP_HOST=registry.BY_KEY["kana"].host).status_code, 200)
+
+    def test_reimport_keeps_reviewed_thai(self):
+        from microsites.models import Kanji
+        from microsites.services.kanji_import import import_kanji
+        import_kanji([{"c": "日", "lv": "N5", "sc": 4, "fr": 1, "on": ["にち"], "kun": [], "en": ["day"], "sp": []}])
+        k = Kanji.objects.get(char="日")
+        self.assertEqual((k.th_meaning, k.on_readings), ("วัน, ดวงอาทิตย์", ["にち"]))
+
+    def test_admin_review_approves_and_validates(self):
+        from microsites.models import Kanji
+        k = Kanji.objects.get(char="日")
+        self.client.force_login(self.staff)
+        url = f"/admin-panel/kanji/{k.id}/save/"
+        bad = self.client.post(url, {"th_meaning": "วัน", "examples": "毎日 | mainichi | ทุกวัน", "approve": True}, content_type="application/json")
+        self.assertEqual(bad.status_code, 400)                # reading must be kana
+        r = self.client.post(url, {"th_meaning": "วัน", "th_note": "", "examples": "毎日 | まいにち | ทุกวัน", "approve": True}, content_type="application/json")
+        self.assertEqual(r.json()["data"]["ai_status"], "approved")
+        k.refresh_from_db()
+        self.assertEqual((k.reviewed_by, k.examples[0]["reading"]), (self.staff, "まいにち"))
+        self.assertIn("ตรวจคันจิ", self.client.get("/admin-panel/kanji/?level=N5").content.decode())
+        self.assertNotIn("ร่างโดย AI", self.get("/kanji/日/").content.decode())
+
+
+class KanaThaiReadingTests(TestCase):
+    def test_reading_to_thai(self):
+        from microsites import kana
+        self.assertEqual([kana.reading_to_thai(r) for r in ("にち", "きょう", "かん", "せん", "ひと.つ")],
+                         ["นิจิ", "เคียว", "คัน", "เส็น", "ฮิโทะทสึ"])

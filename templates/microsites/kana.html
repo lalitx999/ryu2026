@@ -37,7 +37,7 @@
     <div class="row g-4">
       <div class="col-lg-4 order-lg-2 kn-detail-col">
         <aside class="kn-detail" id="kn-detail" aria-live="polite">
-          <div class="kn-detail-glyph ms-jp" data-d="kana">あ</div>
+          <div class="kn-detail-glyph-wrap"><div class="kn-detail-glyph ms-jp" data-d="kana">あ</div><svg class="kn-strokes" data-d="strokes" aria-hidden="true" hidden></svg><button type="button" class="kn-stroke-btn" data-act="strokes" title="ดูลำดับขีด">{% icon "pen" %} <span>ลำดับขีด</span></button></div>
           <div class="kn-detail-main">
             <div class="kn-detail-read"><b data-d="romaji">a</b><span>อ่านว่า <span data-d="thai">อะ</span></span></div>
             <div class="kn-detail-other">อีกชุด: <span class="ms-jp" data-d="other">ア</span></div>
@@ -146,5 +146,5 @@
 {% block final %}{% include "microsites/_final_cta.html" with final_title="อ่านคานะได้แล้ว <span class='ms-grad'>ไปต่อคันจิ</span>" final_text="คลังคันจิ N5–N1 พร้อมคำอ่าน ความหมาย และคำศัพท์ตัวอย่าง หรือเรียนเป็นลำดับกับพี่ริว" final_primary="ไปเรียนคันจิ" final_primary_url=kanji_url final_secondary="ดูคอร์สเรียน" final_secondary_url=course_url %}{% endblock %}
 {% block scripts %}
 {{ kana_data|json_script:"kana-data" }}
-<script src="{% static 'js/kana.js' %}"></script>
+<script src="{% static 'js/kana.js' %}" data-strokes-url="{% static 'data/kana_strokes.json' %}" id="kana-js"></script>
 {% endblock %}

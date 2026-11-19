@@ -1,0 +1,56 @@
+{% extends "microsites/base.html" %}
+{% load static ryu_icons %}
+{% block nav %}<a href="#start">เริ่มที่ N5</a><a href="#features">มีอะไรบ้าง</a><a href="/level/n1/">ระดับ N1</a><a href="#faq">คำถาม</a>{% endblock %}
+{% block header_cta %}<a class="ms-btn ms-btn-sm" href="/level/n5/">เริ่มเรียน N5</a>{% endblock %}
+{% block main %}
+<section class="ms-panel ms-panel-first ms-hero">
+  <figure class="ms-float kana ms-jp" aria-hidden="true">日<small>nichi</small></figure>
+  <figure class="ms-float kana alt ms-jp" aria-hidden="true">語<small>go</small></figure>
+  <figure class="ms-float kana alt ms-jp" aria-hidden="true">学<small>gaku</small></figure>
+  <figure class="ms-float kana ms-jp" aria-hidden="true">本<small>hon</small></figure>
+  <figure class="ms-float kana ms-jp" aria-hidden="true">先<small>sen</small></figure>
+  <figure class="ms-float kana alt ms-jp" aria-hidden="true">生<small>sei</small></figure>
+  <div class="container" style="max-width:52rem">
+    <span class="ms-chip">ฟรี · ไม่ต้องสมัครสมาชิก</span>
+    <h1 class="ms-h1">คันจิ N5–N1<br><span class="ms-scribble">เข้าใจง่าย<svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8 C 40 2, 120 1, 198 6"/></svg></span> ครบ<span class="ms-grad">ทุกตัว</span></h1>
+    <p class="ms-lead">คำอ่านอง/คุงพร้อมคำอ่านภาษาไทย ความหมาย ลำดับขีดแบบเคลื่อนไหว คำศัพท์ตัวอย่างพร้อมเสียง และแบบทดสอบ แยกตามระดับ JLPT</p>
+    <div class="mt-4">{% include "microsites/_kanji_search.html" %}</div>
+    <div class="mt-4">{% include "microsites/_kanji_levels.html" %}</div>
+  </div>
+</section>
+
+<section class="ms-panel" id="start">
+  <div class="container ms-sec">
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+      <div><span class="ms-kicker">เริ่มตรงนี้</span><h2 class="ms-h2 mb-1">คันจิ N5 · {{ grid|length }} ตัวแรก</h2><p class="ms-sub">เรียงตามความถี่ที่พบบ่อย กดที่ตัวคันจิเพื่อดูรายละเอียด</p></div>
+      <a class="ms-btn ms-btn-ghost" href="/level/n5/">ทดสอบ N5 {% icon "arrow-right" %}</a>
+    </div>
+    {% include "microsites/_kanji_grid.html" %}
+  </div>
+</section>
+
+<section class="ms-sec ms-dark-sec" id="features">
+  <div class="container">
+    <div class="text-center mb-5"><h2 class="ms-h2">ในแต่ละตัวมี<span class="ms-grad">ครบ</span></h2><p class="ms-sub">ทุกหน้าคันจิใช้ได้ฟรี ไม่ต้องสมัคร</p></div>
+    <div class="row g-3">
+      <div class="col-sm-6 col-lg-3"><div class="ms-card h-100"><span class="ms-card-ic">{% icon "pen" %}</span><h3 class="h6 fw-bold mb-1">ลำดับขีดเคลื่อนไหว</h3><p class="mb-0">ดูทีละขีดว่าเขียนอะไรก่อนหลัง กดเล่นซ้ำได้</p></div></div>
+      <div class="col-sm-6 col-lg-3"><div class="ms-card h-100"><span class="ms-card-ic">{% icon "book" %}</span><h3 class="h6 fw-bold mb-1">คำอ่าน + ความหมาย</h3><p class="mb-0">อง/คุง พร้อมคำอ่านภาษาไทยโดยประมาณ</p></div></div>
+      <div class="col-sm-6 col-lg-3"><div class="ms-card h-100"><span class="ms-card-ic">{% icon "volume" %}</span><h3 class="h6 fw-bold mb-1">คำศัพท์ตัวอย่างมีเสียง</h3><p class="mb-0">คำที่ใช้คันจินั้นจริง กดฟังเสียงอ่านได้</p></div></div>
+      <div class="col-sm-6 col-lg-3"><div class="ms-card h-100"><span class="ms-card-ic">{% icon "check-circle" %}</span><h3 class="h6 fw-bold mb-1">แบบทดสอบ + บันทึก</h3><p class="mb-0">ทดสอบความหมายทีละระดับ และจำว่าตัวไหนได้แล้ว</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="ms-panel">
+  <div class="container ms-sec" style="max-width:62rem">
+    <div class="ms-course-box">
+      <div><span class="ms-chip">ยังอ่านฮิรางานะไม่คล่อง?</span>
+        <h2 class="ms-h2 mt-3">อ่านคานะให้ออกก่อน แล้วคันจิจะง่ายขึ้นมาก</h2>
+        <p class="mb-0">คำอ่านของคันจิเขียนด้วยฮิรางานะและคาตากานะ ฝึกอ่านให้คล่องได้ฟรีที่อักษรภาษาญี่ปุ่น.online</p></div>
+      <a class="ms-btn" href="{{ kana_url }}">ไปฝึกอักษร {% icon "arrow-right" %}</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block final %}{% include "microsites/_final_cta.html" with final_title="อยากมีครู<span class='ms-grad'>พาเรียนคันจิ</span>?" final_text="คอร์สเรียนสดกับพี่ริว สอนคันจิพร้อมไวยากรณ์และคำศัพท์ตามระดับ JLPT" final_primary="ดูคอร์สเรียน" final_primary_url=course_url final_secondary="ฝึกอักษรฟรี" final_secondary_url=kana_url %}{% endblock %}
+{% block scripts %}<script src="{% static 'js/kanji.js' %}"></script>{% endblock %}

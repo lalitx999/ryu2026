@@ -1,5 +1,6 @@
 from django.urls import path
 
+from . import kanji_views
 from . import ops_views as ops
 from . import views
 
@@ -50,4 +51,7 @@ urlpatterns = [
     path("export/payments.csv", views.export_payments, name="export_payments"),
     path("broadcast/", views.broadcast_page, name="broadcast_page"),
     path("broadcast/send/", views.broadcast, name="broadcast"),
+    path("kanji/", kanji_views.kanji, name="kanji"),
+    path("kanji/<int:pk>/save/", kanji_views.kanji_save, name="kanji_save"),
+    path("kanji/ai-draft/", kanji_views.kanji_ai_draft, name="kanji_ai_draft"),
 ]

@@ -1,0 +1,47 @@
+{% extends "microsites/base.html" %}
+{% load static ryu_icons %}
+{% block title %}คันจิ {{ level }} ทั้งหมด {{ grid|length }} ตัว คำอ่าน ความหมาย แบบทดสอบ | RYU KANJI{% endblock %}
+{% block description %}รายการคันจิ JLPT {{ level }} ทั้งหมด {{ grid|length }} ตัว พร้อมความหมายภาษาไทย คำอ่าน ลำดับขีด และแบบทดสอบความหมาย ฟรี ไม่ต้องสมัครสมาชิก{% endblock %}
+{% block nav %}<a href="/">หน้าแรก</a><a href="#grid">รายการคันจิ</a><a href="#quiz">แบบทดสอบ</a>{% endblock %}
+{% block header_cta %}<a class="ms-btn ms-btn-sm" href="#quiz">ทดสอบ {{ level }}</a>{% endblock %}
+{% block main %}
+<section class="ms-panel ms-panel-first">
+  <div class="container ms-sec" style="padding-top:120px">
+    <div class="text-center mb-4">
+      <span class="ms-chip">JLPT {{ level }}</span>
+      <h1 class="ms-h1">คันจิ {{ level }} <span class="ms-grad">{{ grid|length }} ตัว</span></h1>
+      <div class="kn-progress mx-auto" style="grid-template-columns:1fr;max-width:22rem"><div><span>จำได้แล้ว</span><div class="kn-bar"><i data-kj-progress></i></div><b data-kj-progress-text>0/{{ grid|length }}</b></div></div>
+    </div>
+    <div class="mb-4">{% include "microsites/_kanji_search.html" %}</div>
+    {% include "microsites/_kanji_levels.html" %}
+  </div>
+</section>
+<section class="ms-sec ms-dark-sec" id="quiz">
+  <div class="container" style="max-width:46rem">
+    <div class="text-center mb-4"><h2 class="ms-h2">ทดสอบความหมาย {{ level }} <span class="ms-grad">10 ข้อ</span></h2><p class="ms-sub">ดูคันจิแล้วเลือกความหมายที่ถูกต้อง</p></div>
+    <div class="kn-quiz">
+      <div data-quiz="setup"><button type="button" class="ms-btn ms-btn-light w-100" data-act="kj-quiz-start">{% icon "shuffle" %} เริ่มทำแบบทดสอบ</button>
+        <label class="d-flex align-items-center gap-2 justify-content-center mt-3 small" style="color:#9aa1ad"><input type="checkbox" data-kj-todo> เฉพาะตัวที่ยังไม่ได้จำ</label></div>
+      <div data-quiz="run" hidden>
+        <div class="d-flex justify-content-between align-items-center mb-3"><span class="kn-quiz-count" data-q="count"></span><span class="kn-quiz-score" data-q="score"></span></div>
+        <div class="kn-quiz-prompt" data-q="prompt"></div>
+        <div class="kn-quiz-choices kj-choices" data-q="choices"></div>
+        <div class="kn-quiz-feedback" data-q="feedback" aria-live="polite"></div>
+      </div>
+      <div class="kn-quiz-result" data-quiz="result" hidden>
+        <div class="kn-result-score"><b data-q="final">0</b><span data-q="of">/10</span></div>
+        <p class="mb-3" data-q="verdict"></p>
+        <div class="kn-result-miss" data-q="misses"></div>
+        <button type="button" class="ms-btn ms-btn-light mt-3" data-act="kj-quiz-start">{% icon "refresh" %} ทำอีกรอบ</button>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="ms-panel" id="grid">
+  <div class="container ms-sec">
+    <h2 class="ms-h2 mb-4">รายการคันจิ {{ level }}</h2>
+    {% include "microsites/_kanji_grid.html" %}
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}{{ quiz|json_script:"kj-quiz-data" }}<script src="{% static 'js/kanji.js' %}"></script>{% endblock %}

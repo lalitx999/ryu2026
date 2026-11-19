@@ -1,11 +1,14 @@
 """Pages of the RYU Network domains.  Each domain is one page; views only gather data and render."""
 from django.conf import settings
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from functools import wraps
+from urllib.parse import quote
+
+from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.templatetags.static import static
 
 from microsites import content, kana, registry
-from microsites.selectors import sales_selector
+from microsites.selectors import kanji_selector, sales_selector
 from microsites.services import links, seo
 
 
@@ -83,7 +86,64 @@ def _kana(request, site):
             "free_trial_url": links.main_url(site, "/ryutube/"), "final_images": FINAL_COLLAGE}
 
 
-SALES_PAGES = {"learn": _learn, "japanese": _japanese, "ryu": _ryu, "kana": _kana}
+def _kanji_ctx(request, site, faq=None):
+    preview = request.microsite_preview
+    return {**_base_context(request, site, faq), "levels": kanji_selector.level_counts(),
+            "kana_url": links.sibling_url(registry.BY_KEY["kana"], preview),
+            "dictionary_url": links.sibling_url(registry.BY_KEY["dictionary"], preview),
+            "course_url": links.sibling_url(registry.BY_KEY["learn"], preview), "final_images": FINAL_COLLAGE}
+
+
+def _kanji(request, site):
+    return {**_kanji_ctx(request, site, content.KANJI_FAQ), "grid": kanji_selector.level_list("N5"), "level": "N5"}
+
+
+SALES_PAGES = {"learn": _learn, "japanese": _japanese, "ryu": _ryu, "kana": _kana, "kanji": _kanji}
+
+
+def only_on(*keys):
+    """Paths in site_urls are shared by every network domain; these pages exist on some of them only."""
+    def deco(view):
+        @wraps(view)
+        def wrapper(request, *args, **kwargs):
+            if _site(request).key not in keys or not _site(request).live:
+                raise Http404
+            return view(request, *args, **kwargs)
+        return wrapper
+    return deco
+
+
+@only_on("kanji")
+def kanji_level(request, level):
+    level = level.upper()
+    if level not in kanji_selector.LEVELS:
+        raise Http404
+    site = _site(request)
+    grid = kanji_selector.level_list(level)
+    quiz = [{"c": r["char"], "m": r["th_meaning"] or ", ".join(r["meanings_en"][:2])} for r in grid]
+    return render(request, "microsites/kanji_level.html", {**_kanji_ctx(request, site), "grid": grid, "level": level,
+                                                            "quiz": quiz, "canonical": f"{site.url}level/{level.lower()}/"})
+
+
+@only_on("kanji")
+def kanji_detail(request, char):
+    site = _site(request)
+    d = kanji_selector.detail(char)
+    if d is None:
+        raise Http404
+    return render(request, "microsites/kanji_detail.html", {**_kanji_ctx(request, site), **d,
+                                                             "canonical": f"{site.url}kanji/{quote(char)}/"})
+
+
+@only_on("kanji")
+def kanji_search(request):
+    return JsonResponse({"results": kanji_selector.search(request.GET.get("q", ""))}, json_dumps_params={"ensure_ascii": False})
+
+
+@only_on("kanji", "kana")
+def credits(request):
+    site = _site(request)
+    return render(request, "microsites/credits.html", {**_base_context(request, site), "canonical": f"{site.url}credits/"})
 
 
 def site_home(request):
@@ -99,7 +159,14 @@ def robots_txt(request):
 
 
 def sitemap_xml(request):
-    return HttpResponse(seo.sitemap_xml(_site(request)), content_type="application/xml; charset=utf-8")
+    site = _site(request)
+    extra = []
+    if site.live and site.key in ("kanji", "kana"):
+        extra.append("credits/")
+    if site.live and site.key == "kanji":
+        extra += [f"level/{lv.lower()}/" for lv in kanji_selector.LEVELS]
+        extra += [f"kanji/{quote(c)}/" for c in kanji_selector.all_chars()]
+    return HttpResponse(seo.sitemap_xml(site, extra), content_type="application/xml; charset=utf-8")
 
 
 def favicon(request):
