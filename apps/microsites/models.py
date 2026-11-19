@@ -96,3 +96,34 @@ class TranslationCache(models.Model):
 
     class Meta:
         db_table = "ryu_translation_cache"
+
+
+class ExamItem(models.Model):
+    """One mock-JLPT question written by AI in the JLPT style (never copied from real tests), kept only if a second AI
+    pass solved it to the same answer.  Published with an "AI mock question" label; teachers approve, fix or hide."""
+
+    SECTIONS = [("vocab", "คำศัพท์"), ("kanji", "คันจิ"), ("grammar", "ไวยากรณ์"), ("reading", "การอ่าน"), ("listening", "การฟัง")]
+    LIVE, APPROVED, HIDDEN = "live", "approved", "hidden"
+    STATUS = [(LIVE, "ใช้งาน (AI)"), (APPROVED, "ผู้สอนตรวจแล้ว"), (HIDDEN, "ซ่อน")]
+
+    level = models.CharField(max_length=2, choices=Kanji.LEVELS, db_index=True)
+    section = models.CharField(max_length=10, choices=SECTIONS, db_index=True)
+    group = models.CharField(max_length=40, blank=True, db_index=True)   # questions sharing one passage / script
+    passage = models.TextField(blank=True)                              # reading text, or listening script (read aloud)
+    stem = models.TextField()                                           # 【...】 marks the underlined part
+    choices = models.JSONField(default=list)
+    answer = models.PositiveSmallIntegerField()
+    explanation = models.TextField(blank=True)                          # Thai
+    status = models.CharField(max_length=10, choices=STATUS, default=LIVE, db_index=True)
+    reports = models.PositiveIntegerField(default=0)
+    ai_model = models.CharField(max_length=80, blank=True)
+    reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "ryu_exam_item"
+        ordering = ["level", "section", "id"]
+
+    def __str__(self):
+        return f"{self.level} {self.section} #{self.pk}"

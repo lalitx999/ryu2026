@@ -81,7 +81,7 @@ SITES = (
         keywords=("แปลภาษาญี่ปุ่น", "แปลไทยเป็นญี่ปุ่น", "แปลญี่ปุ่นเป็นไทย", "ล่ามภาษาญี่ปุ่น"),
     ),
     Microsite(
-        key="jlpt", domain="วัดระดับภาษาญี่ปุ่น.online", kind="tool", name="RYU JLPT TEST", live=False,
+        key="jlpt", domain="วัดระดับภาษาญี่ปุ่น.online", kind="tool", name="RYU JLPT TEST",
         title="แบบทดสอบวัดระดับภาษาญี่ปุ่น ข้อสอบจำลอง JLPT N5–N1 | RYU JLPT TEST",
         description="วัดระดับภาษาญี่ปุ่นฟรี ข้อสอบจำลองแนว JLPT N5 ถึง N1 แยกคำศัพท์ คันจิ ไวยากรณ์ การอ่าน จับเวลา วิเคราะห์คะแนน พร้อมเฉลย (ข้อสอบจำลองของ RYU CLASS ไม่ใช่ข้อสอบทางการ)",
         tagline="ข้อสอบจำลอง JLPT N5 → N1", icon="clipboard", accent="#16a34a",

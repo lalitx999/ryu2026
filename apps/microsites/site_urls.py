@@ -15,6 +15,8 @@ urlpatterns = [
     path("api/dict/thai/", views.dict_thai, name="dict_thai"),
     path("api/translate/", views.translate_api, name="translate_api"),
     path("api/translate/<str:key>/", views.translate_result, name="translate_result"),
+    path("test/<str:kind>/", views.jlpt_test, name="jlpt_test"),
+    path("api/exam/report/<int:item_id>/", views.jlpt_report, name="jlpt_report"),
     path("credits/", views.credits, name="microsite_credits"),
     path("favicon.ico", views.favicon, name="microsite_favicon"),
 ]

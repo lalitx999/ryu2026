@@ -13,7 +13,7 @@ from django.views.decorators.http import require_http_methods
 
 from core.http import ServiceError, fail, ok
 from microsites import dict_labels
-from microsites.selectors import dict_selector, kanji_selector, sales_selector
+from microsites.selectors import dict_selector, exam_selector, kanji_selector, sales_selector
 from microsites.services import ratelimit
 from microsites.services import links, seo
 
@@ -124,7 +124,19 @@ def _translator(request, site):
             "course_url": links.sibling_url(registry.BY_KEY["learn"], preview), "final_images": FINAL_COLLAGE}
 
 
-SALES_PAGES = {"learn": _learn, "japanese": _japanese, "ryu": _ryu, "kana": _kana, "kanji": _kanji, "dictionary": _dictionary,
+def _jlpt_ctx(request, site, faq=None):
+    preview = request.microsite_preview
+    return {**_base_context(request, site, faq), "levels": exam_selector.level_counts(),
+            "kanji_site": links.sibling_url(registry.BY_KEY["kanji"], preview).rstrip("/"),
+            "dictionary_url": links.sibling_url(registry.BY_KEY["dictionary"], preview),
+            "course_url": links.sibling_url(registry.BY_KEY["learn"], preview), "final_images": FINAL_COLLAGE}
+
+
+def _jlpt(request, site):
+    return {**_jlpt_ctx(request, site, content.JLPT_FAQ), "sections": exam_selector.SECTION_TH}
+
+
+SALES_PAGES = {"jlpt": _jlpt, "learn": _learn, "japanese": _japanese, "ryu": _ryu, "kana": _kana, "kanji": _kanji, "dictionary": _dictionary,
                "translator": _translator}
 
 
@@ -191,6 +203,8 @@ def sitemap_xml(request):
     extra = []
     if site.live and site.key in ("kanji", "kana", "dictionary"):
         extra.append("credits/")
+    if site.live and site.key == "jlpt":
+        extra += ["test/placement/"] + [f"test/{lv.lower()}/" for lv in exam_selector.LEVELS]
     if site.live and site.key == "dictionary":
         from microsites.models import DictEntry
         extra += [f"word/{i}/" for i in DictEntry.objects.exclude(ai_status=DictEntry.AI_NONE).order_by("rank").values_list("id", flat=True)]
@@ -301,3 +315,30 @@ def translate_result(request, key):
     from microsites.services import translator
     result = translator.cached(key[:64])
     return ok({"key": key, "state": "done" if result else "pending", "result": result})
+
+
+# ───────────── RYU JLPT TEST (วัดระดับภาษาญี่ปุ่น.online) ─────────────
+@only_on("jlpt")
+@ensure_csrf_cookie
+def jlpt_test(request, kind):
+    site = _site(request)
+    kind = kind.upper()
+    if kind == "PLACEMENT":
+        exam, title = exam_selector.placement(), "แบบทดสอบวัดระดับภาษาญี่ปุ่น"
+    elif kind in exam_selector.LEVELS:
+        exam, title = exam_selector.mock(kind), f"ข้อสอบจำลอง JLPT {kind}"
+    else:
+        raise Http404
+    return render(request, "microsites/jlpt_test.html", {**_jlpt_ctx(request, site), "exam": exam, "title": title,
+                                                          "canonical": f"{site.url}test/{kind.lower()}/"})
+
+
+@only_on("jlpt")
+@require_http_methods(["POST"])
+def jlpt_report(request, item_id):
+    from microsites.services import exam_bank
+    try:
+        counted = exam_bank.report(request, item_id)
+    except ServiceError as exc:
+        return fail(exc.message, status=exc.status)
+    return ok(message="ขอบคุณที่แจ้ง ผู้สอนจะตรวจโจทย์ข้อนี้" if counted else "แจ้งข้อนี้ไปแล้ว ขอบคุณครับ")

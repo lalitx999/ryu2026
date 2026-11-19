@@ -120,7 +120,7 @@ sudo systemctl restart ryu-web ryu-worker
 | คันจิ.online | `xn--42ci4c5era.online` | คลังคันจิ N5–N1 (เฟส 3) |
 | พจนานุกรมภาษาญี่ปุ่น.online | `xn--12cnq0cacnswjv8evffb3c2bk61ac.online` | พจนานุกรม AI (เฟส 4) |
 | แปลภาษาญี่ปุ่น.online | `xn--e3cyebx3a3a5eb5a8a6gtec.online` | ล่าม AI ไทย⇄ญี่ปุ่น (เฟส 5) |
-| วัดระดับภาษาญี่ปุ่น.online | `xn--e3cnavdh7av8aza7ejeqb3cyc8sc.online` | เร็ว ๆ นี้ (เฟส 6) |
+| วัดระดับภาษาญี่ปุ่น.online | `xn--e3cnavdh7av8aza7ejeqb3cyc8sc.online` | ข้อสอบจำลอง JLPT (เฟส 6) |
 
 **พรีวิวก่อนต่อ DNS**: ล็อกอินแอดมินบน www.ryusosense.online แล้วเปิด `https://www.ryusosense.online/?site=learn`
 (`learn` / `japanese` / `ryu` / `kana` / `kanji` / `dictionary` / `translator` / `jlpt`) · ออกจากพรีวิว: `?site=off` · หน้าพรีวิวเป็น noindex
@@ -159,9 +159,10 @@ P="sudo -u ryu env DJANGO_SETTINGS_MODULE=config.settings.production .venv/bin/p
 $P migrate
 $P import_kanji      # 2,211 ตัว + ร่างภาษาไทยจาก AI (ไม่ทับตัวที่ผู้สอนตรวจแล้ว)
 $P import_dictionary # 22,661 คำ (JMdict) + ภาษาไทยที่ AI เขียนไว้ล่วงหน้า
+$P import_exam       # คลังข้อสอบจำลอง JLPT (เพิ่มเฉพาะข้อที่ยังไม่มี ไม่แตะข้อที่ผู้สอนแก้แล้ว)
 $P collectstatic --noinput
 sudo systemctl restart ryu-web ryu-worker
 ```
-ผู้สอนตรวจ/แก้/อนุมัติที่ แอดมิน → "ตรวจคันจิ (คันจิ.online)" · ปุ่ม "ให้ AI ร่าง 24 ตัวถัดไป" ใช้ Celery (ต้องมีคีย์ DeepSeek/Groq ใน `.env`)
+ผู้สอนตรวจ/แก้/อนุมัติที่ แอดมิน → "ตรวจคันจิ (คันจิ.online)" และ "ตรวจข้อสอบจำลอง JLPT" (มีแท็บ "ถูกแจ้งว่าผิด") · สร้างโจทย์เพิ่ม: `$P exam_ai_build --levels N3` · ปุ่ม "ให้ AI ร่าง 24 ตัวถัดไป" ใช้ Celery (ต้องมีคีย์ DeepSeek/Groq ใน `.env`)
 พจนานุกรม: คำที่ยังไม่มีภาษาไทย AI จะเขียนตอนมีคนเปิดคำนั้นครั้งแรก (ผ่าน Celery) จำกัด `RYU_AI_PER_IP_HOUR` (ค่าเริ่ม 30) และ `RYU_AI_DAILY_LIMIT` (2000) ใน `.env` — production ใช้ Redis db 2 เป็น cache กลาง (`CACHE_URL` ถ้าต้องการเปลี่ยน) ตัวนับจึงใช้ร่วมกันทุก worker
 แหล่งข้อมูลเปิดและสัญญาอนุญาต: `apps/microsites/data/README.md` และหน้า `/credits/` ของ คันจิ.online

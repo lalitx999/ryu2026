@@ -572,3 +572,58 @@
   .tr-box { padding: 12px; border-radius: 22px; }
   .tr-hist { grid-template-columns: 1fr; gap: 4px; }
 }
+
+/* ── วัดระดับภาษาญี่ปุ่น.online (RYU JLPT TEST) ─────────────────────────────── */
+.jl-placement { display: block; height: 100%; text-decoration: none; color: var(--ms-text); background: var(--ms-ink); border-radius: 28px; padding: 30px;
+  background-image: radial-gradient(120% 80% at 100% 0%, color-mix(in srgb, var(--ms-accent) 45%, transparent), transparent 60%); }
+.jl-placement h2, .jl-placement .ms-kicker { color: #fff; }
+.jl-placement p { color: #c9ced8; }
+.jl-placement .ms-btn { background: #fff; color: var(--ms-ink) !important; border-color: #fff; }
+.jl-last { display: block; font-size: 12.5px; color: #9aa1ad; margin-top: 12px; }
+.jl-levels { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.jl-level { display: flex; flex-direction: column; gap: 2px; border: 1px solid var(--ms-line); border-radius: 20px; padding: 16px 18px; text-decoration: none;
+  color: var(--ms-text); background: #fff; transition: border-color .15s, transform .15s; }
+.jl-level:hover { border-color: var(--ms-ink); transform: translateY(-2px); }
+.jl-level b { font-size: 1.7rem; color: var(--ms-ink); line-height: 1.2; }
+.jl-level span { font-size: 13px; color: var(--ms-muted); }
+.jl-level .jl-last { margin-top: 4px; color: var(--ms-accent); }
+.jl-level.off { opacity: .55; }
+.jl-timer { font-variant-numeric: tabular-nums; font-weight: 700; background: var(--ms-ink); color: #fff; border-radius: 999px; padding: 7px 16px; font-size: 14px; flex-shrink: 0; }
+.jl-timer.low { background: #dc2626; }
+.jl-top { display: flex; justify-content: space-between; font-size: 13px; color: var(--ms-muted); margin-bottom: 8px; }
+.jl-bar { height: 5px; border-radius: 3px; background: var(--ms-line); overflow: hidden; margin-bottom: 22px; }
+.jl-bar i { display: block; height: 100%; background: var(--ms-grad); width: 0; transition: width .3s; }
+.jl-passage { background: var(--ms-soft); border-radius: 20px; padding: 18px 20px; margin-bottom: 18px; line-height: 2; white-space: pre-wrap;
+  font-family: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif; font-size: 1.05rem; color: var(--ms-ink); }
+.jl-listen { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.jl-stem { font-size: 1.3rem; line-height: 1.9; color: var(--ms-ink); margin-bottom: 18px; }
+.jl-stem u { text-decoration-thickness: 2px; text-underline-offset: 5px; }
+.jl-choices { display: grid; gap: 10px; }
+.jl-choice { display: flex; align-items: center; gap: 14px; text-align: left; border: 1px solid var(--ms-line); background: #fff; border-radius: 18px; padding: 14px 18px;
+  font-size: 1.1rem; color: var(--ms-ink); transition: border-color .12s; }
+.jl-choice:hover { border-color: var(--ms-ink); }
+.jl-choice .n { width: 28px; height: 28px; flex-shrink: 0; border-radius: 50%; border: 1px solid var(--ms-line); display: inline-flex; align-items: center; justify-content: center; font-size: 13px; color: var(--ms-muted); }
+.jl-choice.on { border-color: var(--ms-ink); background: var(--ms-soft); box-shadow: inset 0 0 0 1px var(--ms-ink); }
+.jl-choice.on .n { background: var(--ms-ink); color: #fff; border-color: var(--ms-ink); }
+.jl-palette { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 26px; }
+.jl-palette button { width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--ms-line); background: #fff; font-size: 12.5px; color: var(--ms-muted); }
+.jl-palette button.done { background: var(--ms-soft); color: var(--ms-ink); }
+.jl-palette button.cur { border-color: var(--ms-ink); color: var(--ms-ink); font-weight: 700; }
+.jl-score { margin: 14px 0 4px; color: var(--ms-ink); }
+.jl-score b { font-size: 4rem; line-height: 1; }
+.jl-score span { font-size: 1.5rem; color: var(--ms-muted); }
+.jl-verdict { font-size: 1.1rem; }
+.jl-sections { display: grid; gap: 8px; max-width: 32rem; }
+.jl-sec { display: grid; grid-template-columns: 90px 1fr 50px; align-items: center; gap: 10px; font-size: 14px; }
+.jl-sec b { text-align: right; color: var(--ms-ink); }
+.jl-review { display: grid; gap: 12px; }
+.jl-rev { border: 1px solid var(--ms-line); border-left: 4px solid #16a34a; border-radius: 16px; padding: 14px 18px; background: #fff; }
+.jl-rev.bad { border-left-color: #dc2626; }
+.jl-rev-head { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--ms-muted); margin-bottom: 6px; }
+.jl-rev-head .tag { background: #fef3c7; color: #92400e; border-radius: 999px; padding: 1px 10px; }
+.jl-rev-head .tag.ok { background: #dcfce7; color: #166534; }
+.jl-rev-stem { font-size: 1.05rem; color: var(--ms-ink); margin-bottom: 6px; }
+.jl-rev details { margin-bottom: 8px; font-size: 14px; }
+.jl-rev summary { cursor: pointer; color: var(--ms-muted); }
+.jl-rev-ans { font-size: 14px; margin-bottom: 6px; }
+.jl-report { border: 0; background: none; padding: 0; font-size: 12.5px; color: var(--ms-muted); text-decoration: underline; }

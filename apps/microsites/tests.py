@@ -53,10 +53,12 @@ class MicrositeRoutingTests(TestCase):
         titles = {p.split("<title>")[1].split("</title>")[0] for p in pages.values()}
         self.assertEqual(len(titles), 3)                         # no duplicate content between the three
 
-    def test_tool_domain_shows_coming_soon_and_network_links(self):
+    def test_all_sites_live_and_network_footer_links_siblings(self):
+        self.assertTrue(all(s.live for s in registry.SITES))     # all 8 phases shipped: no "coming soon" page left
         html = self.client.get("/", HTTP_HOST=KANJI).content.decode()
-        self.assertIn("เร็ว ๆ นี้", html)
-        self.assertIn(f"https://{LEARN}/", html)                 # footer links to sibling domains
+        self.assertNotIn("เร็ว ๆ นี้", html)
+        for site in registry.SITES:
+            self.assertIn(site.url, html)                          # footer links every network domain
         self.assertIn('aria-current="page"', html)
 
     def test_robots_sitemap_and_404_are_per_domain(self):
@@ -328,3 +330,109 @@ class TranslatorSiteTests(TestCase):
         TranslationCache.objects.filter(pk=old.pk).update(created_at=timezone.now() - timedelta(days=31))
         TranslationCache.objects.create(key="b" * 64, direction="th2ja", style="polite", result={"translation": "y"})
         self.assertEqual(translator.purge(30), 1)
+
+
+@override_settings(DEBUG=False, ALLOWED_HOSTS=["testserver", *registry.all_hosts()], SITE_URL="https://www.ryusosense.online",
+                   CACHES={"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "jlpt-tests"}})
+class JlptSiteTests(TestCase):
+    HOST = registry.BY_KEY["jlpt"].host
+
+    @classmethod
+    def setUpTestData(cls):
+        from microsites.models import ExamItem
+        rows = []
+        for lv in ("N5", "N4"):
+            for sec in ("vocab", "kanji", "grammar"):
+                for k in range(9):
+                    rows.append(ExamItem(level=lv, section=sec, stem=f"{lv}{sec}{k} 【学校】に行きます。", choices=["a", "b", "c", "d"], answer=k % 4, explanation="ไทย"))
+            for g in range(3):
+                for k in range(2):
+                    rows.append(ExamItem(level=lv, section="reading", group=f"r{lv}{g}", passage="本文", stem=f"q{k}", choices=["a", "b", "c", "d"], answer=1))
+                rows.append(ExamItem(level=lv, section="listening", group=f"l{lv}{g}", passage="男：こんにちは\n女：はい", stem="何？", choices=["a", "b", "c", "d"], answer=2))
+        ExamItem.objects.bulk_create(rows)
+        ExamItem.objects.filter(stem__startswith="N5vocab0").update(status=ExamItem.HIDDEN)
+        cls.staff = User.objects.create(email="j@test.local", role="admin", is_staff=True)
+
+    def get(self, path):
+        return self.client.get(path, HTTP_HOST=self.HOST)
+
+    def exam(self, path):
+        html = self.get(path).content.decode()
+        return html, json.loads(html.split('id="exam-data" type="application/json">')[1].split("</script>")[0])
+
+    def test_home_lists_levels_and_disclaimer(self):
+        html = self.get("/").content.decode()
+        self.assertIn("ไม่ใช่ข้อสอบทางการ", html)
+        self.assertIn('href="/test/n5/"', html)
+        self.assertNotIn('href="/test/n1/"', html)              # N1 has no questions yet: not offered
+        self.assertEqual(EMOJI.findall(html), [])
+
+    def test_mock_has_every_section_and_skips_hidden(self):
+        html, data = self.exam("/test/n5/")
+        sections = {i["section"] for i in data["items"]}
+        self.assertEqual(sections, {"vocab", "kanji", "grammar", "reading", "listening"})
+        self.assertEqual(sum(1 for i in data["items"] if i["section"] == "vocab"), 8)
+        self.assertEqual(sum(1 for i in data["items"] if i["section"] == "reading"), 4)        # 2 passages x 2 questions
+        self.assertFalse(any(i["stem"].startswith("N5vocab0") for i in data["items"]))
+        self.assertIn("<u>学校</u>", next(i["stem"] for i in data["items"] if i["section"] == "kanji"))
+        self.assertEqual((data["minutes"], data["level"]), (40, "N5"))
+        self.assertEqual(self.get("/test/n9/").status_code, 404)
+
+    def test_placement_mixes_levels(self):
+        _, data = self.exam("/test/placement/")
+        self.assertEqual({i["level"] for i in data["items"]}, {"N5", "N4"})
+        self.assertEqual(len(data["items"]), 10)
+
+    def test_report_counts_once_per_visitor(self):
+        from microsites.models import ExamItem
+        q = ExamItem.objects.filter(level="N5", section="kanji").first()
+        for _ in range(2):
+            self.client.post(f"/api/exam/report/{q.id}/", HTTP_HOST=self.HOST)
+        q.refresh_from_db()
+        self.assertEqual(q.reports, 1)
+
+    def test_admin_approve_validates_and_resets_reports(self):
+        from microsites.models import ExamItem
+        q = ExamItem.objects.filter(level="N4", section="grammar").first()
+        ExamItem.objects.filter(pk=q.pk).update(reports=3)
+        self.client.force_login(self.staff)
+        url = f"/admin-panel/exam/{q.id}/save/"
+        bad = self.client.post(url, {"action": "approve", "stem": "x", "choices": ["a", "a", "b", "c"], "answer": 0}, content_type="application/json")
+        self.assertEqual(bad.status_code, 400)
+        r = self.client.post(url, {"action": "approve", "stem": "ใหม่", "choices": ["w", "x", "y", "z"], "answer": 3, "explanation": "e"},
+                             content_type="application/json")
+        self.assertEqual(r.json()["data"]["status"], "approved")
+        q.refresh_from_db()
+        self.assertEqual((q.answer, q.reports, q.reviewed_by), (3, 0, self.staff))
+        self.client.post(url, {"action": "hide"}, content_type="application/json")
+        q.refresh_from_db()
+        self.assertEqual(q.status, "hidden")
+        self.assertIn("ตรวจข้อสอบจำลอง", self.client.get("/admin-panel/exam/?status=reported").content.decode())
+
+    def test_ai_build_keeps_only_verified_and_shuffles(self):
+        from unittest import mock
+        from microsites.models import ExamItem
+        from microsites.services import exam_ai
+        from support.ai import Completion
+        gen = json.dumps([{"stem": f"s{k}（　　）", "choices": ["right", "w1", "w2", "w3"], "answer": 0, "explanation": "e"} for k in range(3)])
+        before = ExamItem.objects.count()
+        calls = []
+
+        def fake(messages, **kw):
+            calls.append(1)
+            if len(calls) == 1:
+                return Completion(gen, "Fake")
+            # the checker answers the first two correctly (wherever "right" was shuffled to) and the third wrongly
+            prompt = messages[-1]["content"]
+            out = []
+            for k, block in enumerate(prompt.split("ข้อ ")[1:]):
+                opts = [line.split(") ", 1)[1] for line in block.splitlines()[1:] if ") " in line]
+                idx = opts.index("right")
+                out.append({"q": k, "answer": idx if k < 2 else (idx + 1) % 4})
+            return Completion(json.dumps(out), "Fake")
+
+        with mock.patch("support.ai.complete", side_effect=fake):
+            made, kept = exam_ai.build("N3", "vocab", 3)
+        self.assertEqual((made, kept, ExamItem.objects.count() - before), (3, 2, 2))
+        for q in ExamItem.objects.filter(level="N3"):
+            self.assertEqual(q.choices[q.answer], "right")

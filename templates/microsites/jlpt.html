@@ -1,0 +1,64 @@
+{% extends "microsites/base.html" %}
+{% load static ryu_icons %}
+{% block nav %}<a href="#start">เริ่มทดสอบ</a><a href="#sections">ส่วนของข้อสอบ</a><a href="#faq">คำถาม</a>{% endblock %}
+{% block header_cta %}<a class="ms-btn ms-btn-sm" href="/test/placement/">วัดระดับเลย</a>{% endblock %}
+{% block main %}
+<section class="ms-panel ms-panel-first ms-hero">
+  <figure class="ms-float kana ms-jp" aria-hidden="true">N5<small>start</small></figure>
+  <figure class="ms-float kana alt ms-jp" aria-hidden="true">N3<small>middle</small></figure>
+  <figure class="ms-float kana alt ms-jp" aria-hidden="true">N1<small>top</small></figure>
+  <figure class="ms-float kana ms-jp" aria-hidden="true">合<small>pass</small></figure>
+  <div class="container" style="max-width:52rem">
+    <span class="ms-chip">ข้อสอบจำลองของ RYU CLASS · ไม่ใช่ข้อสอบทางการ</span>
+    <h1 class="ms-h1">วัดระดับ<span class="ms-scribble">ภาษาญี่ปุ่น<svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8 C 40 2, 120 1, 198 6"/></svg></span><br>แนว JLPT <span class="ms-grad">N5–N1</span></h1>
+    <p class="ms-lead">ทำแบบวัดระดับสั้น ๆ เพื่อรู้ว่าตอนนี้อยู่ระดับไหน หรือลองข้อสอบจำลองเต็มรูปแบบ จับเวลา วิเคราะห์คะแนนรายส่วน พร้อมเฉลยภาษาไทย</p>
+    <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+      <a class="ms-btn" href="/test/placement/">วัดระดับแบบสั้น</a>
+      <a class="ms-btn ms-btn-ghost" href="#start">เลือกข้อสอบจำลอง</a>
+    </div>
+  </div>
+</section>
+
+<section class="ms-panel" id="start">
+  <div class="container ms-sec">
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <a class="jl-placement" href="/test/placement/">
+          <span class="ms-kicker">ไม่รู้ว่าอยู่ระดับไหน?</span>
+          <h2 class="ms-h2 mt-1">วัดระดับแบบสั้น</h2>
+          <p class="mb-3">25 ข้อ ระดับละ 5 ข้อจาก N5 ถึง N1 ใช้เวลาประมาณ 20 นาที แล้วระบบจะประเมินระดับคร่าว ๆ ให้</p>
+          <span class="ms-btn">เริ่มวัดระดับ {% icon "arrow-right" %}</span>
+          <div class="jl-last" data-last="placement"></div>
+        </a>
+      </div>
+      <div class="col-lg-7">
+        <span class="ms-kicker">ข้อสอบจำลองเต็มรูปแบบ</span>
+        <h2 class="ms-h2 mt-1 mb-3">เลือกระดับที่จะลองสอบ</h2>
+        <div class="jl-levels">
+          {% for lv in levels %}
+          {% if lv.ready %}<a class="jl-level" href="/test/{{ lv.level|lower }}/">{% else %}<div class="jl-level off">{% endif %}
+            <b>{{ lv.level }}</b><span>{{ lv.minutes }} นาที · คลัง {{ lv.count }} ข้อ</span>
+            <small class="jl-last" data-last="{{ lv.level }}">{% if not lv.ready %}กำลังเตรียมโจทย์{% endif %}</small>
+          {% if lv.ready %}</a>{% else %}</div>{% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ms-sec ms-dark-sec" id="sections">
+  <div class="container">
+    <div class="text-center mb-5"><h2 class="ms-h2">ข้อสอบจำลองมีครบ <span class="ms-grad">5 ส่วน</span></h2><p class="ms-sub">รูปแบบเดียวกับ JLPT แต่สั้นกว่าและแต่งใหม่ทั้งหมด</p></div>
+    <div class="row g-3 row-cols-2 row-cols-lg-5">
+      <div class="col"><div class="ms-card h-100"><span class="ms-card-ic">{% icon "book" %}</span><h3 class="h6 fw-bold mb-1">คำศัพท์</h3><p class="mb-0 small">เติมคำให้ถูกบริบท</p></div></div>
+      <div class="col"><div class="ms-card h-100"><span class="ms-card-ic ms-jp fw-bold">漢</span><h3 class="h6 fw-bold mb-1">คันจิ</h3><p class="mb-0 small">เลือกคำอ่านที่ถูกต้อง</p></div></div>
+      <div class="col"><div class="ms-card h-100"><span class="ms-card-ic">{% icon "pen" %}</span><h3 class="h6 fw-bold mb-1">ไวยากรณ์</h3><p class="mb-0 small">รูปประโยคและคำช่วย</p></div></div>
+      <div class="col"><div class="ms-card h-100"><span class="ms-card-ic">{% icon "file" %}</span><h3 class="h6 fw-bold mb-1">การอ่าน</h3><p class="mb-0 small">อ่านบทความแล้วตอบคำถาม</p></div></div>
+      <div class="col"><div class="ms-card h-100"><span class="ms-card-ic">{% icon "volume" %}</span><h3 class="h6 fw-bold mb-1">การฟัง</h3><p class="mb-0 small">ฟังบทสนทนาแล้วตอบ</p></div></div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block final %}{% include "microsites/_final_cta.html" with final_title="รู้ระดับแล้ว <span class='ms-grad'>ไปให้ถึงเป้า</span>กับพี่ริว" final_text="คอร์สเรียนสด N5–N1 ติวตรงแนวข้อสอบ ดูย้อนหลังได้ไม่จำกัด" final_primary="ดูคอร์สเรียน" final_primary_url=course_url final_secondary="ทวนคันจิฟรี" final_secondary_url=kanji_site %}{% endblock %}
+{% block scripts %}<script src="{% static 'js/jlpt.js' %}"></script>{% endblock %}

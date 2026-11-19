@@ -1,0 +1,60 @@
+{% extends "microsites/base.html" %}
+{% load static ryu_icons %}
+{% block title %}{{ title }} ออนไลน์ฟรี จับเวลา พร้อมเฉลย | RYU JLPT TEST{% endblock %}
+{% block description %}{{ title }} แต่งใหม่ตามรูปแบบ JLPT ทำออนไลน์ฟรี จับเวลา วิเคราะห์คะแนนรายส่วน พร้อมเฉลยภาษาไทย (ข้อสอบจำลองของ RYU CLASS ไม่ใช่ข้อสอบทางการ){% endblock %}
+{% block nav %}<a href="/">หน้าแรก</a>{% endblock %}
+{% block header_cta %}<span class="jl-timer" data-timer aria-live="off">--:--</span>{% endblock %}
+{% block main %}
+<section class="ms-panel ms-panel-first">
+  <div class="container ms-sec" style="padding-top:108px;max-width:54rem">
+    <div class="jl-intro" data-stage="intro">
+      <span class="ms-chip">ข้อสอบจำลองของ RYU CLASS · ไม่ใช่ข้อสอบทางการ</span>
+      <h1 class="ms-h2 mt-3">{{ title }}</h1>
+      {% if exam.items %}
+      <p>{{ exam.items|length }} ข้อ · เวลา {{ exam.minutes }} นาที · ส่งคำตอบได้ก่อนหมดเวลา พาร์ทการฟังกดปุ่มเพื่อฟังบทสนทนา (เปิดเสียงด้วยนะครับ)</p>
+      <p class="ms-note">{% icon "bot" %} โจทย์แต่งโดย AI และผ่านการตรวจซ้ำด้วย AI ข้อที่ผู้สอนตรวจแล้วจะมีป้ายบอก เจอข้อผิดกด "แจ้งโจทย์ผิด" ได้</p>
+      <button type="button" class="ms-btn mt-2" data-act="start">เริ่มทำข้อสอบ</button>
+      {% else %}
+      <p>คลังโจทย์ของระดับนี้กำลังเตรียมอยู่ ลองระดับอื่นหรือกลับมาใหม่ภายหลังนะครับ</p>
+      <a class="ms-btn" href="/">กลับหน้าแรก</a>
+      {% endif %}
+    </div>
+
+    <div data-stage="run" hidden>
+      <div class="jl-top"><span data-q="section"></span><span data-q="count"></span></div>
+      <div class="jl-bar"><i data-q="progress"></i></div>
+      <div class="jl-passage" data-q="passage" hidden></div>
+      <div class="jl-listen" data-q="listen" hidden>
+        <button type="button" class="ms-btn ms-btn-sm" data-act="listen">{% icon "volume" %} ฟังบทสนทนา</button>
+        <span class="ms-note" data-q="listen-note">ฟังได้ไม่จำกัดครั้ง</span>
+      </div>
+      <div class="jl-stem ms-jp" data-q="stem"></div>
+      <div class="jl-choices" data-q="choices"></div>
+      <div class="d-flex justify-content-between align-items-center mt-4 gap-2">
+        <button type="button" class="ms-btn ms-btn-sm ms-btn-ghost" data-act="prev">{% icon "arrow-left" %} ก่อนหน้า</button>
+        <button type="button" class="ms-btn ms-btn-sm ms-btn-ghost" data-act="submit">ส่งคำตอบ</button>
+        <button type="button" class="ms-btn ms-btn-sm" data-act="next">ถัดไป {% icon "arrow-right" %}</button>
+      </div>
+      <div class="jl-palette" data-q="palette"></div>
+    </div>
+
+    <div data-stage="result" hidden>
+      <span class="ms-chip">ผลการทดสอบ</span>
+      <div class="jl-score"><b data-r="score"></b><span data-r="of"></span></div>
+      <p class="jl-verdict" data-r="verdict"></p>
+      <div class="jl-sections" data-r="sections"></div>
+      <div class="d-flex flex-wrap gap-2 mt-3">
+        <a class="ms-btn" href="">{% icon "refresh" %} ทำชุดใหม่</a>
+        <a class="ms-btn ms-btn-ghost" href="/">เลือกข้อสอบอื่น</a>
+        <a class="ms-btn ms-btn-ghost" href="{{ course_url }}">ดูคอร์สเรียน</a>
+      </div>
+      <h2 class="h5 fw-bold mt-5 mb-3">เฉลยและคำอธิบาย</h2>
+      <div class="jl-review" data-r="review"></div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+{{ exam|json_script:"exam-data" }}
+<script src="{% static 'js/jlpt.js' %}" data-report-url="/api/exam/report/" id="jlpt-js"></script>
+{% endblock %}
