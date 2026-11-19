@@ -116,7 +116,16 @@ def _dictionary(request, site):
     return {**_dict_ctx(request, site, content.DICT_FAQ), "basics": dict_selector.basics(24), "samples": content.DICT_SAMPLES}
 
 
-SALES_PAGES = {"learn": _learn, "japanese": _japanese, "ryu": _ryu, "kana": _kana, "kanji": _kanji, "dictionary": _dictionary}
+def _translator(request, site):
+    preview = request.microsite_preview
+    return {**_base_context(request, site, content.TRANSLATOR_FAQ), "styles": content.TRANSLATOR_STYLES,
+            "samples": content.TRANSLATOR_SAMPLES,
+            "dictionary_url": links.sibling_url(registry.BY_KEY["dictionary"], preview),
+            "course_url": links.sibling_url(registry.BY_KEY["learn"], preview), "final_images": FINAL_COLLAGE}
+
+
+SALES_PAGES = {"learn": _learn, "japanese": _japanese, "ryu": _ryu, "kana": _kana, "kanji": _kanji, "dictionary": _dictionary,
+               "translator": _translator}
 
 
 def only_on(*keys):
@@ -262,3 +271,33 @@ def dict_thai(request):
             return fail(exc.message, status=exc.status)
         thai_lookup.delay(q)
     return ok({"cached": DictThaiQuery.objects.filter(query=q).exists()})
+
+
+# ───────────── RYU TRANSLATOR (แปลภาษาญี่ปุ่น.online) ─────────────
+@only_on("translator")
+@require_http_methods(["POST"])
+def translate_api(request):
+    """Start a translation: cached results come back at once, otherwise AI runs in Celery and the page polls."""
+    import json
+    from microsites.services import translator
+    from microsites.tasks import translate_text
+    try:
+        body = json.loads(request.body or b"{}")
+    except ValueError:
+        body = {}
+    try:
+        key, direction, style, result = translator.request_translation(body.get("text"), body.get("direction", "auto"), body.get("style", "polite"))
+        if result is None:
+            ratelimit.check_ai(request, "translate")
+            translate_text.delay(translator.clean_text(body.get("text")), direction, style, key)
+            result = translator.cached(key)          # already there when Celery runs eagerly (dev / tests)
+    except ServiceError as exc:
+        return fail(exc.message, status=exc.status)
+    return ok({"key": key, "state": "done" if result else "pending", "result": result})
+
+
+@only_on("translator")
+def translate_result(request, key):
+    from microsites.services import translator
+    result = translator.cached(key[:64])
+    return ok({"key": key, "state": "done" if result else "pending", "result": result})

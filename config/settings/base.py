@@ -174,4 +174,5 @@ LOGGING = {
 from celery.schedules import crontab  # noqa: E402
 CELERY_BEAT_SCHEDULE = {
     "renewal-reminders": {"task": "courses.tasks.send_renewal_reminders", "schedule": crontab(hour=9, minute=0)},
+    "purge-translations": {"task": "microsites.tasks.purge_translations", "schedule": crontab(hour=4, minute=10)},
 }

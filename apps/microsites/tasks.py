@@ -20,3 +20,15 @@ def thai_lookup(query):
     from microsites.services import dict_ai
     obj = dict_ai.thai_lookup(query)
     return bool(obj)
+
+
+@shared_task(time_limit=90, soft_time_limit=80)
+def translate_text(text, direction, style, key):
+    from microsites.services import translator
+    return bool(translator.translate(text, direction, style, key))
+
+
+@shared_task
+def purge_translations():
+    from microsites.services import translator
+    return translator.purge(30)

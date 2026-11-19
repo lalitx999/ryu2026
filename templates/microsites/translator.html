@@ -1,0 +1,69 @@
+{% extends "microsites/base.html" %}
+{% load static ryu_icons %}
+{% block nav %}<a href="#translate">แปลภาษา</a><a href="#history">ประวัติ</a><a href="#faq">คำถาม</a>{% endblock %}
+{% block header_cta %}<a class="ms-btn ms-btn-sm" href="{{ dictionary_url }}">พจนานุกรม</a>{% endblock %}
+{% block main %}
+<section class="ms-panel ms-panel-first">
+  <div class="container ms-sec" style="padding-top:112px;max-width:72rem" id="translate">
+    <div class="text-center mb-4">
+      <span class="ms-chip">ไทย ⇄ ญี่ปุ่น · เลือกระดับความสุภาพได้</span>
+      <h1 class="ms-h1">แปลภาษาญี่ปุ่น<span class="ms-scribble">ด้วย AI<svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8 C 40 2, 120 1, 198 6"/></svg></span> แบบ<span class="ms-grad">เข้าใจ</span></h1>
+      <p class="ms-lead mx-auto">ได้ทั้งคำแปล คำอ่าน คำแปลในระดับภาษาอื่น และคำอธิบายสำนวนเป็นภาษาไทย</p>
+    </div>
+    <form class="tr-box" data-api="{% url 'translate_api' %}" onsubmit="return false">
+      <div class="tr-bar">
+        <div class="tr-dir" role="group" aria-label="ทิศทางการแปล">
+          <span data-dir-from>ไทย</span>
+          <button type="button" class="tr-swap" data-act="swap" title="สลับทิศทาง">{% icon "refresh" %}</button>
+          <span data-dir-to>ญี่ปุ่น</span>
+          <small class="tr-auto" data-dir-auto>ตรวจภาษาอัตโนมัติ</small>
+        </div>
+        <div class="kn-pills tr-styles" data-name="style">
+          {% for key, label, hint in styles %}<button type="button" class="{% if key == 'polite' %}active{% endif %}" data-v="{{ key }}" title="{{ hint }}">{{ label }}</button>{% endfor %}
+        </div>
+      </div>
+      <div class="tr-panes">
+        <div class="tr-pane">
+          <textarea name="text" maxlength="500" rows="6" placeholder="พิมพ์ภาษาไทยหรือภาษาญี่ปุ่น เช่น ขอบคุณที่ช่วยเหลือเสมอนะครับ" aria-label="ข้อความที่ต้องการแปล"></textarea>
+          <div class="tr-pane-foot"><span class="ms-note" data-count>0/500</span>
+            <button type="submit" class="ms-btn" data-act="translate">{% icon "languages" %} แปล</button></div>
+        </div>
+        <div class="tr-pane tr-out" aria-live="polite">
+          <div class="tr-empty" data-out="empty">คำแปลจะแสดงที่นี่</div>
+          <div class="tr-wait" data-out="wait" hidden>{% icon "bot" %} <span>AI กำลังแปล…</span></div>
+          <div data-out="result" hidden>
+            <div class="tr-translation" data-o="translation"></div>
+            <div class="tr-reading ms-jp" data-o="reading"></div>
+            <div class="tr-reading-th" data-o="reading_th"></div>
+            <div class="d-flex flex-wrap gap-2 mt-3">
+              <button type="button" class="ms-btn ms-btn-sm ms-btn-ghost" data-act="speak">{% icon "volume" %} ฟังเสียง</button>
+              <button type="button" class="ms-btn ms-btn-sm ms-btn-ghost" data-act="copy">{% icon "file" %} <span>คัดลอก</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dc-samples justify-content-start mt-3">{% for s in samples %}<button type="button" data-sample="{{ s }}">{{ s }}</button>{% endfor %}</div>
+    </form>
+
+    <div class="tr-extra" data-out="extra" hidden>
+      <div class="row g-3">
+        <div class="col-lg-6" data-x="alt-col"><div class="tr-card"><h2 class="h6 fw-bold">ระดับภาษาอื่น</h2><div data-o="alternatives"></div></div></div>
+        <div class="col-lg-6" data-x="notes-col"><div class="tr-card"><h2 class="h6 fw-bold">{% icon "bulb" %} ข้อสังเกต</h2><p class="mb-2" data-o="politeness"></p><ul class="mb-0" data-o="notes"></ul></div></div>
+        <div class="col-12" data-x="words-col"><div class="tr-card"><h2 class="h6 fw-bold">คำศัพท์ในประโยค</h2><div class="tr-words" data-o="words" data-dict="{{ dictionary_url }}"></div></div></div>
+      </div>
+      <p class="ms-note mt-3 mb-0">{% icon "bot" %} แปลโดย AI อาจผิดพลาดได้ เอกสารสำคัญควรให้ผู้เชี่ยวชาญตรวจอีกครั้ง</p>
+    </div>
+  </div>
+</section>
+
+<section class="ms-panel" id="history">
+  <div class="container ms-sec" style="max-width:72rem">
+    <div class="d-flex justify-content-between align-items-center mb-3"><h2 class="ms-h2 mb-0">ประวัติการแปล</h2>
+      <button type="button" class="ms-btn ms-btn-sm ms-btn-ghost" data-act="clear-history">ล้างประวัติ</button></div>
+    <p class="ms-note">เก็บไว้ในเบราว์เซอร์ของเครื่องนี้เท่านั้น 10 รายการล่าสุด</p>
+    <div class="tr-history" data-history><p class="ms-note mb-0">ยังไม่มีประวัติ</p></div>
+  </div>
+</section>
+{% endblock %}
+{% block final %}{% include "microsites/_final_cta.html" with final_title="อยากพูด<span class='ms-grad'>ได้เอง</span>โดยไม่ต้องพึ่งแอปแปล?" final_text="เรียนภาษาญี่ปุ่นกับพี่ริว ตั้งแต่ประโยคพื้นฐานจนถึงภาษาธุรกิจ" final_primary="ดูคอร์สเรียน" final_primary_url=course_url final_secondary="เปิดพจนานุกรม" final_secondary_url=dictionary_url %}{% endblock %}
+{% block scripts %}<script src="{% static 'js/translator.js' %}"></script>{% endblock %}

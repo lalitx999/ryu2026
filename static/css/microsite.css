@@ -527,3 +527,48 @@
   border: 1px solid var(--ms-line); border-radius: 18px; text-decoration: none; background: #fff; }
 .dc-kanji:hover { border-color: var(--ms-ink); }
 @media (max-width: 767.98px) { .dc-grid { grid-template-columns: 1fr 1fr; } .dc-card { padding: 12px 14px; } .dc-card .w { font-size: 1.2rem; } }
+
+/* ── แปลภาษาญี่ปุ่น.online (RYU TRANSLATOR) ─────────────────────────────── */
+.tr-box { background: var(--ms-soft); border-radius: 30px; padding: 18px; }
+.tr-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 6px 14px; }
+.tr-dir { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--ms-ink); }
+.tr-swap { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--ms-line); background: #fff; display: inline-flex; align-items: center; justify-content: center; }
+.tr-swap:hover { border-color: var(--ms-ink); }
+.tr-auto { font-weight: 500; color: var(--ms-muted); font-size: 12px; }
+.tr-styles button { border-color: var(--ms-line); color: var(--ms-text); background: #fff; }
+.tr-styles button.active { background: var(--ms-ink); color: #fff; border-color: var(--ms-ink); }
+.tr-styles.dim { opacity: .45; }
+.tr-panes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tr-pane { background: #fff; border-radius: 22px; border: 1px solid var(--ms-line); padding: 16px; display: flex; flex-direction: column; min-height: 240px; }
+.tr-pane textarea { flex: 1; border: 0; outline: none; resize: vertical; font-size: 1.15rem; line-height: 1.6; min-height: 150px; background: transparent; }
+.tr-pane-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 8px; }
+.tr-empty { color: var(--ms-muted); margin: auto; text-align: center; }
+.tr-wait { display: inline-flex; align-items: center; gap: 8px; margin: auto; color: #3730a3; background: #e0e7ff; border-radius: 999px; padding: 6px 14px; font-size: 14px; }
+.tr-wait[hidden] { display: none; }
+.tr-translation { font-size: 1.45rem; font-weight: 600; color: var(--ms-ink); line-height: 1.6; white-space: pre-wrap; }
+.tr-reading { color: var(--ms-muted); margin-top: 6px; }
+.tr-reading-th { color: var(--ms-muted); font-size: 14px; }
+.tr-extra { margin-top: 18px; }
+.tr-card { background: #fff; border: 1px solid var(--ms-line); border-radius: 22px; padding: 18px 20px; height: 100%; }
+.tr-card h2 { display: flex; align-items: center; gap: 6px; }
+.tr-alt { width: 100%; text-align: left; display: flex; flex-direction: column; gap: 2px; border: 1px solid var(--ms-line); background: var(--ms-soft); border-radius: 16px;
+  padding: 10px 14px; margin-bottom: 8px; }
+.tr-alt small { color: var(--ms-muted); font-size: 12px; }
+.tr-alt .ms-jp { color: var(--ms-ink); font-weight: 600; font-size: 1.05rem; }
+.tr-alt .rd { color: var(--ms-muted); font-weight: 400; font-size: 13px; }
+.tr-words { display: flex; flex-wrap: wrap; gap: 8px; }
+.tr-word { display: inline-flex; flex-direction: column; text-decoration: none; border: 1px solid var(--ms-line); border-radius: 16px; padding: 8px 14px; line-height: 1.35; }
+.tr-word:hover { border-color: var(--ms-ink); }
+.tr-word .ms-jp { color: var(--ms-ink); font-weight: 600; font-size: 1.1rem; }
+.tr-word small { color: var(--ms-muted); }
+.tr-word em { font-style: normal; color: var(--ms-text); font-size: 13px; }
+.tr-history { display: grid; gap: 8px; }
+.tr-hist { text-align: left; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; border: 1px solid var(--ms-line); background: #fff; border-radius: 16px; padding: 12px 16px; }
+.tr-hist:hover { border-color: var(--ms-ink); }
+.tr-hist span:last-child { color: var(--ms-ink); font-weight: 600; }
+.ms-panel-first .tr-box ~ .tr-extra [hidden], [data-x][hidden] { display: none !important; }
+@media (max-width: 767.98px) {
+  .tr-panes { grid-template-columns: 1fr; }
+  .tr-box { padding: 12px; border-radius: 22px; }
+  .tr-hist { grid-template-columns: 1fr; gap: 4px; }
+}

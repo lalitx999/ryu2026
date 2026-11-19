@@ -74,7 +74,7 @@ SITES = (
         keywords=("พจนานุกรมภาษาญี่ปุ่น", "ดิกชันนารีญี่ปุ่น", "ศัพท์ญี่ปุ่น", "แปลศัพท์ญี่ปุ่น"),
     ),
     Microsite(
-        key="translator", domain="แปลภาษาญี่ปุ่น.online", kind="tool", name="RYU TRANSLATOR", live=False,
+        key="translator", domain="แปลภาษาญี่ปุ่น.online", kind="tool", name="RYU TRANSLATOR",
         title="แปลภาษาญี่ปุ่น ⇄ ไทย ด้วย AI เลือกระดับความสุภาพได้ | RYU TRANSLATOR",
         description="แปลภาษาไทยเป็นญี่ปุ่น และญี่ปุ่นเป็นไทย ด้วย AI เลือกภาษาทั่วไป สุภาพ หรือธุรกิจ พร้อมอธิบายสำนวนและเสียงอ่าน ใช้ฟรี",
         tagline="ล่าม AI ไทย ⇄ ญี่ปุ่น", icon="languages", accent="#0284c7",

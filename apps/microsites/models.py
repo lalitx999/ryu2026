@@ -81,3 +81,18 @@ class DictThaiQuery(models.Model):
 
     class Meta:
         db_table = "ryu_dict_thai_query"
+
+
+class TranslationCache(models.Model):
+    """Finished AI translations, keyed by a hash of (text, direction, style), so a repeated request costs nothing.
+    Only the result is stored (it contains the meaning of the text, so it is purged after 30 days by a daily task)."""
+
+    key = models.CharField(max_length=64, unique=True)
+    direction = models.CharField(max_length=8)                    # th2ja | ja2th
+    style = models.CharField(max_length=10)                       # casual | polite | business
+    result = models.JSONField(default=dict)
+    hits = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        db_table = "ryu_translation_cache"

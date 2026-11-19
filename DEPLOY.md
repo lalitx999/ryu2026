@@ -119,7 +119,7 @@ sudo systemctl restart ryu-web ryu-worker
 | อักษรภาษาญี่ปุ่น.online | `xn--12cyzbhxr5bc5a4bpb4b5b4qc.online` | ตารางฮิรางานะ/คาตากานะ (เฟส 2) |
 | คันจิ.online | `xn--42ci4c5era.online` | คลังคันจิ N5–N1 (เฟส 3) |
 | พจนานุกรมภาษาญี่ปุ่น.online | `xn--12cnq0cacnswjv8evffb3c2bk61ac.online` | พจนานุกรม AI (เฟส 4) |
-| แปลภาษาญี่ปุ่น.online | `xn--e3cyebx3a3a5eb5a8a6gtec.online` | เร็ว ๆ นี้ (เฟส 5) |
+| แปลภาษาญี่ปุ่น.online | `xn--e3cyebx3a3a5eb5a8a6gtec.online` | ล่าม AI ไทย⇄ญี่ปุ่น (เฟส 5) |
 | วัดระดับภาษาญี่ปุ่น.online | `xn--e3cnavdh7av8aza7ejeqb3cyc8sc.online` | เร็ว ๆ นี้ (เฟส 6) |
 
 **พรีวิวก่อนต่อ DNS**: ล็อกอินแอดมินบน www.ryusosense.online แล้วเปิด `https://www.ryusosense.online/?site=learn`

@@ -270,3 +270,61 @@ class DictionarySiteTests(TestCase):
     def _id(jmdict_id):
         from microsites.models import DictEntry
         return DictEntry.objects.get(jmdict_id=jmdict_id).id
+
+
+@override_settings(DEBUG=False, ALLOWED_HOSTS=["testserver", *registry.all_hosts()], SITE_URL="https://www.ryusosense.online",
+                   CELERY_TASK_ALWAYS_EAGER=True, RYU_AI_PER_IP_HOUR=50, RYU_AI_DAILY_LIMIT=100,
+                   CACHES={"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "tr-tests"}})
+class TranslatorSiteTests(TestCase):
+    HOST = registry.BY_KEY["translator"].host
+    ANSWER = {"translation": "いつも助けてくれてありがとう。", "reading": "いつもたすけてくれてありがとう。",
+              "alternatives": [{"style": "business", "text": "いつもお世話になっております。", "reading": "いつもおせわになっております。"},
+                               {"style": "polite", "text": "same style must be dropped", "reading": ""}],
+              "notes": ["ข้อสังเกต"], "words": [{"word": "助ける", "reading": "たすける", "th": "ช่วยเหลือ"}]}
+
+    def setUp(self):
+        from django.core.cache import cache
+        cache.clear()
+
+    def post(self, body):
+        return self.client.post("/api/translate/", body, content_type="application/json", HTTP_HOST=self.HOST)
+
+    def fake(self, data):
+        from unittest import mock
+        from support.ai import Completion
+        return mock.patch("support.ai.complete", return_value=Completion(json.dumps(data, ensure_ascii=False), "Fake (test)"))
+
+    def test_page_and_translation_is_cached(self):
+        html = self.client.get("/", HTTP_HOST=self.HOST).content.decode()
+        self.assertIn('data-api="/api/translate/"', html)
+        self.assertEqual(EMOJI.findall(html), [])
+        with self.fake(self.ANSWER) as m:
+            r1 = self.post({"text": "ขอบคุณที่ช่วยเหลือเสมอนะ", "direction": "auto", "style": "polite"}).json()["data"]
+            r2 = self.post({"text": "ขอบคุณที่ช่วยเหลือเสมอนะ", "direction": "auto", "style": "polite"}).json()["data"]
+        self.assertEqual(m.call_count, 1)                                   # second request served from the cache
+        res = r1["result"]
+        self.assertEqual((r1["state"], res["direction"], res["translation"]), ("done", "th2ja", "いつも助けてくれてありがとう。"))
+        self.assertEqual([a["style"] for a in res["alternatives"]], ["business"])   # same-style alternative dropped
+        self.assertTrue(res["reading_th"])
+        self.assertEqual(r2["result"]["translation"], res["translation"])
+        poll = self.client.get(f"/api/translate/{r1['key']}/", HTTP_HOST=self.HOST).json()["data"]
+        self.assertEqual(poll["state"], "done")
+
+    def test_japanese_input_detected_and_limits(self):
+        with self.fake({"translation": "ขอบคุณสำหรับวันนี้", "reading": "おつかれさまでした"}):
+            res = self.post({"text": "お疲れ様でした"}).json()["data"]["result"]
+        self.assertEqual(res["direction"], "ja2th")
+        self.assertEqual(self.post({"text": "   "}).status_code, 400)
+        self.assertEqual(self.post({"text": "ก" * 501}).status_code, 400)
+        with override_settings(RYU_AI_PER_IP_HOUR=0), self.fake(self.ANSWER):
+            self.assertEqual(self.post({"text": "ข้อความใหม่"}).status_code, 429)
+
+    def test_purge_old_rows(self):
+        from datetime import timedelta
+        from django.utils import timezone
+        from microsites.models import TranslationCache
+        from microsites.services import translator
+        old = TranslationCache.objects.create(key="a" * 64, direction="th2ja", style="polite", result={"translation": "x"})
+        TranslationCache.objects.filter(pk=old.pk).update(created_at=timezone.now() - timedelta(days=31))
+        TranslationCache.objects.create(key="b" * 64, direction="th2ja", style="polite", result={"translation": "y"})
+        self.assertEqual(translator.purge(30), 1)
