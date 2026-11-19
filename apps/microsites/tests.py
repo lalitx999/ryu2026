@@ -1,3 +1,4 @@
+import json
 import re
 
 from django.test import TestCase, override_settings
@@ -184,3 +185,88 @@ class KanaThaiReadingTests(TestCase):
         from microsites import kana
         self.assertEqual([kana.reading_to_thai(r) for r in ("にち", "きょう", "かん", "せん", "ひと.つ")],
                          ["นิจิ", "เคียว", "คัน", "เส็น", "ฮิโทะทสึ"])
+
+
+@override_settings(DEBUG=False, ALLOWED_HOSTS=["testserver", *registry.all_hosts()], SITE_URL="https://www.ryusosense.online",
+                   CELERY_TASK_ALWAYS_EAGER=True, RYU_AI_PER_IP_HOUR=50, RYU_AI_DAILY_LIMIT=100,
+                   CACHES={"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "dict-tests"}})
+class DictionarySiteTests(TestCase):
+    HOST = registry.BY_KEY["dictionary"].host
+
+    @classmethod
+    def setUpTestData(cls):
+        from microsites.services.dict_import import import_words
+        import_words([
+            {"id": 1, "k": ["食べる"], "r": ["たべる"], "s": [{"pos": ["v1", "vt"], "g": ["to eat"], "m": []}], "rk": 0},
+            {"id": 2, "k": ["食堂"], "r": ["しょくどう"], "s": [{"pos": ["n"], "g": ["cafeteria", "dining hall"], "m": []}], "rk": 1},
+            {"id": 3, "k": [], "r": ["テレビ"], "s": [{"pos": ["n"], "g": ["television", "TV"], "m": []}], "rk": 2},
+            {"id": 4, "k": ["劇場"], "r": ["げきじょう"], "s": [{"pos": ["n"], "g": ["theater", "theatre"], "m": []}], "rk": 3},
+            {"id": 5, "k": ["美味しい"], "r": ["おいしい"], "s": [{"pos": ["adj-i"], "g": ["delicious", "tasty"], "m": []}], "rk": 4},
+        ])
+
+    def setUp(self):
+        from django.core.cache import cache
+        cache.clear()
+
+    def get(self, path):
+        return self.client.get(path, HTTP_HOST=self.HOST)
+
+    def post(self, path, body=None):
+        return self.client.post(path, body or {}, content_type="application/json", HTTP_HOST=self.HOST)
+
+    def search(self, q):
+        return self.get(f"/api/dict/search/?q={q}").json()
+
+    def test_search_japanese_english_thai(self):
+        self.assertEqual(self.search("食べる")["results"][0]["word"], "食べる")
+        self.assertEqual(self.search("たべ")["results"][0]["word"], "食べる")            # prefix on reading
+        self.assertEqual(self.search("てれび")["results"][0]["word"], "テレビ")            # hiragana finds katakana
+        self.assertEqual(self.search("eat")["results"][0]["word"], "食べる")               # whole word before "theater"
+        th = self.search("อร่อย")
+        self.assertEqual((th["script"], th["results"], th["thai_cached"]), ("th", [], False))
+
+    def _fake_ai(self, text):
+        from unittest import mock
+        from support.ai import Completion
+        return mock.patch("support.ai.complete", return_value=Completion(text, "Fake (test)"))
+
+    def test_word_page_and_ai_explanation_is_written_once(self):
+        html = self.get("/word/" + str(self._id(1)) + "/").content.decode()
+        self.assertIn("<ruby>食べる<rt>たべる</rt></ruby>", html)
+        self.assertIn("กริยากลุ่ม 2", html)                           # Thai part-of-speech label
+        self.assertIn("/kanji/%E9%A3%9F/", html)                       # link to คันจิ.online
+        self.assertEqual(EMOJI.findall(html), [])
+        answer = json.dumps([{"id": self._id(1), "th_gloss": "กิน", "th_explain": "ใช้ทั่วไป",
+                              "examples": [{"ja": "ご飯を食べる。", "reading": "ごはんをたべる。", "th": "กินข้าว"},
+                                           {"ja": "No kanji here", "reading": "abc", "th": "x"}]}], ensure_ascii=False)
+        with self._fake_ai(answer) as m:
+            r = self.post(f"/api/dict/word/{self._id(1)}/").json()
+            self.post(f"/api/dict/word/{self._id(1)}/")
+        self.assertEqual(m.call_count, 1)
+        self.assertEqual((r["data"]["th"], len(r["data"]["examples"])), ("กิน", 1))   # invalid example dropped
+        self.assertIn(f"/word/{self._id(1)}/", self.get("/sitemap.xml").content.decode())
+
+    def test_thai_lookup_matches_dictionary_and_caches(self):
+        answer = json.dumps([{"word": "美味しい", "reading": "おいしい"}, {"word": "旨い", "reading": "うまい"}], ensure_ascii=False)
+        with self._fake_ai(answer) as m:
+            self.assertEqual(self.post("/api/dict/thai/", {"q": "อร่อย"}).status_code, 200)
+            self.post("/api/dict/thai/", {"q": "อร่อย"})
+        self.assertEqual(m.call_count, 1)
+        res = self.search("อร่อย")
+        self.assertEqual((res["thai_cached"], res["results"][0]["word"], res["suggestions"][0]["word"]), (True, "美味しい", "旨い"))
+        self.assertEqual(self.post("/api/dict/thai/", {"q": "eat"}).status_code, 400)
+
+    @override_settings(RYU_AI_PER_IP_HOUR=1)
+    def test_ai_is_rate_limited_per_visitor(self):
+        with self._fake_ai("[]"):
+            self.assertEqual(self.post(f"/api/dict/word/{self._id(2)}/").status_code, 200)
+            self.assertEqual(self.post(f"/api/dict/word/{self._id(3)}/").status_code, 429)
+
+    def test_dictionary_paths_only_on_dictionary_domain(self):
+        self.assertEqual(self.client.get(f"/word/{self._id(1)}/", HTTP_HOST=LEARN).status_code, 404)
+        self.assertEqual(self.client.get("/api/dict/search/?q=a", HTTP_HOST=registry.BY_KEY["kanji"].host).status_code, 404)
+
+    @staticmethod
+    def _id(jmdict_id):
+        from microsites.models import DictEntry
+        return DictEntry.objects.get(jmdict_id=jmdict_id).id

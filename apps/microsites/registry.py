@@ -67,7 +67,7 @@ SITES = (
         keywords=("คันจิ", "คันจิ N5", "คันจิ N4", "คันจิ N3", "เรียนคันจิ"),
     ),
     Microsite(
-        key="dictionary", domain="พจนานุกรมภาษาญี่ปุ่น.online", kind="tool", name="RYU DICTIONARY", live=False,
+        key="dictionary", domain="พจนานุกรมภาษาญี่ปุ่น.online", kind="tool", name="RYU DICTIONARY",
         title="พจนานุกรมภาษาญี่ปุ่น–ไทย พร้อม AI ช่วยอธิบาย | RYU DICTIONARY",
         description="พจนานุกรมญี่ปุ่น–ไทย และไทย–ญี่ปุ่น มีฟุริงานะ คำอ่านภาษาไทย ประเภทคำ ตัวอย่างประโยค และเสียงอ่าน พร้อม AI ช่วยอธิบาย ใช้ฟรี",
         tagline="พจนานุกรมญี่ปุ่น ⇄ ไทย + AI", icon="book", accent="#0d9488",

@@ -1,0 +1,56 @@
+{% extends "microsites/base.html" %}
+{% load static ryu_icons %}
+{% block nav %}<a href="#search">ค้นหา</a><a href="#basics">คำพื้นฐาน</a><a href="#faq">คำถาม</a>{% endblock %}
+{% block header_cta %}<a class="ms-btn ms-btn-sm" href="{{ translator_url }}">แปลประโยค</a>{% endblock %}
+{% block main %}
+<section class="ms-panel ms-panel-first ms-hero" id="search">
+  <figure class="ms-float kana ms-jp" aria-hidden="true">語<small>go</small></figure>
+  <figure class="ms-float kana alt ms-jp" aria-hidden="true">辞<small>ji</small></figure>
+  <figure class="ms-float kana alt ms-jp" aria-hidden="true">言<small>gen</small></figure>
+  <figure class="ms-float kana ms-jp" aria-hidden="true">字<small>ji</small></figure>
+  <div class="container" style="max-width:52rem">
+    <span class="ms-chip">ญี่ปุ่น ⇄ ไทย · มี AI ช่วยอธิบาย</span>
+    <h1 class="ms-h1">พจนานุกรม<span class="ms-scribble">ภาษาญี่ปุ่น<svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8 C 40 2, 120 1, 198 6"/></svg></span><br>ค้นได้<span class="ms-grad">ทุกภาษา</span></h1>
+    <p class="ms-lead">พิมพ์ภาษาญี่ปุ่น ไทย หรืออังกฤษ ได้คำอ่าน ฟุริงานะ ประเภทคำ ความหมาย ตัวอย่างประโยค และเสียงอ่าน</p>
+    <form class="dc-search mt-4" role="search" onsubmit="return false" data-search-url="{% url 'dict_search' %}" data-thai-url="{% url 'dict_thai' %}">
+      <span class="kj-search-ic">{% icon "search" %}</span>
+      <input type="search" name="q" placeholder="食べる / たべる / กิน / eat" autocomplete="off" aria-label="ค้นหาคำศัพท์" autofocus>
+    </form>
+    <div class="dc-samples">{% for s in samples %}<button type="button" data-sample="{{ s }}">{{ s }}</button>{% endfor %}</div>
+  </div>
+</section>
+
+<section class="ms-panel" id="results-panel" hidden>
+  <div class="container ms-sec" style="max-width:56rem;padding-top:48px;padding-bottom:56px">
+    <div class="d-flex justify-content-between align-items-baseline mb-3"><h2 class="h5 fw-bold mb-0" data-r="title">ผลการค้นหา</h2><span class="ms-note" data-r="count"></span></div>
+    <div class="dc-results" data-r="list"></div>
+    <div class="dc-ai-box" data-r="ai" hidden>
+      <p class="mb-2">ยังไม่พบคำนี้ในพจนานุกรม ให้ AI ช่วยหาคำภาษาญี่ปุ่นที่ตรงความหมาย แล้วตรวจกับพจนานุกรมให้</p>
+      <button type="button" class="ms-btn ms-btn-sm" data-act="ask-ai">{% icon "bot" %} ให้ AI ช่วยหาคำญี่ปุ่น</button>
+      <p class="ms-note mt-2 mb-0" data-r="ai-msg"></p>
+    </div>
+    <div class="dc-suggest" data-r="suggest" hidden></div>
+  </div>
+</section>
+
+<section class="ms-panel" id="basics">
+  <div class="container ms-sec">
+    <div class="mb-4"><span class="ms-kicker">เริ่มตรงนี้</span><h2 class="ms-h2 mb-1">คำพื้นฐานที่ควรรู้</h2><p class="ms-sub">กดที่คำเพื่อดูความหมาย ตัวอย่างประโยค และเสียงอ่าน</p></div>
+    <div class="dc-results dc-grid">
+      {% for w in basics %}<a class="dc-card" href="/word/{{ w.id }}/"><span class="w ms-jp">{{ w.word }}</span>{% if w.reading %}<span class="r ms-jp">{{ w.reading }}</span>{% endif %}<span class="m">{{ w.th|default:w.en|truncatechars:48 }}</span></a>{% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="ms-sec ms-dark-sec">
+  <div class="container">
+    <div class="row g-3">
+      <div class="col-md-4"><div class="ms-card h-100"><span class="ms-card-ic">{% icon "book" %}</span><h3 class="h6 fw-bold mb-1">ฐานข้อมูลเป็นหลัก</h3><p class="mb-0">คำศัพท์และคำอ่านมาจาก JMdict พจนานุกรมเปิดที่ผู้เรียนทั่วโลกใช้</p></div></div>
+      <div class="col-md-4"><div class="ms-card h-100"><span class="ms-card-ic">{% icon "bot" %}</span><h3 class="h6 fw-bold mb-1">AI ช่วยอธิบายเป็นไทย</h3><p class="mb-0">ความหมายไทย ความต่างที่ควรรู้ และตัวอย่างประโยคพร้อมคำแปล</p></div></div>
+      <div class="col-md-4"><div class="ms-card h-100"><span class="ms-card-ic">{% icon "volume" %}</span><h3 class="h6 fw-bold mb-1">ฟังเสียงอ่าน</h3><p class="mb-0">กดฟังคำและประโยคตัวอย่าง พร้อมคำอ่านภาษาไทยโดยประมาณ</p></div></div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block final %}{% include "microsites/_final_cta.html" with final_title="ค้นศัพท์ได้แล้ว <span class='ms-grad'>ฝึกใช้จริง</span>กับพี่ริว" final_text="คอร์สเรียนสด N5–N1 สอนคำศัพท์พร้อมไวยากรณ์และการใช้ในประโยค" final_primary="ดูคอร์สเรียน" final_primary_url=course_url final_secondary="แปลทั้งประโยค" final_secondary_url=translator_url %}{% endblock %}
+{% block scripts %}<script src="{% static 'js/dict.js' %}"></script>{% endblock %}

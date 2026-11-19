@@ -139,6 +139,9 @@ DEEPSEEK_API_KEY = env("DEEPSEEK_API_KEY", default="")
 DEEPSEEK_MODEL = env("DEEPSEEK_MODEL", default="deepseek-chat")
 GROQ_API_KEY = env("GROQ_API_KEY", default="")
 GROQ_MODEL = env("GROQ_MODEL", default="openai/gpt-oss-20b")
+# Free, login-less AI on the RYU Network sites (dictionary, translator): per-visitor and site-wide limits
+RYU_AI_PER_IP_HOUR = env.int("RYU_AI_PER_IP_HOUR", default=30)
+RYU_AI_DAILY_LIMIT = env.int("RYU_AI_DAILY_LIMIT", default=2000)
 
 # ── Email ───────────────────────────────────────────
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

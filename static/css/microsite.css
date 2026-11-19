@@ -480,3 +480,50 @@
   .kn-stroke-btn { right: -6px; bottom: -6px; padding: 4px; }
 }
 .kn-strokes[hidden], .kn-detail-glyph[hidden] { display: none; }
+
+/* ── พจนานุกรมภาษาญี่ปุ่น.online (RYU DICTIONARY) ─────────────────────────────── */
+.dc-search { position: relative; max-width: 38rem; margin: 0 auto; }
+.dc-search input { width: 100%; border: 1px solid #d4d6dc; border-radius: 999px; padding: 17px 24px 17px 52px; font-size: 1.1rem; background: #fff;
+  box-shadow: 0 16px 34px -26px rgba(15,23,42,.5); outline: none; }
+.dc-search input:focus { border-color: var(--ms-ink); }
+.dc-samples { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 14px; }
+.dc-samples button { border: 1px solid var(--ms-line); background: #fff; border-radius: 999px; padding: 5px 14px; font-size: 14px; color: var(--ms-text);
+  font-family: "Hiragino Sans", "Noto Sans JP", "Noto Sans Thai", sans-serif; }
+.dc-samples button:hover { border-color: var(--ms-ink); }
+.dc-results { display: grid; gap: 10px; }
+.dc-grid { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+.dc-card { display: flex; flex-direction: column; gap: 2px; padding: 14px 18px; border: 1px solid var(--ms-line); border-radius: 18px; text-decoration: none;
+  background: #fff; color: var(--ms-text); transition: box-shadow .15s, transform .15s; }
+.dc-card:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -22px rgba(15,23,42,.5); }
+.dc-card .w { font-size: 1.45rem; font-weight: 600; color: var(--ms-ink); line-height: 1.3; }
+.dc-card .r { font-size: 13px; color: var(--ms-muted); }
+.dc-card .m { font-size: 14.5px; color: var(--ms-ink); }
+.dc-card .e { font-size: 12px; color: var(--ms-muted); }
+.dc-ai-box { margin-top: 16px; background: var(--ms-soft); border-radius: 20px; padding: 18px 20px; }
+.dc-suggest { margin-top: 14px; }
+.dc-suggest .ms-jp { display: inline-block; background: var(--ms-soft); border-radius: 999px; padding: 4px 12px; margin: 0 6px 6px 0; }
+.dc-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+.dc-word { font-size: clamp(2.6rem, 8vw, 4.2rem); font-weight: 700; color: var(--ms-ink); line-height: 1.4; }
+.dc-word rt { font-size: .32em; color: var(--ms-muted); font-weight: 500; }
+.dc-read { color: var(--ms-muted); }
+.dc-thai { background: var(--ms-soft); border-radius: 24px; padding: 20px 22px; margin-bottom: 18px; }
+.dc-th-gloss { font-size: clamp(1.25rem, 3vw, 1.6rem); font-weight: 700; color: var(--ms-ink); margin-bottom: 6px; }
+.dc-th-gloss:empty { display: none; }
+.dc-ai-tag, .dc-ai-wait { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; border-radius: 999px; padding: 4px 12px; }
+.dc-ai-tag { background: #fef3c7; color: #92400e; }
+.dc-ai-wait { background: #e0e7ff; color: #3730a3; }
+.dc-ai-tag[hidden], .dc-ai-wait[hidden] { display: none; }
+.dc-senses { padding-left: 1.3rem; margin: 0 0 12px; }
+.dc-senses li { margin-bottom: 10px; }
+.dc-pos { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 2px; }
+.dc-pos span { font-size: 12px; background: #fff; border: 1px solid var(--ms-line); border-radius: 999px; padding: 1px 10px; color: var(--ms-muted); }
+.dc-examples { display: grid; gap: 10px; }
+.dc-example { position: relative; text-align: left; display: flex; flex-direction: column; gap: 2px; background: #fff; border: 1px solid var(--ms-line);
+  border-radius: 20px; padding: 16px 50px 16px 20px; transition: box-shadow .15s; }
+.dc-example:hover { box-shadow: 0 14px 28px -22px rgba(15,23,42,.5); }
+.dc-example .ja { font-size: 1.25rem; color: var(--ms-ink); font-weight: 600; }
+.dc-example .rd { font-size: 13px; color: var(--ms-muted); }
+.dc-kanji { display: inline-flex; width: 64px; height: 64px; align-items: center; justify-content: center; font-size: 2rem; font-weight: 600; color: var(--ms-ink);
+  border: 1px solid var(--ms-line); border-radius: 18px; text-decoration: none; background: #fff; }
+.dc-kanji:hover { border-color: var(--ms-ink); }
+@media (max-width: 767.98px) { .dc-grid { grid-template-columns: 1fr 1fr; } .dc-card { padding: 12px 14px; } .dc-card .w { font-size: 1.2rem; } }

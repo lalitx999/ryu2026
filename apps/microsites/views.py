@@ -8,7 +8,13 @@ from django.shortcuts import render
 from django.templatetags.static import static
 
 from microsites import content, kana, registry
-from microsites.selectors import kanji_selector, sales_selector
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_http_methods
+
+from core.http import ServiceError, fail, ok
+from microsites import dict_labels
+from microsites.selectors import dict_selector, kanji_selector, sales_selector
+from microsites.services import ratelimit
 from microsites.services import links, seo
 
 
@@ -98,7 +104,19 @@ def _kanji(request, site):
     return {**_kanji_ctx(request, site, content.KANJI_FAQ), "grid": kanji_selector.level_list("N5"), "level": "N5"}
 
 
-SALES_PAGES = {"learn": _learn, "japanese": _japanese, "ryu": _ryu, "kana": _kana, "kanji": _kanji}
+def _dict_ctx(request, site, faq=None):
+    preview = request.microsite_preview
+    return {**_base_context(request, site, faq),
+            "kanji_site": links.sibling_url(registry.BY_KEY["kanji"], preview).rstrip("/"),
+            "translator_url": links.sibling_url(registry.BY_KEY["translator"], preview),
+            "course_url": links.sibling_url(registry.BY_KEY["learn"], preview), "final_images": FINAL_COLLAGE}
+
+
+def _dictionary(request, site):
+    return {**_dict_ctx(request, site, content.DICT_FAQ), "basics": dict_selector.basics(24), "samples": content.DICT_SAMPLES}
+
+
+SALES_PAGES = {"learn": _learn, "japanese": _japanese, "ryu": _ryu, "kana": _kana, "kanji": _kanji, "dictionary": _dictionary}
 
 
 def only_on(*keys):
@@ -140,12 +158,13 @@ def kanji_search(request):
     return JsonResponse({"results": kanji_selector.search(request.GET.get("q", ""))}, json_dumps_params={"ensure_ascii": False})
 
 
-@only_on("kanji", "kana")
+@only_on("kanji", "kana", "dictionary")
 def credits(request):
     site = _site(request)
     return render(request, "microsites/credits.html", {**_base_context(request, site), "canonical": f"{site.url}credits/"})
 
 
+@ensure_csrf_cookie
 def site_home(request):
     site = _site(request)
     builder = SALES_PAGES.get(site.key) if site.live else None
@@ -161,8 +180,11 @@ def robots_txt(request):
 def sitemap_xml(request):
     site = _site(request)
     extra = []
-    if site.live and site.key in ("kanji", "kana"):
+    if site.live and site.key in ("kanji", "kana", "dictionary"):
         extra.append("credits/")
+    if site.live and site.key == "dictionary":
+        from microsites.models import DictEntry
+        extra += [f"word/{i}/" for i in DictEntry.objects.exclude(ai_status=DictEntry.AI_NONE).order_by("rank").values_list("id", flat=True)]
     if site.live and site.key == "kanji":
         extra += [f"level/{lv.lower()}/" for lv in kanji_selector.LEVELS]
         extra += [f"kanji/{quote(c)}/" for c in kanji_selector.all_chars()]
@@ -178,3 +200,65 @@ def not_found(request, exception=None):
     if site is None:
         return HttpResponse("Not found", status=404)
     return render(request, "microsites/404.html", _base_context(request, site), status=404)
+
+
+# ───────────── RYU DICTIONARY (พจนานุกรมภาษาญี่ปุ่น.online) ─────────────
+def _word_json(e):
+    return {"id": e.id, "ai": e.ai_status, "th": e.th_gloss, "explain": e.th_explain, "examples": e.examples}
+
+
+@only_on("dictionary")
+@ensure_csrf_cookie
+def dict_word(request, entry_id):
+    site = _site(request)
+    d = dict_selector.word(entry_id, dict_labels.jmdict_tags())
+    if d is None:
+        raise Http404
+    return render(request, "microsites/dict_word.html", {**_dict_ctx(request, site), **d,
+                                                          "canonical": f"{site.url}word/{entry_id}/"})
+
+
+@only_on("dictionary")
+def dict_search(request):
+    return JsonResponse(dict_selector.search(request.GET.get("q", "")), json_dumps_params={"ensure_ascii": False})
+
+
+@only_on("dictionary")
+@require_http_methods(["GET", "POST"])
+def dict_word_api(request, entry_id):
+    """GET: the Thai part of a word (for polling).  POST: ask AI to write it (rate-limited, once per word)."""
+    from microsites.models import DictEntry
+    from microsites.tasks import explain_word
+    e = DictEntry.objects.filter(pk=entry_id).first()
+    if e is None:
+        raise Http404
+    if request.method == "POST" and e.ai_status == DictEntry.AI_NONE:
+        try:
+            ratelimit.check_ai(request, "dict")
+        except ServiceError as exc:
+            return fail(exc.message, status=exc.status)
+        explain_word.delay(e.id)
+        e.refresh_from_db()
+    return ok(_word_json(e))
+
+
+@only_on("dictionary")
+@require_http_methods(["POST"])
+def dict_thai(request):
+    """Thai word with no cached answer: ask AI for Japanese candidates (rate-limited), then the page re-runs the search."""
+    import json
+    from microsites.models import DictThaiQuery
+    from microsites.tasks import thai_lookup
+    try:
+        q = str(json.loads(request.body or b"{}").get("q", "")).strip()[:100]
+    except ValueError:
+        q = ""
+    if dict_selector.script_of(q) != "th":
+        return fail("ใช้กับคำภาษาไทยเท่านั้น")
+    if not DictThaiQuery.objects.filter(query=q).exists():
+        try:
+            ratelimit.check_ai(request, "dict")
+        except ServiceError as exc:
+            return fail(exc.message, status=exc.status)
+        thai_lookup.delay(q)
+    return ok({"cached": DictThaiQuery.objects.filter(query=q).exists()})

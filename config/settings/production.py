@@ -19,3 +19,7 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 # drop the middleware and point `alias` at STATIC_ROOT after `collectstatic`.
 STORAGES["staticfiles"] = {"BACKEND": "config.storage.HashedModuleStorage"}  # noqa: F405
 CELERY_TASK_ALWAYS_EAGER = False
+
+# Shared cache (Redis db 2; Celery uses 0/1): AI rate-limit counters, kanji search index, renewal de-duplication
+CACHES = {"default": {"BACKEND": "django.core.cache.backends.redis.RedisCache",
+                      "LOCATION": env("CACHE_URL", default="redis://127.0.0.1:6379/2")}}  # noqa: F405

@@ -1,0 +1,46 @@
+{% extends "microsites/base.html" %}
+{% load static ryu_icons %}
+{% block title %}{{ e.headword }}{% if e.reading != e.headword %} ({{ e.reading }}){% endif %}{% if e.th_gloss %} แปลว่า {{ e.th_gloss|truncatechars:60 }}{% endif %} | พจนานุกรมภาษาญี่ปุ่น RYU{% endblock %}
+{% block description %}{{ e.headword }} อ่านว่า {{ e.reading }} ({{ th_reading }}) {% if e.th_gloss %}แปลว่า {{ e.th_gloss }} {% endif %}ความหมายภาษาอังกฤษ {{ senses.0.g|join:", " }} พร้อมตัวอย่างประโยคและเสียงอ่าน{% endblock %}
+{% block nav %}<a href="/">ค้นหาคำ</a><a href="#meaning">ความหมาย</a><a href="#examples">ตัวอย่างประโยค</a>{% endblock %}
+{% block header_cta %}<a class="ms-btn ms-btn-sm" href="/">ค้นคำใหม่</a>{% endblock %}
+{% block main %}
+<section class="ms-panel ms-panel-first">
+  <div class="container ms-sec" style="padding-top:110px;max-width:60rem">
+    <nav class="kj-crumb"><a href="/">RYU DICTIONARY</a> <span>/</span> <span class="ms-jp">{{ e.headword }}</span></nav>
+    <div class="dc-head">
+      <div>
+        <h1 class="dc-word ms-jp mb-1">{% if e.reading != e.headword %}<ruby>{{ e.headword }}<rt>{{ e.reading }}</rt></ruby>{% else %}{{ e.headword }}{% endif %}</h1>
+        <div class="dc-read"><span class="ms-jp">{{ e.reading }}</span> · อ่านว่า {{ th_reading }}</div>
+      </div>
+      <button type="button" class="ms-btn" data-say="{{ e.reading }}">{% icon "volume" %} ฟังเสียง</button>
+    </div>
+    <div class="dc-thai" id="meaning" data-word-api="{% url 'dict_word_api' e.id %}" data-ai="{{ e.ai_status }}">
+      <div class="dc-th-gloss" data-w="th">{{ e.th_gloss }}</div>
+      <p class="mb-2" data-w="explain">{{ e.th_explain }}</p>
+      <div class="dc-ai-tag" data-w="tag" {% if e.ai_status == "none" %}hidden{% endif %}>{% icon "bot" %} <span>{% if e.ai_status == "approved" %}ผู้สอนตรวจแล้ว{% else %}ภาษาไทยเขียนโดย AI จากความหมายในพจนานุกรม{% endif %}</span></div>
+      <div class="dc-ai-wait" data-w="wait" hidden>{% icon "bot" %} <span>AI กำลังอธิบายคำนี้เป็นภาษาไทย…</span></div>
+    </div>
+    <ol class="dc-senses">
+      {% for s in senses %}<li><div class="dc-pos">{% for p in s.pos %}<span>{{ p }}</span>{% endfor %}</div><div>{{ s.g|join:"; " }}</div></li>{% endfor %}
+    </ol>
+    {% if other_forms %}<p class="ms-note mb-0">รูปอื่น: <span class="ms-jp">{{ other_forms|join:"、" }}</span></p>{% endif %}
+  </div>
+</section>
+
+<section class="ms-panel" id="examples">
+  <div class="container ms-sec" style="max-width:60rem">
+    <h2 class="ms-h2 mb-4">ตัวอย่างประโยค</h2>
+    <div class="dc-examples" data-w="examples">
+      {% for x in e.examples %}<button type="button" class="dc-example" data-say="{{ x.reading }}"><span class="ja ms-jp">{{ x.ja }}</span><span class="rd ms-jp">{{ x.reading }}</span><span class="th">{{ x.th }}</span><span class="kj-ex-play">{% icon "volume" %}</span></button>
+      {% empty %}<p class="ms-note" data-w="no-examples">ยังไม่มีตัวอย่างประโยค</p>{% endfor %}
+    </div>
+    {% if kanji_chars %}
+    <h3 class="h6 fw-bold mt-5 mb-3">คันจิในคำนี้</h3>
+    <div class="d-flex flex-wrap gap-2">{% for c in kanji_chars %}<a class="dc-kanji ms-jp" href="{{ kanji_site }}/kanji/{{ c|urlencode }}/">{{ c }}</a>{% endfor %}</div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+{% block final %}{% include "microsites/_final_cta.html" with final_title="อยากแปล<span class='ms-grad'>ทั้งประโยค</span>?" final_text="ใช้ล่าม AI แปลไทย ⇄ ญี่ปุ่น เลือกระดับความสุภาพได้ หรือเรียนเป็นระบบกับพี่ริว" final_primary="แปลประโยค" final_primary_url=translator_url final_secondary="ดูคอร์สเรียน" final_secondary_url=course_url %}{% endblock %}
+{% block scripts %}<script src="{% static 'js/dict.js' %}"></script>{% endblock %}

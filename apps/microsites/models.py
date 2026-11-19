@@ -37,3 +37,47 @@ class Kanji(models.Model):
 
     def __str__(self):
         return f"{self.char} ({self.level})"
+
+
+class DictEntry(models.Model):
+    """One JMdict word (common-words edition).  Japanese forms, parts of speech and English glosses are open data
+    (JMdict, CC BY-SA); the Thai fields are written by AI on first lookup (or in advance for the most basic words)."""
+
+    AI_NONE, AI_DRAFT, AI_APPROVED = "none", "draft", "approved"
+    AI_STATUS = [(AI_NONE, "ยังไม่มีภาษาไทย"), (AI_DRAFT, "AI ช่วยอธิบาย"), (AI_APPROVED, "ผู้สอนตรวจแล้ว")]
+
+    jmdict_id = models.PositiveIntegerField(unique=True)
+    headword = models.CharField(max_length=64, db_index=True)      # first kanji form, or the reading for kana words
+    reading = models.CharField(max_length=64, db_index=True)
+    forms = models.JSONField(default=list, blank=True)            # all kanji spellings, common first
+    readings = models.JSONField(default=list, blank=True)
+    senses = models.JSONField(default=list, blank=True)           # [{"pos": [...], "g": [english...], "m": [misc...]}]
+    rank = models.PositiveIntegerField(default=0, db_index=True)   # lower = more basic (see data/README.md)
+    keys = models.TextField(blank=True)                           # "|日本|にほん|にっぽん|" for exact / prefix lookups
+    gloss_text = models.TextField(blank=True)                     # lowercase English glosses for English search
+
+    th_gloss = models.CharField(max_length=255, blank=True)
+    th_explain = models.TextField(blank=True)
+    examples = models.JSONField(default=list, blank=True)         # [{"ja", "reading", "th"}]
+    ai_status = models.CharField(max_length=10, choices=AI_STATUS, default=AI_NONE, db_index=True)
+    ai_model = models.CharField(max_length=80, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "ryu_dict_entry"
+        ordering = ["rank"]
+
+    def __str__(self):
+        return f"{self.headword} ({self.reading})"
+
+
+class DictThaiQuery(models.Model):
+    """Cache of "Thai word -> Japanese words" answers from AI, so each Thai query is asked only once."""
+
+    query = models.CharField(max_length=100, unique=True)
+    entry_ids = models.JSONField(default=list, blank=True)        # matched DictEntry ids, best first
+    suggestions = models.JSONField(default=list, blank=True)      # AI words not found in the dictionary
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "ryu_dict_thai_query"

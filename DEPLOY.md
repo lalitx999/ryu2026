@@ -118,7 +118,7 @@ sudo systemctl restart ryu-web ryu-worker
 | เรียนภาษาญี่ปุ่นกับพี่ริว.online | `xn--12cx9abgdykqjj2cs0jjb6bdhg1d3j0hcg.online` | เซลเพจ (พี่ริว) |
 | อักษรภาษาญี่ปุ่น.online | `xn--12cyzbhxr5bc5a4bpb4b5b4qc.online` | ตารางฮิรางานะ/คาตากานะ (เฟส 2) |
 | คันจิ.online | `xn--42ci4c5era.online` | คลังคันจิ N5–N1 (เฟส 3) |
-| พจนานุกรมภาษาญี่ปุ่น.online | `xn--12cnq0cacnswjv8evffb3c2bk61ac.online` | เร็ว ๆ นี้ (เฟส 4) |
+| พจนานุกรมภาษาญี่ปุ่น.online | `xn--12cnq0cacnswjv8evffb3c2bk61ac.online` | พจนานุกรม AI (เฟส 4) |
 | แปลภาษาญี่ปุ่น.online | `xn--e3cyebx3a3a5eb5a8a6gtec.online` | เร็ว ๆ นี้ (เฟส 5) |
 | วัดระดับภาษาญี่ปุ่น.online | `xn--e3cnavdh7av8aza7ejeqb3cyc8sc.online` | เร็ว ๆ นี้ (เฟส 6) |
 
@@ -158,8 +158,10 @@ cd /srv/ryu2026
 P="sudo -u ryu env DJANGO_SETTINGS_MODULE=config.settings.production .venv/bin/python manage.py"
 $P migrate
 $P import_kanji      # 2,211 ตัว + ร่างภาษาไทยจาก AI (ไม่ทับตัวที่ผู้สอนตรวจแล้ว)
+$P import_dictionary # 22,661 คำ (JMdict) + ภาษาไทยที่ AI เขียนไว้ล่วงหน้า
 $P collectstatic --noinput
 sudo systemctl restart ryu-web ryu-worker
 ```
 ผู้สอนตรวจ/แก้/อนุมัติที่ แอดมิน → "ตรวจคันจิ (คันจิ.online)" · ปุ่ม "ให้ AI ร่าง 24 ตัวถัดไป" ใช้ Celery (ต้องมีคีย์ DeepSeek/Groq ใน `.env`)
+พจนานุกรม: คำที่ยังไม่มีภาษาไทย AI จะเขียนตอนมีคนเปิดคำนั้นครั้งแรก (ผ่าน Celery) จำกัด `RYU_AI_PER_IP_HOUR` (ค่าเริ่ม 30) และ `RYU_AI_DAILY_LIMIT` (2000) ใน `.env` — production ใช้ Redis db 2 เป็น cache กลาง (`CACHE_URL` ถ้าต้องการเปลี่ยน) ตัวนับจึงใช้ร่วมกันทุก worker
 แหล่งข้อมูลเปิดและสัญญาอนุญาต: `apps/microsites/data/README.md` และหน้า `/credits/` ของ คันจิ.online

@@ -9,6 +9,10 @@ urlpatterns = [
     path("level/<str:level>/", views.kanji_level, name="kanji_level"),
     path("kanji/<str:char>/", views.kanji_detail, name="kanji_detail"),
     path("search/", views.kanji_search, name="kanji_search"),
+    path("word/<int:entry_id>/", views.dict_word, name="dict_word"),
+    path("api/dict/search/", views.dict_search, name="dict_search"),
+    path("api/dict/word/<int:entry_id>/", views.dict_word_api, name="dict_word_api"),
+    path("api/dict/thai/", views.dict_thai, name="dict_thai"),
     path("credits/", views.credits, name="microsite_credits"),
     path("favicon.ico", views.favicon, name="microsite_favicon"),
 ]
