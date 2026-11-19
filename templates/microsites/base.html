@@ -28,12 +28,12 @@
 <div class="ms-preview">โหมดพรีวิว: <b>{{ site.domain }}</b> · <a href="?site=off">ออกจากพรีวิว</a></div>
 {% endif %}
 <header class="ms-header">
-  <div class="container d-flex align-items-center justify-content-between gap-3">
+  <div class="ms-bar">
     <a class="ms-brand" href="/">
-      <img src="{% static 'assets/ryu_logo.jpg' %}" alt="" width="36" height="36">
+      <img src="{% static 'assets/ryu_logo.jpg' %}" alt="" width="34" height="34">
       <span><b>{{ site.name }}</b><small>{{ site.domain }}</small></span>
     </a>
-    <nav class="ms-nav d-none d-md-flex">{% block nav %}{% endblock %}</nav>
+    <nav class="ms-nav d-none d-lg-flex">{% block nav %}{% endblock %}</nav>
     {% block header_cta %}<a class="ms-btn ms-btn-sm" href="{{ register_url }}">สมัครเรียน</a>{% endblock %}
   </div>
 </header>
@@ -41,10 +41,10 @@
 <main>{% block main %}{% endblock %}</main>
 
 {% if faq %}
-<section class="ms-sec" id="faq">
-  <div class="container" style="max-width:52rem">
-    <h2 class="ms-h2 text-center">คำถามที่พบบ่อย</h2>
-    <div class="accordion ms-faq" id="faq-list">
+<section class="ms-panel" id="faq">
+  <div class="container ms-sec" style="max-width:50rem">
+    <h2 class="ms-h2 text-center mb-4 ms-reveal">คำถามที่พบบ่อย</h2>
+    <div class="accordion ms-faq ms-reveal" id="faq-list">
       {% for q, a in faq %}
       <div class="accordion-item">
         <h3 class="accordion-header"><button class="accordion-button{% if not forloop.first %} collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#faq-{{ forloop.counter }}" aria-expanded="{{ forloop.first|yesno:'true,false' }}">{{ q }}</button></h3>
@@ -56,6 +56,7 @@
 </section>
 {% endif %}
 
+{% block final %}{% endblock %}
 {% include "microsites/_network.html" %}
 <footer class="ms-foot">
   <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
@@ -64,6 +65,16 @@
   </div>
 </footer>
 <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script>
+(function () {  /* reveal sections as they scroll into view */
+  var els = document.querySelectorAll('.ms-reveal');
+  if (!('IntersectionObserver' in window)) { els.forEach(function (el) { el.classList.add('in'); }); return; }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { rootMargin: '0px 0px -8% 0px' });
+  els.forEach(function (el) { io.observe(el); });
+})();
+</script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

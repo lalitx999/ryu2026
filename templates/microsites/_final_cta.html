@@ -1,0 +1,10 @@
+{% load static %}
+<section class="ms-final ms-dark-sec">
+  <div class="ms-final-bg" aria-hidden="true">{% for f in final_images %}<img src="{% static 'assets/images/salepage/'|add:f %}" alt="" loading="lazy">{% endfor %}</div>
+  <h2 class="ms-h2 ms-reveal">{{ final_title|safe }}</h2>
+  <p class="ms-reveal">{{ final_text }}</p>
+  <div class="d-flex flex-wrap justify-content-center gap-2 ms-reveal">
+    <a class="ms-btn ms-btn-light" href="{{ final_primary_url }}">{{ final_primary }}</a>
+    <a class="ms-btn ms-btn-outline-light" href="{{ final_secondary_url }}">{{ final_secondary }}</a>
+  </div>
+</section>

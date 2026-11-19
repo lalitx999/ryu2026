@@ -1,39 +1,59 @@
 {% extends "microsites/base.html" %}
 {% load static ryu %}
-{% block nav %}<a href="#roadmap">หลักสูตร</a><a href="#included">สิ่งที่ได้รับ</a><a href="#pricing">ราคา</a><a href="#faq">คำถาม</a>{% endblock %}
+{% block nav %}<a href="#roadmap">หลักสูตร</a><a href="#features">เรียนยังไง</a><a href="#pricing">ราคา</a><a href="#faq">คำถาม</a>{% endblock %}
 {% block main %}
-<section class="ms-hero">
-  <div class="container">
-    <div class="row align-items-center g-4 g-lg-5">
-      <div class="col-lg-6">
-        <span class="ms-chip">หลักสูตร JLPT N5 → N1</span>
-        <h1 class="ms-h1">เรียนภาษาญี่ปุ่นออนไลน์<br><span class="ms-accent-text">ครบทุกระดับ</span> ในที่เดียว</h1>
-        <p class="ms-lead">เริ่มจากศูนย์จนถึง N1 ด้วยหลักสูตรที่เรียงลำดับไว้ให้แล้ว เรียนสดผ่าน Zoom ทุกสัปดาห์ ดูคลิปย้อนหลังได้ไม่จำกัด พร้อมเอกสาร แบบฝึกหัด และกลุ่ม LINE ถามตอบ</p>
-        <div class="d-flex flex-wrap gap-2 mt-4">
-          <a class="ms-btn" href="{{ register_url }}">สมัครเรียนเลย</a>
-          <a class="ms-btn ms-btn-ghost" href="#roadmap">ดูหลักสูตรทั้ง 5 ระดับ</a>
-        </div>
-        <ul class="ms-stats">
-          <li><b>5</b><span>ระดับ N5–N1</span></li>
-          <li><b>สด</b><span>ทุกสัปดาห์</span></li>
-          <li><b>HD</b><span>คลิปย้อนหลัง</span></li>
-          {% if pricing.from_monthly %}<li><b>฿{{ pricing.from_monthly|baht }}</b><span>เริ่มต้น/เดือน</span></li>{% endif %}
-        </ul>
-      </div>
-      <div class="col-lg-6"><img class="ms-hero-img" src="{% static 'assets/images/salepage/cover.png' %}" alt="คอร์สเรียนภาษาญี่ปุ่นออนไลน์ RYU CLASS" fetchpriority="high"></div>
+<section class="ms-panel ms-panel-first ms-hero">
+  {% for f in floaters %}<figure class="ms-float" aria-hidden="true"><img src="{% static 'assets/images/salepage/'|add:f %}" alt="">{% if forloop.counter <= 4 %}<figcaption>{% cycle 'JLPT N5' 'JLPT N4' 'JLPT N3' 'JLPT N2' %}</figcaption>{% endif %}</figure>{% endfor %}
+  <div class="container" style="max-width:52rem">
+    <span class="ms-chip">หลักสูตร JLPT N5 → N1</span>
+    <h1 class="ms-h1">เรียนภาษาญี่ปุ่น<span class="ms-scribble">ครบทุกระดับ<svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8 C 40 2, 120 1, 198 6"/></svg></span><br>จาก 0 สู่ <span class="ms-script ms-grad">N1</span></h1>
+    <p class="ms-lead">หลักสูตรที่เรียงลำดับไว้ให้แล้ว เรียนสดผ่าน Zoom ทุกสัปดาห์ ดูคลิปย้อนหลังได้ไม่จำกัด พร้อมเอกสาร แบบฝึกหัด และกลุ่ม LINE ถามตอบ{% if pricing.from_monthly %} เริ่มต้นเดือนละ ฿{{ pricing.from_monthly|baht }}{% endif %}</p>
+    <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+      <a class="ms-btn" href="{{ register_url }}">สมัครเรียนเลย</a>
+      <a class="ms-btn ms-btn-ghost" href="#roadmap">ดูหลักสูตรทั้ง 5 ระดับ</a>
+    </div>
+  </div>
+  <a class="ms-scroll-hint" href="#pains">เลื่อนลง ⌄</a>
+</section>
+
+<section class="ms-sec ms-dark-sec" id="pains">
+  <div class="container text-center">
+    <h2 class="ms-h2 ms-reveal">เรียนภาษาญี่ปุ่นเอง มันยากตรงนี้..</h2>
+    <p class="ms-sub ms-reveal">ถ้าเคยเจอแบบนี้ ไม่ใช่คุณคนเดียว</p>
+    <div class="ms-notes">
+      {% for text, color, tilt in pains %}<div class="ms-note-card ms-reveal" style="--c:{{ color }};--r:{{ tilt }}deg">{{ text }}</div>{% endfor %}
     </div>
   </div>
 </section>
 
-<section class="ms-sec" id="roadmap">
-  <div class="container">
-    <div class="text-center mb-4 mb-md-5">
+<section class="ms-panel" id="features">
+  <div class="container ms-sec">
+    <div class="text-center mb-5 ms-reveal">
+      <p class="ms-sub mb-1" style="font-size:clamp(1.3rem,2.6vw,1.9rem);color:var(--ms-muted)">เรียนคนเดียวมักไปไม่ถึง</p>
+      <h2 class="ms-h2">แต่กับ RYU CLASS <span class="ms-scribble">คุณไปถึงเป้าได้จริง<svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 7 C 50 1, 140 2, 198 8"/></svg></span></h2>
+    </div>
+    {% for f in features %}
+    <div class="ms-feature ms-reveal">
+      <div class="ms-feature-text">
+        <span class="ms-kicker">{{ f.kicker }}</span>
+        <h3>{{ f.title }} <span class="ms-grad">{{ f.grad }}</span></h3>
+        <p class="mb-0">{{ f.text }}</p>
+      </div>
+      <div class="ms-pastel">{% include "microsites/_mock.html" with card=f.card %}</div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="ms-panel" id="roadmap">
+  <div class="container ms-sec">
+    <div class="text-center mb-5 ms-reveal">
       <h2 class="ms-h2">เส้นทางจากศูนย์สู่ N1</h2>
       <p class="ms-sub">แต่ละระดับต่อยอดจากระดับก่อนหน้า รู้ชัดว่าเรียนจบแล้วทำอะไรได้</p>
     </div>
     <ol class="ms-roadmap">
       {% for lvl in levels %}
-      <li class="ms-level">
+      <li class="ms-level ms-reveal">
         <div class="ms-level-badge">{{ lvl.level }}</div>
         <div class="ms-level-body">
           <div class="d-flex flex-wrap align-items-baseline justify-content-between gap-2">
@@ -53,47 +73,31 @@
   </div>
 </section>
 
-<section class="ms-sec ms-sec-alt" id="included">
+<section class="ms-sec ms-dark-sec" id="included">
   <div class="container">
-    <div class="text-center mb-4 mb-md-5"><h2 class="ms-h2">ทุกแพ็กเกจได้รับ</h2><p class="ms-sub">ครบทั้งเรียนสด ทวนย้อนหลัง และฝึกทำโจทย์</p></div>
+    <div class="text-center mb-5 ms-reveal"><h2 class="ms-h2">ทุกแพ็กเกจได้รับ <span class="ms-grad">ครบ</span></h2><p class="ms-sub">ทั้งเรียนสด ทวนย้อนหลัง และฝึกทำโจทย์</p></div>
     <div class="row g-3">
       {% for icon, title, text in included %}
-      <div class="col-sm-6 col-lg-4"><div class="ms-card h-100"><span class="ms-card-ic">{{ icon }}</span><h3 class="h6 fw-bold mb-1">{{ title }}</h3><p class="mb-0">{{ text }}</p></div></div>
+      <div class="col-sm-6 col-lg-4 ms-reveal"><div class="ms-card h-100"><span class="ms-card-ic">{{ icon }}</span><h3 class="h6 fw-bold mb-1">{{ title }}</h3><p class="mb-0">{{ text }}</p></div></div>
       {% endfor %}
     </div>
-  </div>
-</section>
-
-<section class="ms-sec">
-  <div class="container">
-    <div class="text-center mb-4 mb-md-5"><h2 class="ms-h2">เริ่มเรียนได้ใน 3 ขั้นตอน</h2></div>
-    <div class="row g-3">
+    <div class="row g-4 mt-4">
       {% for title, text in how_steps %}
-      <div class="col-md-4"><div class="ms-step h-100"><span class="ms-step-no">{{ forloop.counter }}</span><h3 class="h6 fw-bold">{{ title }}</h3><p class="mb-0">{{ text }}</p></div></div>
+      <div class="col-md-4 ms-reveal"><div class="ms-step"><span class="ms-step-no">ขั้นที่ {{ forloop.counter }}</span><h3 class="h6 fw-bold">{{ title }}</h3><p class="mb-0">{{ text }}</p></div></div>
       {% endfor %}
     </div>
   </div>
 </section>
 
-<section class="ms-sec ms-sec-alt" id="pricing">
-  <div class="container" style="max-width:64rem">
-    <div class="text-center mb-4"><h2 class="ms-h2">ค่าสมาชิก</h2><p class="ms-sub">ยิ่งสมัครยาว ยิ่งคุ้ม · ราคาอัปเดตจากระบบจริง</p></div>
-    {% include "microsites/_price_table.html" %}
-    <div class="ms-lifetime mt-4">
+<section class="ms-panel" id="pricing">
+  <div class="container ms-sec" style="max-width:64rem">
+    <div class="text-center mb-4 ms-reveal"><h2 class="ms-h2">ค่าสมาชิก</h2><p class="ms-sub">ยิ่งสมัครยาว ยิ่งคุ้ม · ราคาอัปเดตจากระบบจริง</p></div>
+    <div class="ms-reveal">{% include "microsites/_price_table.html" %}</div>
+    <div class="ms-lifetime mt-4 ms-reveal">
       <h3 class="h6 fw-bold mb-2">🏆 สิทธิ์เรียนตลอดชีพ เมื่อยอดสะสมครบ</h3>
       <div class="d-flex flex-wrap gap-2">{% for lvl, amount in lifetime %}<span><b>{{ lvl }}</b> ฿{{ amount }}</span>{% endfor %}</div>
     </div>
   </div>
 </section>
-
-<section class="ms-sec">
-  <div class="container"><div class="ms-cta">
-    <h2 class="h3 fw-bold mb-2">พร้อมเริ่มระดับแรกของคุณหรือยัง?</h2>
-    <p class="mb-4">สมัครวันนี้ เริ่มเรียนได้ทันทีหลังระบบตรวจสลิป หรือลองดูบทเรียนฟรีก่อนตัดสินใจ</p>
-    <div class="d-flex flex-wrap justify-content-center gap-2">
-      <a class="ms-btn ms-btn-light" href="{{ register_url }}">สมัครเรียนเลย</a>
-      <a class="ms-btn ms-btn-outline-light" href="{{ free_trial_url }}">ดูบทเรียนฟรี</a>
-    </div>
-  </div></div>
-</section>
 {% endblock %}
+{% block final %}{% include "microsites/_final_cta.html" with final_title="พร้อมเริ่ม<span class='ms-grad'>ระดับแรก</span>ของคุณหรือยัง?" final_text="สมัครวันนี้ เริ่มเรียนได้ทันทีหลังระบบตรวจสลิป หรือลองดูบทเรียนฟรีก่อนตัดสินใจ" final_primary="สมัครเรียนเลย" final_primary_url=register_url final_secondary="ดูบทเรียนฟรี" final_secondary_url=free_trial_url %}{% endblock %}

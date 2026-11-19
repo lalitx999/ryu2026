@@ -36,11 +36,24 @@ def _sales_context(request, site):
     levels = [{**lvl, "register": level_links[lvl["level"]], "price": pricing["by_level"].get(lvl["level"])}
               for lvl in content.LEVELS]
     return {"pricing": pricing, "levels": levels, "included": content.INCLUDED, "how_steps": content.HOW_STEPS,
-            "lifetime": content.LIFETIME, "free_trial_url": links.main_url(site, "/ryutube/")}
+            "lifetime": content.LIFETIME, "free_trial_url": links.main_url(site, "/ryutube/"),
+            "final_images": FINAL_COLLAGE}
+
+
+def _notes(items):
+    """Sticky notes: (text, colour, tilt in degrees) - colours and tilts cycle so neighbours never match."""
+    tilts = (-4, 3, -2, 5, -3)
+    return [(text, content.NOTE_COLORS[i % len(content.NOTE_COLORS)], tilts[i % len(tilts)]) for i, text in enumerate(items)]
+
+
+# images that float around the hero, like a pinned collage (all RYU's own artwork)
+HERO_FLOATERS = ["N5.png", "N4.png", "N3.png", "N2.png", "N1.png", "cover.png"]
+FINAL_COLLAGE = ["N5.png", "sa.png", "N4.png", "sss.png", "N3.png", "asasa.png", "N2.png", "ryuuu.png", "N1.png", "86-1-1024x1024.png", "cover.png", "N5.png"]
 
 
 def _learn(request, site):
-    return {**_base_context(request, site, content.LEARN_FAQ), **_sales_context(request, site)}
+    return {**_base_context(request, site, content.LEARN_FAQ), **_sales_context(request, site),
+            "pains": _notes(content.LEARN_PAINS), "features": content.LEARN_FEATURES, "floaters": HERO_FLOATERS}
 
 
 def _japanese(request, site):
@@ -48,13 +61,14 @@ def _japanese(request, site):
     path = [{"site": registry.BY_KEY[key], "href": links.sibling_url(registry.BY_KEY[key], preview), "title": t, "text": d}
             for key, t, d in content.FREE_PATH]
     return {**_base_context(request, site, content.JAPANESE_FAQ), **_sales_context(request, site),
-            "goals": content.GOALS, "myths": content.MYTHS, "free_path": path,
+            "goals": content.GOALS, "myths": [(m, t, color, tilt) for (m, t), (_, color, tilt) in zip(content.MYTHS, _notes(content.MYTHS))], "free_path": path,
             "course_site": links.sibling_url(registry.BY_KEY["learn"], preview)}
 
 
 def _ryu(request, site):
     return {**_base_context(request, site, content.RYU_FAQ), **_sales_context(request, site),
-            "style": content.TEACHING_STYLE, "videos": content.VIDEOS, "socials": content.SOCIALS}
+            "style": content.TEACHING_STYLE, "videos": content.VIDEOS, "socials": content.SOCIALS,
+            "floaters": HERO_FLOATERS}
 
 
 SALES_PAGES = {"learn": _learn, "japanese": _japanese, "ryu": _ryu}
