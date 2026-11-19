@@ -1,4 +1,4 @@
-{% load static %}
+{% load static ryu_icons %}
 <header class="xp-taskbar xp-topbar scrollbar-none">
   <div class="d-flex align-items-center gap-2 gap-sm-3 flex-shrink-0">
     <a href="{% url 'portal:home' %}" class="d-flex align-items-center gap-2 text-decoration-none">
@@ -15,7 +15,7 @@
       <a class="xp-nav-link" href="{% url 'araigogu_page' %}"><span>🤖</span><span>Araigogu AI</span></a>
       <a class="xp-nav-link" href="{% url 'community_pages:forum' %}"><span>🌐</span><span>ชุมชนออนไลน์</span></a>
       <a class="xp-nav-link" href="{% url 'games_page' %}"><span>🎮</span><span>RyuGames</span></a>
-      <a class="xp-nav-link" href="{% url 'portal:network' %}"><span>🧰</span><span>เครื่องมือฟรี</span></a>
+      <a class="xp-nav-link" href="{% url 'portal:network' %}"><span class="d-inline-flex">{% icon "grid" %}</span><span>เครื่องมือฟรี</span></a>
     </nav>
   </div>
   <div class="d-flex align-items-center gap-2 flex-shrink-0">

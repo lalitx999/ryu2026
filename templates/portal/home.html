@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static ryu %}
+{% load static ryu ryu_icons %}
 {% block body_class %}xp-lock{% endblock %}
 {% block mobile_nav %}{% endblock %}
 {% block body %}
@@ -28,7 +28,7 @@
       <div class="emoji">📚</div><span>Ryu-Library</span>
     </button>
     <a class="xp-desktop-icon text-decoration-none" href="{% url 'portal:network' %}">
-      <div class="emoji">🌐</div><span>RYU Network<br>เครื่องมือฟรี</span>
+      <div class="emoji" style="color:#1e3a8a">{% icon "globe" %}</div><span>RYU Network<br>เครื่องมือฟรี</span>
     </a>
   </div>
 
@@ -67,7 +67,7 @@
       </div>
       <div class="right">
         <button class="xp-menu-item" style="color:#00156e" data-act="open-public">📂 หลักสูตรคอร์สทั้งหมด</button>
-        <a class="xp-menu-item" style="color:#00156e" href="{% url 'portal:network' %}">🌐 RYU Network (เครื่องมือฟรี)</a>
+        <a class="xp-menu-item" style="color:#00156e" href="{% url 'portal:network' %}">{% icon "globe" %} RYU Network (เครื่องมือฟรี)</a>
         {% if IS_ADMIN_USER %}<a class="xp-menu-item" style="color:#8b0000" href="{% url 'backoffice:dashboard' %}" target="_blank" rel="noreferrer">🛠️ AdminCN Portal (หลังบ้าน)</a>{% endif %}
       </div>
     </div>

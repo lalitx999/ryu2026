@@ -1,3 +1,5 @@
+import re
+
 from django.test import TestCase, override_settings
 
 from core import testing  # noqa: F401  (py3.14 template-copy shim)
@@ -10,6 +12,8 @@ KANJI = "คันจิ.online".encode("idna").decode()
 LEARN = registry.BY_KEY["learn"].host
 JAPANESE = registry.BY_KEY["japanese"].host
 RYU = registry.BY_KEY["ryu"].host
+# emoji / pictographs (arrows such as → stay allowed as plain text)
+EMOJI = re.compile("[\U0001F000-\U0001FAFF\u2600-\u27BF\u2B00-\u2BFF\u231A-\u23FF\u25A0-\u25FF\uFE0F\u200D\u3297\u3299]")
 
 
 @override_settings(DEBUG=False, ALLOWED_HOSTS=["testserver", *registry.all_hosts()], SITE_URL="https://www.ryusosense.online")
@@ -79,3 +83,11 @@ class MicrositeRoutingTests(TestCase):
         self.assertIn('href="/?site=kanji"', html)              # sibling links stay inside the preview
         self.client.get("/?site=off")
         self.assertNotIn("โหมดพรีวิว", self.client.get("/").content.decode())
+
+    def test_pages_use_icons_not_emoji(self):
+        for site in registry.SITES:
+            html = self.client.get("/", HTTP_HOST=site.host).content.decode()
+            self.assertEqual(EMOJI.findall(html), [], site.domain)
+            self.assertIn('class="ms-ic', html)
+        hub = self.client.get("/network/").content.decode()     # the hub's own content (the XP topbar is the legacy look)
+        self.assertEqual(EMOJI.findall(hub[hub.index("<main"):hub.index("</main>")]), [])

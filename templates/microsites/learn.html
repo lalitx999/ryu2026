@@ -1,4 +1,5 @@
 {% extends "microsites/base.html" %}
+{% load ryu_icons %}
 {% load static ryu %}
 {% block nav %}<a href="#roadmap">หลักสูตร</a><a href="#features">เรียนยังไง</a><a href="#pricing">ราคา</a><a href="#faq">คำถาม</a>{% endblock %}
 {% block main %}
@@ -13,7 +14,7 @@
       <a class="ms-btn ms-btn-ghost" href="#roadmap">ดูหลักสูตรทั้ง 5 ระดับ</a>
     </div>
   </div>
-  <a class="ms-scroll-hint" href="#pains">เลื่อนลง ⌄</a>
+  <a class="ms-scroll-hint" href="#pains">เลื่อนลง {% icon "chevron-down" %}</a>
 </section>
 
 <section class="ms-sec ms-dark-sec" id="pains">
@@ -78,7 +79,7 @@
     <div class="text-center mb-5 ms-reveal"><h2 class="ms-h2">ทุกแพ็กเกจได้รับ <span class="ms-grad">ครบ</span></h2><p class="ms-sub">ทั้งเรียนสด ทวนย้อนหลัง และฝึกทำโจทย์</p></div>
     <div class="row g-3">
       {% for icon, title, text in included %}
-      <div class="col-sm-6 col-lg-4 ms-reveal"><div class="ms-card h-100"><span class="ms-card-ic">{{ icon }}</span><h3 class="h6 fw-bold mb-1">{{ title }}</h3><p class="mb-0">{{ text }}</p></div></div>
+      <div class="col-sm-6 col-lg-4 ms-reveal"><div class="ms-card h-100"><span class="ms-card-ic">{% icon icon %}</span><h3 class="h6 fw-bold mb-1">{{ title }}</h3><p class="mb-0">{{ text }}</p></div></div>
       {% endfor %}
     </div>
     <div class="row g-4 mt-4">
@@ -94,7 +95,7 @@
     <div class="text-center mb-4 ms-reveal"><h2 class="ms-h2">ค่าสมาชิก</h2><p class="ms-sub">ยิ่งสมัครยาว ยิ่งคุ้ม · ราคาอัปเดตจากระบบจริง</p></div>
     <div class="ms-reveal">{% include "microsites/_price_table.html" %}</div>
     <div class="ms-lifetime mt-4 ms-reveal">
-      <h3 class="h6 fw-bold mb-2">🏆 สิทธิ์เรียนตลอดชีพ เมื่อยอดสะสมครบ</h3>
+      <h3 class="h6 fw-bold mb-2 d-flex align-items-center gap-2">{% icon "trophy" %} สิทธิ์เรียนตลอดชีพ เมื่อยอดสะสมครบ</h3>
       <div class="d-flex flex-wrap gap-2">{% for lvl, amount in lifetime %}<span><b>{{ lvl }}</b> ฿{{ amount }}</span>{% endfor %}</div>
     </div>
   </div>

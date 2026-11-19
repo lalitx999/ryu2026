@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static ryu_icons %}
 {% block title %}RYU Network · เครื่องมือเรียนภาษาญี่ปุ่นฟรี และเว็บในเครือ | RyuClass{% endblock %}
 {% block description %}รวมเว็บในเครือ RYU CLASS: คันจิ.online อักษรภาษาญี่ปุ่น.online พจนานุกรมภาษาญี่ปุ่น.online แปลภาษาญี่ปุ่น.online วัดระดับภาษาญี่ปุ่น.online ใช้ฟรี ไม่ต้องสมัครสมาชิก{% endblock %}
 {% block body_class %}lib-page{% endblock %}
@@ -8,7 +8,7 @@
 <main class="container py-4 py-md-5" style="max-width:64rem">
   <div class="lib-card">
     <div class="px-4 py-3 d-flex justify-content-between align-items-center border-bottom" style="border-color:#1e293b !important">
-      <div class="fw-semibold" style="font-size:14px;color:#e2e8f0">🌐 RYU Network · เว็บในเครือ RyuClass</div>
+      <div class="fw-semibold" style="font-size:14px;color:#e2e8f0">RYU Network · เว็บในเครือ RyuClass</div>
       <a href="{% url 'portal:home' %}" class="btn btn-sm btn-outline-secondary t12">กลับหน้าหลัก</a>
     </div>
     <div class="p-3 p-md-4 d-flex flex-column gap-4">
@@ -22,12 +22,12 @@
           <div class="col-12 col-sm-6 col-lg-4">
             <a class="lib-item text-decoration-none h-100" href="{{ s.url }}?utm_source=ryusosense&amp;utm_medium=network_hub" target="_blank" rel="noopener">
               <div class="d-flex justify-content-between align-items-center">
-                <span class="fw-bold" style="font-size:26px;color:{{ s.accent }}">{{ s.icon }}</span>
+                <span class="fw-bold d-inline-flex" style="font-size:26px;color:{{ s.accent }}">{% icon s.icon %}</span>
                 {% if not s.live %}<span class="t10 rounded-pill px-2" style="color:#64748b;border:1px solid #1e293b">เร็วๆ นี้</span>{% endif %}
               </div>
               <div><h2 class="mb-1" style="font-size:15px;font-weight:600;color:#e2e8f0">{{ s.name }}</h2>
                 <p class="t12 mb-0" style="color:#94a3b8;line-height:1.5">{{ s.tagline }}</p></div>
-              <div class="mt-auto pt-2 border-top t12 fw-semibold" style="color:{{ s.accent }};border-color:#1e293b !important">{{ s.domain }} ↗</div>
+              <div class="mt-auto pt-2 border-top t12 fw-semibold" style="color:{{ s.accent }};border-color:#1e293b !important">{{ s.domain }} {% icon "arrow-up-right" %}</div>
             </a>
           </div>
           {% endfor %}
@@ -39,9 +39,9 @@
           {% for s in sales %}
           <div class="col-12 col-md-4">
             <a class="lib-item text-decoration-none h-100" href="{{ s.url }}?utm_source=ryusosense&amp;utm_medium=network_hub" target="_blank" rel="noopener">
-              <span style="font-size:24px">{{ s.icon }}</span>
+              <span class="d-inline-flex" style="font-size:24px;color:{{ s.accent }}">{% icon s.icon %}</span>
               <div><h3 class="mb-1" style="font-size:14px;font-weight:600;color:#e2e8f0">{{ s.tagline }}</h3></div>
-              <div class="mt-auto pt-2 border-top t12 fw-semibold" style="color:{{ s.accent }};border-color:#1e293b !important">{{ s.domain }} ↗</div>
+              <div class="mt-auto pt-2 border-top t12 fw-semibold" style="color:{{ s.accent }};border-color:#1e293b !important">{{ s.domain }} {% icon "arrow-up-right" %}</div>
             </a>
           </div>
           {% endfor %}
@@ -50,5 +50,5 @@
     </div>
   </div>
 </main>
-<footer class="text-center py-4 t12" style="color:#475569;border-top:1px solid rgba(30,41,59,.8)"><p class="mb-0">RyuClass © 2026 — เรียนภาษาญี่ปุ่นเข้าใจง่าย สไตล์พี่ริว 🐾</p></footer>
+<footer class="text-center py-4 t12" style="color:#475569;border-top:1px solid rgba(30,41,59,.8)"><p class="mb-0">RyuClass © 2026 — เรียนภาษาญี่ปุ่นเข้าใจง่าย สไตล์พี่ริว</p></footer>
 {% endblock %}

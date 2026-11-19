@@ -1,4 +1,5 @@
 {% extends "microsites/base.html" %}
+{% load ryu_icons %}
 {% load static ryu %}
 {% block og_image %}{% static 'assets/images/salepage/ryuuu.png' %}{% endblock %}
 {% block nav %}<a href="#style">สไตล์การสอน</a><a href="#videos">ตัวอย่างคลิป</a><a href="#pricing">ราคา</a><a href="#contact">คุยกับพี่ริว</a>{% endblock %}
@@ -38,7 +39,7 @@
     <div class="text-center mb-5 ms-reveal"><h2 class="ms-h2">ทำไมนักเรียนชอบเรียนกับพี่ริว</h2><p class="ms-sub">สไตล์การสอนที่ทำให้ภาษาญี่ปุ่นไม่น่ากลัวอีกต่อไป</p></div>
     <div class="row g-3">
       {% for icon, title, text in style %}
-      <div class="col-sm-6 col-lg-3 ms-reveal"><div class="ms-card ms-card-center h-100"><span class="ms-card-ic">{{ icon }}</span><h3 class="h6 fw-bold mb-1">{{ title }}</h3><p class="mb-0">{{ text }}</p></div></div>
+      <div class="col-sm-6 col-lg-3 ms-reveal"><div class="ms-card ms-card-center h-100"><span class="ms-card-ic">{% icon icon %}</span><h3 class="h6 fw-bold mb-1">{{ title }}</h3><p class="mb-0">{{ text }}</p></div></div>
       {% endfor %}
     </div>
   </div>
@@ -63,7 +64,7 @@
   <div class="container ms-sec" style="max-width:62rem">
     <div class="text-center mb-4 ms-reveal"><h2 class="ms-h2">ในคลาสของพี่ริวมีอะไรบ้าง</h2></div>
     <ul class="ms-checklist ms-reveal">
-      {% for icon, title, text in included %}<li><span>{{ icon }}</span><div><b>{{ title }}</b><small>{{ text }}</small></div></li>{% endfor %}
+      {% for icon, title, text in included %}<li><span>{% icon icon %}</span><div><b>{{ title }}</b><small>{{ text }}</small></div></li>{% endfor %}
     </ul>
   </div>
 </section>
@@ -85,7 +86,7 @@
         <a class="ms-line" href="{{ LINE_SUPPORT_URL }}" target="_blank" rel="noopener"><b>ทัก LINE พี่ริว</b><small>LINE ID : @ryusosense</small></a>
         <h3 class="h6 fw-bold mt-4 mb-2">ติดตามเทคนิคภาษาญี่ปุ่นฟรี</h3>
         <div class="d-flex flex-wrap gap-2">
-          {% for name, url, color, glyph in socials %}<a class="ms-social" style="--c:{{ color }}" href="{{ url }}" target="_blank" rel="noopener"><span>{{ glyph }}</span>{{ name }}</a>{% endfor %}
+          {% for name, url, color, glyph in socials %}<a class="ms-social" style="--c:{{ color }}" href="{{ url }}" target="_blank" rel="noopener"><span>{% icon glyph %}</span>{{ name }}</a>{% endfor %}
         </div>
       </div>
       <div class="col-md-6 ms-reveal"><img class="ms-shot" src="{% static 'assets/images/salepage/line_oa_chat_250822_080345.jpg' %}" alt="QR code LINE OA พี่ริว" loading="lazy"></div>

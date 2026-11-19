@@ -1,9 +1,10 @@
 {% extends "microsites/base.html" %}
+{% load ryu_icons %}
 {% block header_cta %}<a class="ms-btn ms-btn-sm" href="{{ main_site_url }}">RYU CLASS</a>{% endblock %}
 {% block main %}
 <section class="ms-panel ms-panel-first ms-hero">
   <div class="container" style="max-width:44rem">
-    <div class="ms-soon-ic">{{ site.icon }}</div><br>
+    <div class="ms-soon-ic">{% icon site.icon %}</div><br>
     <span class="ms-chip">กำลังสร้าง · เร็ว ๆ นี้</span>
     <h1 class="ms-h1">{{ site.name }}</h1>
     <p class="ms-lead">{{ site.description }}</p>

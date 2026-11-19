@@ -1,18 +1,19 @@
+{% load ryu_icons %}
 {# small UI mockups shown inside the pastel feature cards; `card` = zoom | replay | chat #}
 <div class="ms-mock">
 {% if card == "zoom" %}
   <div class="ms-mock-top"><span>คลาสสด JLPT N4 · บทที่ 6</span><span class="live">LIVE</span></div>
-  <div class="ms-mock-grid"><span class="teacher">👨‍🏫</span><span>🙂</span><span>😄</span><span>🤓</span><span>😊</span><span>🙋</span></div>
+  <div class="ms-mock-grid"><span class="teacher">{% icon "user" %}</span>{% for i in "12345" %}<span>{% icon "user" %}</span>{% endfor %}</div>
 {% elif card == "replay" %}
-  <div class="ms-mock-player">▶</div>
+  <div class="ms-mock-player">{% icon "play" %}</div>
   <div class="ms-mock-bar"><i></i></div>
   <div class="ms-mock-row"><span>บทที่ 3 · รูป て</span><span>18:42 / 30:00</span></div>
-  <div class="ms-mock-file">📄 <span>สรุปไวยากรณ์บทที่ 3.pdf</span></div>
-  <div class="ms-mock-file">✅ <span>แบบฝึกหัด 8/10 ข้อ</span></div>
+  <div class="ms-mock-file">{% icon "file" %} <span>สรุปไวยากรณ์บทที่ 3.pdf</span></div>
+  <div class="ms-mock-file">{% icon "check-circle" %} <span>แบบฝึกหัด 8/10 ข้อ</span></div>
 {% else %}
-  <div class="ms-mock-top"><span>💬 กลุ่ม LINE คลาส N5</span></div>
+  <div class="ms-mock-top"><span class="d-inline-flex align-items-center gap-2">{% icon "message" %} กลุ่ม LINE คลาส N5</span></div>
   <div class="ms-bubble me">「たべます」กับ「たべる」ต่างกันยังไงครับ</div>
-  <div class="ms-bubble them">ความหมายเดียวกันครับ <b>たべます</b> สุภาพ ใช้กับคนไม่สนิท ส่วน <b>たべる</b> ใช้กับเพื่อน 👍</div>
-  <div class="ms-bubble me">เข้าใจแล้ว ขอบคุณครับ 🙏</div>
+  <div class="ms-bubble them">ความหมายเดียวกันครับ <b>たべます</b> สุภาพ ใช้กับคนไม่สนิท ส่วน <b>たべる</b> ใช้กับเพื่อน</div>
+  <div class="ms-bubble me">เข้าใจแล้ว ขอบคุณครับ</div>
 {% endif %}
 </div>

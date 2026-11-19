@@ -12,6 +12,8 @@
   color: var(--ms-text); background: var(--ms-dark); line-height: 1.7; -webkit-font-smoothing: antialiased; }
 .ms a { color: inherit; }
 .ms h1, .ms h2, .ms h3 { color: var(--ms-ink); letter-spacing: -.01em; }
+.ms-ic { display: inline-block; vertical-align: -.14em; flex-shrink: 0; }
+.ms-glyph { font-family: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif; font-weight: 700; line-height: 1; }
 .ms-jp { font-family: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif; }
 
 /* ── header: floating capsule ─────────────────────────────── */
@@ -89,7 +91,7 @@
 .ms-float.kana small { font-size: 12px; color: var(--ms-muted); font-weight: 500; margin-top: 8px; font-family: inherit; }
 .ms-float.kana.alt { color: var(--ms-accent); }
 @keyframes ms-bob { 50% { translate: 0 -10px; } }
-.ms-scroll-hint { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); font-size: 13px; color: var(--ms-muted); z-index: 2; text-decoration: none; }
+.ms-scroll-hint { display: inline-flex; align-items: center; gap: 4px; position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); font-size: 13px; color: var(--ms-muted); z-index: 2; text-decoration: none; }
 
 /* ── sticky notes (problems / myths) on dark ─────────────────────────────── */
 .ms-notes { display: flex; flex-wrap: wrap; justify-content: center; gap: 22px; margin-top: 40px; }
@@ -98,7 +100,7 @@
   transition: opacity .7s ease, transform .7s ease, rotate .2s, scale .2s; }
 .ms-note-card:hover { rotate: 0deg; scale: 1.03; }
 .ms-note-card small { display: block; font-weight: 400; font-size: .92rem; margin-top: 10px; color: #374151; }
-.ms-note-card .tag { display: block; font-size: 12px; font-weight: 700; letter-spacing: .03em; opacity: .7; margin-bottom: 6px; }
+.ms-note-card .tag { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; letter-spacing: .03em; opacity: .7; margin-bottom: 6px; }
 .ms-notes-wide .ms-note-card { width: 300px; }
 
 /* ── alternating feature rows with pastel mockup cards ─────────────────────────────── */
@@ -116,13 +118,13 @@
 .ms-mock-top { display: flex; align-items: center; justify-content: space-between; font-weight: 600; color: var(--ms-ink); margin-bottom: 10px; }
 .ms-mock-top .live { font-size: 11px; color: #fff; background: #ef4444; border-radius: 999px; padding: 1px 8px; }
 .ms-mock-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-.ms-mock-grid span { aspect-ratio: 4/3; border-radius: 10px; background: linear-gradient(135deg, #e5e7eb, #f3f4f6); display: flex; align-items: center; justify-content: center; font-size: 20px; }
-.ms-mock-grid span.teacher { grid-column: span 2; grid-row: span 2; background: linear-gradient(135deg, #fed7aa, #fde68a); font-size: 34px; }
+.ms-mock-grid span { aspect-ratio: 4/3; border-radius: 10px; background: linear-gradient(135deg, #e5e7eb, #f3f4f6); display: flex; align-items: center; justify-content: center; font-size: 20px; color: #9ca3af; }
+.ms-mock-grid span.teacher { grid-column: span 2; grid-row: span 2; background: linear-gradient(135deg, #fed7aa, #fde68a); font-size: 34px; color: #9a3412; }
 .ms-mock-player { aspect-ratio: 16/9; border-radius: 12px; background: #0f172a; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 30px; }
 .ms-mock-bar { height: 5px; border-radius: 3px; background: #e5e7eb; margin: 10px 0 8px; overflow: hidden; }
 .ms-mock-bar i { display: block; width: 62%; height: 100%; background: var(--ms-grad); }
 .ms-mock-row { display: flex; justify-content: space-between; color: var(--ms-muted); font-size: 12px; }
-.ms-mock-file { display: flex; gap: 8px; align-items: center; background: var(--ms-soft); border-radius: 10px; padding: 7px 10px; margin-top: 8px; color: var(--ms-ink); }
+.ms-mock-file { display: flex; font-size: 13px; gap: 8px; align-items: center; background: var(--ms-soft); border-radius: 10px; padding: 7px 10px; margin-top: 8px; color: var(--ms-ink); }
 .ms-bubble { max-width: 82%; padding: 8px 12px; border-radius: 16px; margin-bottom: 8px; line-height: 1.45; }
 .ms-bubble.me { margin-left: auto; background: var(--ms-ink); color: #fff; border-bottom-right-radius: 4px; }
 .ms-bubble.them { background: var(--ms-soft); color: var(--ms-ink); border-bottom-left-radius: 4px; }
@@ -131,10 +133,10 @@
 .ms-card { background: #fff; border: 1px solid var(--ms-line); border-radius: var(--ms-radius); padding: 24px; transition: transform .2s, box-shadow .2s; }
 .ms-card:hover { transform: translateY(-3px); box-shadow: 0 20px 40px -28px rgba(15,23,42,.45); }
 .ms-card-center { text-align: center; }
-.ms-card-ic { display: inline-flex; width: 46px; height: 46px; align-items: center; justify-content: center; border-radius: 14px;
+.ms-card-ic { color: var(--ms-ink); display: inline-flex; width: 46px; height: 46px; align-items: center; justify-content: center; border-radius: 14px;
   background: var(--ms-soft); font-size: 22px; margin-bottom: 14px; }
 .ms-dark-sec .ms-card { background: var(--ms-dark-2); border-color: rgba(255,255,255,.08); color: #c9ced8; }
-.ms-dark-sec .ms-card-ic { background: rgba(255,255,255,.08); }
+.ms-dark-sec .ms-card-ic { background: rgba(255,255,255,.08); color: #fff; }
 .ms-step { border-top: 2px solid var(--ms-ink); padding-top: 18px; }
 .ms-step-no { font-size: 13px; font-weight: 700; color: var(--ms-muted); display: block; margin-bottom: 6px; }
 
@@ -186,7 +188,8 @@
 /* ── ภาษาญี่ปุ่น.online ─────────────────────────────── */
 .ms-goals { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px; }
 .ms-goal { border: 1px solid #d4d6dc; background: #fff; border-radius: 999px; padding: 10px 20px; font-weight: 600; color: var(--ms-text); transition: all .15s; }
-.ms-goal span { margin-right: 6px; }
+.ms-goal { display: inline-flex; align-items: center; gap: 8px; }
+.ms-goal .ms-ic { font-size: 18px; }
 .ms-goal.active { border-color: var(--ms-ink); background: var(--ms-ink); color: #fff; }
 .ms-goal-result { display: flex; gap: 24px; align-items: center; background: var(--ms-soft); border-radius: 24px; padding: 26px; }
 .ms-goal-level { flex-shrink: 0; text-align: center; background: #fff; border-radius: 18px; padding: 16px 22px; box-shadow: 0 12px 30px -20px rgba(15,23,42,.5); }
@@ -227,7 +230,7 @@
 .ms-video { border-radius: var(--ms-radius); overflow: hidden; background: #000; border: 1px solid rgba(255,255,255,.1); }
 .ms-checklist { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
 .ms-checklist li { display: flex; gap: 12px; align-items: flex-start; background: var(--ms-soft); border-radius: 18px; padding: 16px 18px; }
-.ms-checklist li > span { font-size: 22px; }
+.ms-checklist li > span { font-size: 22px; color: var(--ms-ink); display: inline-flex; padding-top: 2px; }
 .ms-checklist b { display: block; color: var(--ms-ink); }
 .ms-checklist small { color: var(--ms-muted); }
 .ms-line { display: block; text-align: center; text-decoration: none; background: #06c755; color: #fff !important; border-radius: 999px; padding: 14px; }

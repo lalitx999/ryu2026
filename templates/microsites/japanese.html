@@ -1,4 +1,5 @@
 {% extends "microsites/base.html" %}
+{% load ryu_icons %}
 {% load static ryu %}
 {% block nav %}<a href="#goal">เป้าหมาย</a><a href="#myths">ยากไหม?</a><a href="#path">เรียนฟรี</a><a href="#course">คอร์ส</a>{% endblock %}
 {% block header_cta %}<a class="ms-btn ms-btn-sm" href="#path">เริ่มฟรี</a>{% endblock %}
@@ -19,7 +20,7 @@
       <a class="ms-btn ms-btn-ghost" href="#path">เริ่มเรียนฟรี</a>
     </div>
   </div>
-  <a class="ms-scroll-hint" href="#goal">เลื่อนลง ⌄</a>
+  <a class="ms-scroll-hint" href="#goal">เลื่อนลง {% icon "chevron-down" %}</a>
 </section>
 
 <section class="ms-panel" id="goal">
@@ -27,7 +28,7 @@
     <div class="text-center mb-4 ms-reveal"><h2 class="ms-h2">อยากใช้ภาษาญี่ปุ่นทำอะไร?</h2><p class="ms-sub">เลือกเป้าหมาย แล้วดูระดับที่ควรไปให้ถึง</p></div>
     <div class="ms-goals ms-reveal" role="tablist">
       {% for g in goals %}
-      <button type="button" class="ms-goal{% if forloop.first %} active{% endif %}" role="tab" aria-selected="{{ forloop.first|yesno:'true,false' }}" data-goal="{{ g.key }}"><span>{{ g.icon }}</span>{{ g.label }}</button>
+      <button type="button" class="ms-goal{% if forloop.first %} active{% endif %}" role="tab" aria-selected="{{ forloop.first|yesno:'true,false' }}" data-goal="{{ g.key }}">{% icon g.icon %}{{ g.label }}</button>
       {% endfor %}
     </div>
     {% for g in goals %}
@@ -45,7 +46,7 @@
     <p class="ms-sub ms-reveal">3 ความเชื่อที่ทำให้หลายคนไม่กล้าเริ่ม</p>
     <div class="ms-notes ms-notes-wide text-start">
       {% for myth, truth, color, tilt in myths %}
-      <div class="ms-note-card ms-reveal" style="--c:{{ color }};--r:{{ tilt }}deg"><span class="tag">✗ ความเชื่อ</span>“{{ myth }}”<small>{{ truth }}</small></div>
+      <div class="ms-note-card ms-reveal" style="--c:{{ color }};--r:{{ tilt }}deg"><span class="tag">{% icon "x" %} ความเชื่อ</span>“{{ myth }}”<small>{{ truth }}</small></div>
       {% endfor %}
     </div>
   </div>
@@ -58,12 +59,12 @@
       {% for p in free_path %}
       <li class="ms-reveal"><a href="{{ p.href }}" style="--c:{{ p.site.accent }}">
         <span class="no">{{ forloop.counter }}</span>
-        <span class="ic ms-jp">{{ p.site.icon }}</span>
+        <span class="ic ms-jp">{% icon p.site.icon %}</span>
         <span class="txt"><b>{{ p.title }}</b><small>{{ p.text }}</small><em>{{ p.site.domain }}{% if not p.site.live %} · เร็ว ๆ นี้{% endif %}</em></span>
       </a></li>
       {% endfor %}
       <li class="ms-reveal"><a href="{{ free_trial_url }}" style="--c:#f59e0b">
-        <span class="no">5</span><span class="ic">▶</span>
+        <span class="no">5</span><span class="ic">{% icon "play" %}</span>
         <span class="txt"><b>ลองเรียนกับครูจริง</b><small>บทเรียนทดลองฟรีของพี่ริว</small><em>Ryutube · ryusosense.online</em></span>
       </a></li>
     </ol>
