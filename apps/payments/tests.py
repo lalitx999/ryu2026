@@ -176,7 +176,7 @@ class PlanPageTests(PlanBase):
 
     def test_course_page_and_dialogs(self):
         html = self.client.get(f"/courses/{self.courses['N3'].id}/").content.decode()
-        self.assertIn("฿960.- / 30 วัน", html)
+        self.assertIn('href="/salepage/#pricing-section"', html)   # price lives behind the details link
         self.assertIn("ทุกระดับ N5–N1", html)
         self.assertIn('"renewalDays": 30', html)
         self.assertNotIn("33 วัน", html)

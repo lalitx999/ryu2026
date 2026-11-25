@@ -9,6 +9,8 @@
 .cp-title { font-size:24px; font-weight:900; margin:0; }
 .cp-desc { color:#dbeafe; font-size:12px; margin:4px 0 0; max-width:42rem; font-weight:500; white-space:pre-line; }
 .cp-price { margin:8px 0 0; font-size:14px; font-weight:900; color:#fde047; }
+.cp-price-link { display:inline-block; color:#fde047; text-decoration:none; border:1px solid rgba(253,224,71,.6); border-radius:4px; padding:2px 10px; }
+.cp-price-link:hover { background:rgba(253,224,71,.15); color:#fde047; }
 .cp-expiry { display:inline-block; margin:8px 0 0; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:800; background:rgba(16,185,129,.25); border:1px solid #34d399; color:#d1fae5; }
 .cp-expiry.soon { background:rgba(245,158,11,.25); border-color:#fbbf24; color:#fef3c7; }
 .cp-expiry.urgent { background:rgba(239,68,68,.3); border-color:#f87171; color:#fee2e2; }

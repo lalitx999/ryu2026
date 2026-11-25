@@ -103,7 +103,7 @@ class OutlineAndProgressTests(CoursePageBase):
 
     def test_page_renders_player_and_dialogs(self):
         html = self.client.get("/courses/1/").content.decode()
-        for needle in ("video-player-container", "cb-play", "cb-rate", "cb-full", "btn-prev", "btn-attach", "note-stamp", "authModal", "ryu-boot", "฿100.- / 30 วัน"):
+        for needle in ("video-player-container", "cb-play", "cb-rate", "cb-full", "btn-prev", "btn-attach", "note-stamp", "authModal", "ryu-boot", "/salepage/#pricing-section"):
             self.assertIn(needle, html, needle)
         self.client.force_login(self.student)
         html = self.client.get("/courses/1/").content.decode()

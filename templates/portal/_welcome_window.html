@@ -52,9 +52,9 @@
                 <div class="mini-progress"><div style="width:{{ c.progress_percent }}%"></div></div>
               </div>{% endif %}
             </div>
-            <div class="d-flex justify-content-between align-items-center border-top pt-2 mt-2" style="border-color:#d1d5db !important">
-              <span class="t12 fw-bold" style="color:#1e3a8a">฿{{ c.price|baht }}.-/ด</span>
-              <button type="button" class="xp-btn-green" data-course-url="{% url 'portal:course' c.id %}">{% if user.is_authenticated and c.has_access %}เข้าเรียน{% else %}ดูบทเรียน{% endif %}</button>
+            <div class="d-flex justify-content-between align-items-center gap-1 border-top pt-2 mt-2" style="border-color:#d1d5db !important">
+              <a class="xp-btn-gray text-nowrap px-2" href="/salepage/#pricing-section">รายละเอียด</a>
+              <button type="button" class="xp-btn-green text-nowrap px-2" data-course-url="{% url 'portal:course' c.id %}">{% if user.is_authenticated and c.has_access %}เข้าเรียน{% else %}ดูบทเรียน{% endif %}</button>
             </div>
           </div>
         </div>
