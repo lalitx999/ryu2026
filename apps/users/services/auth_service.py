@@ -11,6 +11,7 @@ from django.utils import timezone
 
 from core.http import ServiceError, is_admin_user
 from courses.models import Course
+from courses.pricing import PLAN_LEVEL_ACCESS, plan_course, single_plan_active
 from payments.services import payment_service
 from users.models import EmailVerificationCode, User
 from users import tasks
@@ -59,7 +60,8 @@ def login_user(email, password):
 
 @transaction.atomic
 def register_student(data, slip_file):
-    required = ("name", "email", "password", "phone", "level", "duration")
+    plan = single_plan_active()
+    required = ("name", "email", "password", "phone", "duration") if plan else ("name", "email", "password", "phone", "level", "duration")
     if any(not str(data.get(k, "")).strip() for k in required) or not slip_file:
         raise ServiceError("กรุณากรอกข้อมูลและแนบสลิปการโอนเงินให้ครบถ้วนทุกช่องครับ")
     email = _clean_email(data["email"])
@@ -68,7 +70,8 @@ def register_student(data, slip_file):
     if User.objects.filter(email__iexact=email).exists():
         raise ServiceError("อีเมลนี้ถูกใช้งานสมัครเรียนแล้ว หากต้องการเรียนเพิ่มหรือต่ออายุ กรุณาเข้าสู่ระบบก่อนครับ")
 
-    course = Course.objects.filter(level=data["level"], is_active=True).order_by("id").first()
+    # all-access plan: the level picked on the page no longer matters, the purchase is the plan (N1 covers N5-N1)
+    course = plan_course() if plan else Course.objects.filter(level=data["level"], is_active=True).order_by("id").first()
     if course is None:
         raise ServiceError("ระดับคอร์สไม่ถูกต้อง")
     try:
@@ -84,7 +87,8 @@ def register_student(data, slip_file):
     )
     payment_service.submit_slip_payment(
         user=user, course=course, amount=amount, duration_days=duration,
-        slip_file=slip_file, is_zoom_included=duration >= 180, is_renewal=False,
+        slip_file=slip_file, is_zoom_included=plan or duration >= 180, is_renewal=False,
+        level_access=PLAN_LEVEL_ACCESS if plan else None,
     )
     issue_verification_code(user)
     return user

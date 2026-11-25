@@ -4,6 +4,8 @@ import json
 from django.conf import settings
 from django.templatetags.static import static
 
+from courses.pricing import single_plan_active
+
 SITE_NAME = "RyuClass"
 SITEMAP_ROUTES = [("/", "daily", "1.0"), ("/ryutube/", "weekly", "0.9"), ("/salepage/", "weekly", "0.8"),
                   ("/araigogu/", "weekly", "0.8"), ("/community/", "weekly", "0.8"), ("/games/", "weekly", "0.8"),
@@ -23,12 +25,28 @@ FAQ = [("RyuClass สอนคอร์สภาษาญี่ปุ่นร�
         "สามารถเข้าเรียนทดลองฟรีบทเรียนพื้นฐาน N5 ได้ที่หน้า Ryutube โดยไม่มีค่าใช้จ่าย")]
 
 
+def _offers():
+    if single_plan_active():
+        return {"@type": "AggregateOffer", "priceCurrency": "THB", "lowPrice": str(settings.SINGLE_PLAN_MONTHLY),
+                "highPrice": str(settings.SINGLE_PLAN_YEARLY), "offerCount": "2"}
+    return {"@type": "AggregateOffer", "priceCurrency": "THB", "lowPrice": "0", "highPrice": "50000", "offerCount": "5"}
+
+
+def _faq():
+    if not single_plan_active():
+        return FAQ
+    price = ("ค่าเรียนเท่าไหร่?",
+             f"ราคาเดียว เรียนได้ทุกระดับ N5–N1 รวมคลาส Zoom รายเดือน ฿{settings.SINGLE_PLAN_MONTHLY:,} "
+             f"หรือรายปี ฿{settings.SINGLE_PLAN_YEARLY:,}")
+    return [FAQ[0], price] + FAQ[1:]
+
+
 def structured_data():
     base = settings.SITE_URL.rstrip("/")
     org = {"@context": "https://schema.org", "@type": "EducationalOrganization", "name": SITE_NAME,
            "alternateName": "ริวคลาส ภาษาญี่ปุ่นออนไลน์", "url": base, "logo": base + static("assets/ryu_logo.jpg"),
            "description": "แพลตฟอร์มเรียนภาษาญี่ปุ่นออนไลน์และเตรียมสอบวัดระดับ JLPT N5 - N1 ครบวงจร พร้อมระบบ AI Tutor Araigogu และสิทธิ์เรียนตลอดชีพ",
-           "offers": {"@type": "AggregateOffer", "priceCurrency": "THB", "lowPrice": "0", "highPrice": "50000", "offerCount": "5"}}
+           "offers": _offers()}
     courses = {"@context": "https://schema.org", "@type": "ItemList", "itemListElement": [
         {"@type": "ListItem", "position": i, "item": {
             "@type": "Course", "name": f"คอร์สเรียนภาษาญี่ปุ่น JLPT {lvl}", "description": f"คอร์สเรียนภาษาญี่ปุ่นระดับ {lvl} {desc}",
@@ -36,7 +54,7 @@ def structured_data():
             "hasCourseInstance": {"@type": "CourseInstance", "courseMode": "online", "courseWorkload": hours}}}
         for i, (lvl, desc, hours) in enumerate(COURSES, start=1)]}
     faq = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
-        {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in FAQ]}
+        {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in _faq()]}
     return [org, courses, faq]
 
 

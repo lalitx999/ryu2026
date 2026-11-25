@@ -59,7 +59,7 @@
         <div class="ms-level-body">
           <div class="d-flex flex-wrap align-items-baseline justify-content-between gap-2">
             <h3 class="h5 fw-bold mb-0">JLPT {{ lvl.level }} · {{ lvl.name }}</h3>
-            {% if lvl.price %}<span class="ms-price-tag">เริ่ม ฿{{ lvl.price.monthly|baht }}/เดือน</span>{% endif %}
+            {% if pricing.plan %}<span class="ms-price-tag">รวมในแพ็กเกจทุกระดับ</span>{% elif lvl.price %}<span class="ms-price-tag">เริ่ม ฿{{ lvl.price.monthly|baht }}/เดือน</span>{% endif %}
           </div>
           <ul class="ms-ticks">{% for item in lvl.learn %}<li>{{ item }}</li>{% endfor %}</ul>
           <p class="ms-can"><b>เรียนจบแล้ว:</b> {{ lvl.can }}</p>
@@ -92,7 +92,7 @@
 
 <section class="ms-panel" id="pricing">
   <div class="container ms-sec" style="max-width:64rem">
-    <div class="text-center mb-4 ms-reveal"><h2 class="ms-h2">ค่าสมาชิก</h2><p class="ms-sub">ยิ่งสมัครยาว ยิ่งคุ้ม · ราคาอัปเดตจากระบบจริง</p></div>
+    <div class="text-center mb-4 ms-reveal"><h2 class="ms-h2">ค่าสมาชิก</h2><p class="ms-sub">{% if pricing.plan %}ราคาเดียว เรียนได้ทุกระดับ · สมัครรายปีคุ้มกว่า{% else %}ยิ่งสมัครยาว ยิ่งคุ้ม · ราคาอัปเดตจากระบบจริง{% endif %}</p></div>
     <div class="ms-reveal">{% include "microsites/_price_table.html" %}</div>
     <div class="ms-lifetime mt-4 ms-reveal">
       <h3 class="h6 fw-bold mb-2 d-flex align-items-center gap-2">{% icon "trophy" %} สิทธิ์เรียนตลอดชีพ เมื่อยอดสะสมครบ</h3>

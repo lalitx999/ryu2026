@@ -1,4 +1,14 @@
 {% load ryu %}
+{% if pricing.plan %}{% with p=pricing.plan %}
+<div class="ms-plan">
+  <p class="ms-plan-head">เรียนได้ทุกระดับ N5–N1 · รวมคลาส Zoom</p>
+  <div class="ms-plan-grid">
+    <div class="ms-plan-opt"><span>รายเดือน (30 วัน)</span><b>฿{{ p.monthly|baht }}</b></div>
+    <div class="ms-plan-opt is-best"><span>รายปี (365 วัน)</span><b>฿{{ p.yearly|baht }}</b><small>ประหยัด ฿{{ p.yearly_saving|baht }}</small></div>
+  </div>
+</div>
+<p class="ms-note text-center mt-2 mb-0">ราคาอาจเปลี่ยนแปลงตามโปรโมชั่น · สิทธิ์ตลอดชีพสะสมเลเวลตามยอดที่ชำระ</p>
+{% endwith %}{% else %}
 <div class="ms-table-wrap">
   <table class="ms-table">
     <thead><tr><th>ระดับ</th><th>รายเดือน</th><th>6 เดือน</th><th>12 เดือน</th><th>ตลอดชีพ</th></tr></thead>
@@ -13,3 +23,4 @@
   </table>
 </div>
 <p class="ms-note text-center mt-2 mb-0">ราคาอาจเปลี่ยนแปลงตามโปรโมชั่น · สิทธิ์ตลอดชีพสะสมเลเวลตามยอดที่ชำระ</p>
+{% endif %}

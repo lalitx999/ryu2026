@@ -10,7 +10,7 @@ from django.utils import timezone
 
 from core.http import ServiceError
 from courses.models import Course, Enrollment
-from courses.pricing import package_amount
+from courses.pricing import PLAN_LEVEL_ACCESS, package_amount, plan_course, single_plan_active
 from courses.services.access_service import AccessService
 from payments.models import Payment
 
@@ -50,10 +50,12 @@ def _store_slip(slip_file, user_id):
 
 
 @transaction.atomic
-def submit_slip_payment(*, user, course, amount, duration_days, slip_file, is_zoom_included, is_renewal):
+def submit_slip_payment(*, user, course, amount, duration_days, slip_file, is_zoom_included, is_renewal,
+                        level_access=None):
     filename = _store_slip(slip_file, user.id)
     payment = Payment.objects.create(
-        user=user, course=course, amount=amount, duration_days=duration_days, level_access=course.level,
+        user=user, course=course, amount=amount, duration_days=duration_days,
+        level_access=level_access or course.level,
         is_zoom_included=is_zoom_included, slip_path=filename, status="pending", is_renewal=is_renewal,
         discount_percent=0,
     )
@@ -66,6 +68,8 @@ def submit_slip_payment(*, user, course, amount, duration_days, slip_file, is_zo
 
 def upload_slip_existing_user(user, data, slip_file):
     """Logged-in student buys / renews a course."""
+    if single_plan_active():
+        return _upload_slip_single_plan(user, data, slip_file)
     course = Course.objects.filter(id=data.get("course_id") or 0, is_active=True).first()
     if course is None or not slip_file:
         raise ServiceError("กรุณากรอกข้อมูลและแนบสลิปการโอนเงินให้ครบถ้วนครับ")
@@ -90,6 +94,25 @@ def upload_slip_existing_user(user, data, slip_file):
     return payment
 
 
+def _upload_slip_single_plan(user, data, slip_file):
+    """All-access plan: whatever course the page sent, the purchase is the plan (N1 covers N5-N1).
+    30 or 365 days at the plan price, no renewal bonus days, no per-student renewal price."""
+    course = plan_course()
+    if course is None or not slip_file:
+        raise ServiceError("กรุณากรอกข้อมูลและแนบสลิปการโอนเงินให้ครบถ้วนครับ")
+    try:
+        days = int(data.get("duration"))
+    except (TypeError, ValueError):
+        raise ServiceError("ระยะเวลาเรียนไม่ถูกต้อง")
+    renewal_requested = str(data.get("renewal", "")).lower() in ("1", "true", "yes")
+    has_active = Enrollment.objects.filter(user=user, is_active=True, status="ACTIVE", is_lifetime_video=False,
+                                           video_expires_at__gte=timezone.localdate()).exists()
+    amount = expected_amount(course, days, data.get("expected_amount"))
+    return submit_slip_payment(user=user, course=course, amount=amount, duration_days=days, slip_file=slip_file,
+                               is_zoom_included=True, is_renewal=renewal_requested or has_active,
+                               level_access=PLAN_LEVEL_ACCESS)
+
+
 @transaction.atomic
 def approve_payment(payment_id, reviewed_by=None, trans_ref=None):
     """Single approval path (admin click or EasySlip).  Row-locked so it can never double-count."""
@@ -108,7 +131,14 @@ def approve_payment(payment_id, reviewed_by=None, trans_ref=None):
     if payment.duration_days >= 999:
         enrollment.is_lifetime_video = True
     else:
-        enrollment.video_expires_at = max(enrollment.video_expires_at or today, today) + timedelta(days=payment.duration_days)
+        start = enrollment.video_expires_at or today
+        if payment.level_access == PLAN_LEVEL_ACCESS:
+            # an early renewal moving from a single level to the plan keeps the days already paid for:
+            # the plan starts when the student's current access ends, not today
+            start = max([start] + list(Enrollment.objects.filter(
+                user=user, is_active=True, status="ACTIVE", is_lifetime_video=False, video_expires_at__isnull=False)
+                .values_list("video_expires_at", flat=True)))
+        enrollment.video_expires_at = max(start, today) + timedelta(days=payment.duration_days)
         if payment.is_zoom_included:
             enrollment.zoom_expires_at = max(enrollment.zoom_expires_at or today, today) + timedelta(days=payment.duration_days)
     enrollment.save()

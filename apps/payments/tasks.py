@@ -10,6 +10,7 @@ from celery import shared_task
 from django.conf import settings
 from django.utils import timezone
 
+from courses.pricing import PLAN_LABEL, PLAN_LEVEL_ACCESS
 from payments.models import Payment, SlipVerificationLog
 from payments.services import payment_service
 
@@ -112,7 +113,8 @@ def process_new_slip(self, payment_id):
     ]
     if user.phone:
         lines.append(f"📞 <code>{user.phone}</code>")
-    lines += [f"📚 Level: <b>{payment.level_access}</b> ({payment.course.title})",
+    level = PLAN_LABEL if payment.level_access == PLAN_LEVEL_ACCESS else f"{payment.level_access} ({payment.course.title})"
+    lines += [f"📚 Level: <b>{level}</b>",
               f"⌛ Duration: <b>{payment.duration_days} days</b>", f"💰 Amount: <b>฿{payment.amount:,.2f}</b>",
               f"📋 Payment ID: #<b>{payment.id}</b>", f"⏰ {timezone.localtime().strftime('%d/%m/%Y %H:%M')}",
               f"\n🔗 <a href='{settings.SITE_URL.rstrip('/')}/admin-panel/payments/'>ตรวจสอบสลิปใน Admin</a>"]

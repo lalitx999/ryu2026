@@ -627,3 +627,14 @@
 .jl-rev summary { cursor: pointer; color: var(--ms-muted); }
 .jl-rev-ans { font-size: 14px; margin-bottom: 6px; }
 .jl-report { border: 0; background: none; padding: 0; font-size: 12.5px; color: var(--ms-muted); text-decoration: underline; }
+
+/* all-access plan card (replaces the per-level price table from SINGLE_PLAN_START) */
+.ms-plan { max-width: 40rem; margin: 0 auto; border: 1px solid var(--ms-line); border-radius: var(--ms-radius); background: #fff; padding: 22px; }
+.ms-plan-head { text-align: center; font-weight: 700; color: var(--ms-ink); margin: 0 0 16px; }
+.ms-plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ms-plan-opt { border: 1px solid var(--ms-line); border-radius: var(--ms-radius); padding: 16px; text-align: center; display: flex; flex-direction: column; gap: 4px; }
+.ms-plan-opt span { font-size: 14px; color: var(--ms-muted); }
+.ms-plan-opt b { font-size: 30px; line-height: 1.1; color: var(--ms-ink); }
+.ms-plan-opt small { font-size: 13px; font-weight: 700; color: var(--ms-ink); }
+.ms-plan-opt.is-best { border: 2px solid var(--ms-ink); background: var(--ms-soft); }
+@media (max-width: 480px) { .ms-plan-grid { grid-template-columns: 1fr; } }

@@ -17,7 +17,8 @@ from users.models import User
 TMP = tempfile.mkdtemp()
 
 
-@override_settings(PDF_STORAGE_DIR=TMP, MEDIA_ROOT=TMP, SLIPS_STORAGE_DIR=os.path.join(TMP, "slips"), RENEWAL_BONUS_DAYS=3)
+@override_settings(PDF_STORAGE_DIR=TMP, MEDIA_ROOT=TMP, SLIPS_STORAGE_DIR=os.path.join(TMP, "slips"), RENEWAL_BONUS_DAYS=3,
+                   **testing.LEGACY_PRICING)
 class CoursePageBase(TestCase):
     @classmethod
     def setUpClass(cls):

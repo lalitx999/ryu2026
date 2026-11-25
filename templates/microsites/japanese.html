@@ -79,7 +79,8 @@
         <h2 class="ms-h2 mt-3">เรียนสดกับพี่ริว{% if pricing.from_monthly %} เริ่มต้นเดือนละ ฿{{ pricing.from_monthly|baht }}{% endif %}</h2>
         <p class="mb-3">เรียนสดผ่าน Zoom ทุกสัปดาห์ ดูคลิปย้อนหลังได้ไม่จำกัด มีเอกสาร แบบฝึกหัด และกลุ่ม LINE ถามตอบ</p>
         <div class="ms-level-chips">
-          {% for r in pricing.rows %}<a href="{{ register_url }}&amp;level={{ r.level }}"><b>{{ r.level }}</b>฿{{ r.monthly|baht }}/ด.</a>{% endfor %}
+          {% if pricing.plan %}<a href="{{ register_url }}"><b>N5–N1</b>฿{{ pricing.plan.monthly|baht }}/ด. · ฿{{ pricing.plan.yearly|baht }}/ปี</a>
+          {% else %}{% for r in pricing.rows %}<a href="{{ register_url }}&amp;level={{ r.level }}"><b>{{ r.level }}</b>฿{{ r.monthly|baht }}/ด.</a>{% endfor %}{% endif %}
         </div>
       </div>
       <div class="d-flex flex-column gap-2">

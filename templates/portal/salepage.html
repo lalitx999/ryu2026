@@ -29,7 +29,16 @@
     <div class="mb-5" style="border-top:2px dashed #e5e7eb"></div>
     <div class="mx-auto" style="max-width:72rem">
       <div class="text-center mb-4"><div class="sale-chip mb-3"><span style="font-size:24px">🎯</span><span>โปรโมชั่นพิเศษ</span></div>
-        <h2 class="fw-bold mb-2" style="font-size:clamp(24px,3.5vw,36px);color:#1f2937">ค่าสมาชิก</h2><p class="text-secondary mb-0">เลือกระดับและแพ็กเกจที่เหมาะกับคุณ</p></div>
+        <h2 class="fw-bold mb-2" style="font-size:clamp(24px,3.5vw,36px);color:#1f2937">ค่าสมาชิก</h2><p class="text-secondary mb-0">{% if plan %}ราคาเดียว เรียนได้ทุกระดับ N5–N1{% else %}เลือกระดับและแพ็กเกจที่เหมาะกับคุณ{% endif %}</p></div>
+      {% if plan %}
+      <div class="sale-plan mx-auto">
+        <p class="sale-plan-head">เรียนได้ทุกระดับ N5–N1 · รวมคลาส Zoom</p>
+        <div class="row g-3">
+          <div class="col-12 col-sm-6"><a class="sale-plan-opt" href="/auth/register/"><span>รายเดือน (30 วัน)</span><b>{{ plan.monthly|baht }} ฿</b><small>&nbsp;</small></a></div>
+          <div class="col-12 col-sm-6"><a class="sale-plan-opt is-best" href="/auth/register/"><span>รายปี (365 วัน)</span><b>{{ plan.yearly|baht }} ฿</b><small>ประหยัด {{ plan.yearly_saving|baht }} ฿</small></a></div>
+        </div>
+      </div>
+      {% else %}
       <div class="table-responsive rounded-3 shadow border">
         <table class="sale-table">
           <thead><tr><th>ระดับ</th><th>รายเดือน</th><th>6 เดือน</th><th>12 เดือน</th><th>ตลอดชีพ</th></tr></thead>
@@ -43,6 +52,7 @@
           </tbody>
         </table>
       </div>
+      {% endif %}
       <p class="text-center mt-3 mb-0 fw-medium" style="font-size:12px;color:#6b7280">💡 ราคาสามารถเปลี่ยนแปลงได้ตามโปรโมชั่น | สิทธิ์ตลอดชีพสะสมเลเวลตามยอดที่จ่าย</p>
     </div>
   </section>

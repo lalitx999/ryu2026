@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from courses.models import Course
+from courses.pricing import renewal_days
 from portal import seo
 from courses.selectors import course_selector
 from users.selectors.user_selector import profile_payload
@@ -28,8 +29,14 @@ def home(request):
         "courses": courses,
         "my_courses": [c for c in courses if c["has_access"]],
         "profile": profile,
-        "boot": {"loggedIn": bool(user), "profile": profile, "courses": courses},
+        "boot": _boot(bool(user), profile, courses),
     })
+
+
+def _boot(logged_in, profile, courses):
+    """#ryu-boot payload read by dialogs.js; `plan` is the all-access plan once it is on sale (else None)."""
+    return {"loggedIn": logged_in, "profile": profile, "courses": courses,
+            "plan": course_selector.plan(), "renewalDays": renewal_days()}
 
 
 GUIDE_STEPS = [
@@ -63,7 +70,7 @@ def course_page(request, course_id):
     get_object_or_404(Course, pk=course_id, is_active=True)
     outline = course_selector.course_outline(course_id, request.user)
     # the sign-in / payment dialogs on this page read the same #ryu-boot payload as the desktop
-    boot = {"loggedIn": request.user.is_authenticated, "profile": None, "courses": course_selector.catalog(request.user if request.user.is_authenticated else None)}
+    boot = _boot(request.user.is_authenticated, None, course_selector.catalog(request.user if request.user.is_authenticated else None))
     mine = next((c for c in boot["courses"] if c["id"] == course_id), None)
     access = mine if mine and (mine["access_lifetime"] or mine["access_until"]) else None   # expiry shown in the banner
     return render(request, "portal/course.html", {"outline": outline, "course_id": course_id, "boot": boot, "access": access})
@@ -74,7 +81,7 @@ def salepage(request):
     """Public landing page.  The price table is read from the live course prices (one query)."""
     rows = course_selector.price_table()
     return render(request, "portal/salepage.html", {
-        "rows": rows, "levels": ["N1", "N2", "N3", "N4"],
+        "rows": rows, "plan": course_selector.plan(), "levels": ["N1", "N2", "N3", "N4"],
         "features": [("sa.png", "ระบบการสอนแบบ Zoom", "เรียนสดผ่าน Zoom"), ("sss.png", "ระบบการเรียนบน Teachable", "ระบบ Teachable"),
                      ("asasa.png", "กลุ่ม LINE ส่วนตัว", "กลุ่ม LINE เฉพาะ"), ("86-1-1024x1024.png", "ครบทุกคอร์ส JLPT", "ครบทุกเลเวล")],
     })

@@ -23,3 +23,14 @@ body.sale-page { background:#f9fafb; color:#111827; }
 .sale-line { width:100%; max-width:75%; background:linear-gradient(to right,#22c55e,#16a34a); color:#fff; border-radius:16px; padding:20px; text-align:center; text-decoration:none; box-shadow:0 8px 20px rgba(22,163,74,.3); transition:all .2s; } .sale-line:hover { color:#fff; transform:translateY(-4px); }
 @media (max-width:767px){ .sale-line { max-width:100%; } }
 .sale-foot { background:#111827; color:#fff; padding:48px 20px; text-align:center; margin-top:auto; }
+
+/* all-access plan card (replaces the per-level table from SINGLE_PLAN_START) */
+.sale-plan { max-width:42rem; background:#fff; border:1px solid #e5e7eb; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,.08); padding:24px; }
+.sale-plan-head { text-align:center; font-weight:bold; color:#1f2937; margin:0 0 16px; font-size:16px; }
+.sale-plan-opt { display:flex; flex-direction:column; align-items:center; gap:4px; padding:20px 16px; border:1px solid #e5e7eb; border-radius:12px; text-decoration:none; color:#374151; height:100%; transition:transform .15s; }
+.sale-plan-opt:hover { transform:translateY(-2px); color:#374151; }
+.sale-plan-opt span { font-size:14px; color:#6b7280; }
+.sale-plan-opt b { font-size:34px; line-height:1.1; color:#111827; }
+.sale-plan-opt small { font-size:12px; font-weight:600; color:#16a34a; }
+.sale-plan-opt.is-best { border:2px solid #b91c1c; background:#fef2f2; }
+.sale-plan-opt.is-best b { color:#b91c1c; }

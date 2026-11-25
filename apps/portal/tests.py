@@ -7,6 +7,7 @@ from courses.models import Course
 from portal import seo
 
 
+@testing.legacy_pricing
 class MarketingPageTests(TestCase):
     @classmethod
     def setUpTestData(cls):

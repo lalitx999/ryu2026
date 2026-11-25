@@ -9,6 +9,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 
 from courses.models import Enrollment
+from courses.pricing import renewal_days, single_plan_active
 
 logger = logging.getLogger(__name__)
 DEFAULT_DAYS = (3, 2, 1)
@@ -63,7 +64,8 @@ def send_reminder(enrollment, days_remaining=None, *, dedupe=True):
     ctx = {"subject": f"[RyuClass] แจ้งเตือนต่ออายุคอร์สเรียน: {enrollment.course.title}", "headline": headline, "status_sub": status_sub,
            "badge_color": color, "badge_text": badge, "user_name": user.name or user.email.split("@")[0],
            "course_title": enrollment.course.title, "email": user.email, "expiry": expiry,
-           "cta_url": f"{settings.SITE_URL.rstrip('/')}/courses/{enrollment.course_id}/"}
+           "cta_url": f"{settings.SITE_URL.rstrip('/')}/courses/{enrollment.course_id}/",
+           "renewal_days": renewal_days(), "plan": single_plan_active()}
     try:
         msg = EmailMultiAlternatives(ctx["subject"], render_to_string("emails/renewal_reminder.txt", ctx),
                                      settings.DEFAULT_FROM_EMAIL, [user.email])

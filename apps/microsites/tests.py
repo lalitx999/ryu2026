@@ -17,7 +17,8 @@ RYU = registry.BY_KEY["ryu"].host
 EMOJI = re.compile("[\U0001F000-\U0001FAFF\u2600-\u27BF\u2B00-\u2BFF\u231A-\u23FF\u25A0-\u25FF\uFE0F\u200D\u3297\u3299]")
 
 
-@override_settings(DEBUG=False, ALLOWED_HOSTS=["testserver", *registry.all_hosts()], SITE_URL="https://www.ryusosense.online")
+@override_settings(DEBUG=False, ALLOWED_HOSTS=["testserver", *registry.all_hosts()], SITE_URL="https://www.ryusosense.online",
+                   **testing.LEGACY_PRICING)
 class MicrositeRoutingTests(TestCase):
     @classmethod
     def setUpTestData(cls):

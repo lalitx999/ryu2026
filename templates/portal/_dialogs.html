@@ -54,7 +54,8 @@
             <div class="col-6"><label>อีเมลเข้าสู่ระบบ</label><input class="form-control" type="email" name="email" required placeholder="student@example.com"></div>
             <div class="col-6"><label>รหัสผ่าน (Password)</label><input class="form-control" type="password" name="password" required minlength="6" autocomplete="new-password" placeholder="••••••••"></div>
             <div class="col-4"><label>เบอร์โทรศัพท์</label><input class="form-control" name="phone" required placeholder="0812345678"></div>
-            <div class="col-4"><label>ระดับที่สมัคร</label><select class="form-select fw-semibold" name="level"></select></div>
+            {% if boot.plan %}<div class="col-4"><label>คอร์สที่สมัคร</label><div class="form-control fw-semibold bg-light">ทุกระดับ N5–N1</div><select class="d-none" name="level" aria-hidden="true" tabindex="-1"></select></div>
+            {% else %}<div class="col-4"><label>ระดับที่สมัคร</label><select class="form-select fw-semibold" name="level"></select></div>{% endif %}
             <div class="col-4"><label>ระยะเวลา</label><select class="form-select fw-semibold" name="duration"></select></div>
           </div>
           <div><p class="fw-bold mb-2" id="reg-amount" aria-live="polite" style="color:#1e3a8a"></p>
@@ -76,9 +77,10 @@
         <button type="button" class="xp-btn-close" data-bs-dismiss="modal" aria-label="ปิด">X</button></div></div>
       <form id="form-payment" class="modal-body p-3 xp-form d-flex flex-column gap-2">
         <div class="xp-bank">🏦 <b>โอนเงิน {{ BANK_INFO.bank }}:</b> {{ BANK_INFO.name }}<br>💸 <b>เลขบัญชี:</b> {{ BANK_INFO.account }}</div>
-        <div id="pay-renew-note" class="d-none p-2 rounded fw-bold" style="border:1px solid #fbbf24;background:#fffbeb;color:#78350f">⚠️ ต่ออายุก่อนหมดอายุ: ต่อสิทธิ์เพิ่ม 33 วันหลังสลิปผ่าน</div>
+        <div id="pay-renew-note" class="d-none p-2 rounded fw-bold" style="border:1px solid #fbbf24;background:#fffbeb;color:#78350f">⚠️ ต่ออายุก่อนหมดอายุ: ต่อสิทธิ์เพิ่ม {{ boot.renewalDays }} วันหลังสลิปผ่าน{% if boot.plan %} เรียนได้ทุกระดับ N5–N1{% endif %}</div>
         <div class="row g-2">
-          <div class="col-6"><label>เลือกคอร์สเรียน</label><select class="form-select" name="course_id"></select></div>
+          {% if boot.plan %}<div class="col-6"><label>คอร์สเรียน</label><div class="form-control bg-light">ทุกระดับ N5–N1</div><select class="d-none" name="course_id" aria-hidden="true" tabindex="-1"></select></div>
+          {% else %}<div class="col-6"><label>เลือกคอร์สเรียน</label><select class="form-select" name="course_id"></select></div>{% endif %}
           <div class="col-6"><label>ระยะเวลาแพ็กเกจ</label><select class="form-select" name="duration"></select></div>
         </div>
         <div class="xp-info fw-bold" id="pay-amount" aria-live="polite"></div>
@@ -98,8 +100,8 @@
     <div class="modal-header"><div class="xp-titlebar w-100"><div class="title"><span>⚠️ แจ้งเตือนต่ออายุคอร์ส</span></div></div></div>
     <div class="modal-body p-4 d-flex flex-column gap-2" style="font-size:14px;color:#1f2937">
       <p class="fw-bold mb-0" style="color:#78350f" id="renew-text"></p>
-      <p class="mb-0">เหลือเวลาอีก <span id="renew-days"></span> วัน — ต่ออายุก่อนหมดอายุ รับสิทธิ์เพิ่ม 33 วัน</p>
-      <p class="t12 mb-0" style="color:#4b5563">แนบสลิปแล้วทีมงานจะตรวจสอบก่อนต่อสิทธิ์เพิ่ม 33 วัน</p>
+      <p class="mb-0">เหลือเวลาอีก <span id="renew-days"></span> วัน — ต่ออายุก่อนหมดอายุ รับสิทธิ์เพิ่ม {{ boot.renewalDays }} วัน</p>
+      <p class="t12 mb-0" style="color:#4b5563">แนบสลิปแล้วทีมงานจะตรวจสอบก่อนต่อสิทธิ์เพิ่ม {{ boot.renewalDays }} วัน</p>
       <div class="d-flex justify-content-end gap-2 border-top pt-3"><button type="button" id="renew-later" class="xp-btn-gray">ไว้ก่อน</button><button type="button" id="renew-now" class="xp-btn-green">ต่ออายุเลย</button></div>
     </div></div>
   </div>

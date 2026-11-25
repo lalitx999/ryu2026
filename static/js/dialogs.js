@@ -1,10 +1,13 @@
 /* Shared dialogs: sign-in / register / verify / reset, payment + renewal, ?auth= deep links.
-   Loaded by the desktop (home) and by the course page; both embed #ryu-boot = {loggedIn, profile, courses}. */
+   Loaded by the desktop (home) and by the course page; both embed
+   #ryu-boot = {loggedIn, profile, courses, plan, renewalDays}.  `plan` (the all-access N5-N1 plan) is set once it
+   is on sale: every course then carries the same packages and the server records the purchase as the plan. */
 (function () {
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   const { ajax, esc, baht, busy, flash } = window.Ryu;
-  const boot = JSON.parse($('#ryu-boot').textContent);   // {loggedIn, profile, courses}
+  const boot = JSON.parse($('#ryu-boot').textContent);   // {loggedIn, profile, courses, plan, renewalDays}
+  const RENEW_DAYS = String(boot.renewalDays || 33);
   const state = { paymentRenewal: false };
 
   /* ---------- bootstrap modals ---------- */
@@ -88,9 +91,8 @@
     }
     recalc();
     function recalc() {
-      const c = boot.courses.find((x) => x.level === lvl.value);
-      if (document.activeElement !== dur) fillPackages(dur, c, dur.value);
-      else fillPackages(dur, c, dur.value);
+      const c = boot.plan ? boot.courses[0] : boot.courses.find((x) => x.level === lvl.value);
+      fillPackages(dur, c, dur.value);
       const p = c && c.packages.find((x) => String(x.duration) === dur.value);
       f.dataset.amount = p ? p.price : '';
       $('#reg-amount').textContent = p ? 'ยอดที่ต้องชำระ ฿' + baht(p.price, 2) : 'กรุณาเลือกคอร์สและแพ็กเกจที่เปิดจำหน่าย';
@@ -112,7 +114,7 @@
       if (renewal) {
         p = c && c.packages.find((x) => x.duration === 30);
         if (p && c.renewal_price) p = Object.assign({}, p, { price: c.renewal_price });   // admin-set personal renewal price
-        dur.innerHTML = '<option value="33">ต่ออายุ (33 วัน)</option>'; dur.disabled = true;
+        dur.innerHTML = `<option value="${RENEW_DAYS}">ต่ออายุ (${RENEW_DAYS} วัน)</option>`; dur.disabled = true;
       } else {
         dur.disabled = false; fillPackages(dur, c, dur.value); p = c && c.packages.find((x) => String(x.duration) === dur.value);
       }
@@ -124,7 +126,7 @@
   $('#form-payment').addEventListener('submit', async (e) => {
     e.preventDefault(); const f = e.target; const btn = f.querySelector('[type=submit]'); busy(btn, true, 'กำลังส่งข้อมูล...');
     const fd = new FormData(); fd.append('course_id', f.elements.course_id.value);
-    fd.append('duration', state.paymentRenewal ? '33' : f.elements.duration.value);
+    fd.append('duration', state.paymentRenewal ? RENEW_DAYS : f.elements.duration.value);
     fd.append('renewal', state.paymentRenewal ? '1' : ''); fd.append('expected_amount', f.dataset.amount);
     fd.append('slip', f.elements.slip.files[0]);
     try { const r = await ajax.post('/api/payments/upload-slip/', fd); flash($('#pay-msg'), 'ok', r.message); setTimeout(() => location.reload(), 1800); }

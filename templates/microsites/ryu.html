@@ -71,7 +71,7 @@
 
 <section class="ms-panel" id="pricing">
   <div class="container ms-sec" style="max-width:64rem">
-    <div class="text-center mb-4 ms-reveal"><h2 class="ms-h2">ค่าเรียนกับพี่ริว</h2><p class="ms-sub">เลือกระดับและระยะเวลาที่เหมาะกับคุณ</p></div>
+    <div class="text-center mb-4 ms-reveal"><h2 class="ms-h2">ค่าเรียนกับพี่ริว</h2><p class="ms-sub">{% if pricing.plan %}ราคาเดียว เรียนได้ทุกระดับ เลือกแค่รายเดือนหรือรายปี{% else %}เลือกระดับและระยะเวลาที่เหมาะกับคุณ{% endif %}</p></div>
     <div class="ms-reveal">{% include "microsites/_price_table.html" %}</div>
     <div class="text-center mt-4"><a class="ms-btn" href="{{ register_url }}">สมัครเรียน</a></div>
   </div>

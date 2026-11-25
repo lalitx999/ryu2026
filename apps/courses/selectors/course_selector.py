@@ -6,7 +6,7 @@ from django.db.models import Count, Q
 from django.utils import timezone
 
 from courses.models import Course, Enrollment, Lesson, Module, Progress
-from courses.pricing import package_prices
+from courses.pricing import display_price, package_prices, plan_summary, single_plan_active
 from courses.services.access_service import AccessService
 from courses.services.video import decrypt_video_url, to_embed_url
 
@@ -29,6 +29,8 @@ def catalog(user=None):
         rank = AccessService.video_rank_for(active)
     result = []
     custom = getattr(user, "custom_renewal_price", None) if user is not None and getattr(user, "is_authenticated", False) else None
+    if single_plan_active():
+        custom = None  # the all-access plan replaces every per-student renewal price
     renewal_price = str(custom) if custom else None  # admin-set per-student renewal price (None = package price)
     for c in courses:
         completed = done.get(c.id, 0)
@@ -36,7 +38,7 @@ def catalog(user=None):
         window = AccessService.access_window(active, c.level, today) if active else None
         result.append({
             "id": c.id, "level": c.level, "title": c.title, "description": c.description or "",
-            "price": str(c.price), "packages": package_prices(c), "thumbnail": c.thumbnail or "",
+            "price": str(display_price(c)), "packages": package_prices(c), "thumbnail": c.thumbnail or "",
             "renewal_price": renewal_price,
             "has_access": rank >= AccessService.LEVEL_RANK.get(c.level, 99) > 0,
             "is_lifetime": bool(enrollment and enrollment.is_lifetime_video),
@@ -83,7 +85,7 @@ def course_outline(course_id, user=None):
     return {
         "course_id": course.id, "level": course.level, "course_title": course.title,
         "course_description": course.description or "", "has_access": has_access,
-        "price": str(course.price), "packages": package_prices(course), "thumbnail": course.thumbnail or "",
+        "price": str(display_price(course)), "packages": package_prices(course), "thumbnail": course.thumbnail or "",
         "modules": [{"id": m.id, "title": m.title, "lessons": by_module.get(m.id, [])} for m in modules],
     }
 
@@ -102,9 +104,16 @@ def free_trial_lessons():
 LIFETIME_LABELS = {"N5": "N5", "N4": "N5-N4", "N3": "N5-N4-N3", "N2": "N5-N4-N3-N2", "N1": "N5-N4-N3-N2-N1"}
 
 
+def plan():
+    """The all-access plan for price displays, or None while the per-level prices are still on sale."""
+    return plan_summary() if single_plan_active() else None
+
+
 def price_table():
     """Live package prices of every active course, with savings vs. paying monthly (one query).
-    Shared by the RyuClass sale page and the RYU Network sales sites."""
+    Shared by the RyuClass sale page and the RYU Network sales sites.  Empty once the all-access plan is on."""
+    if single_plan_active():
+        return []
     rows = []
     for c in Course.objects.filter(is_active=True).only("level", "price", "price_180", "price_365", "price_lifetime").order_by("sort_order", "id"):
         monthly = c.price or 0

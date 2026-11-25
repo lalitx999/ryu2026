@@ -1,4 +1,5 @@
 """Settings shared by every environment.  Secrets come from the environment / .env only."""
+import datetime
 import sys
 from pathlib import Path
 
@@ -131,6 +132,11 @@ CSRF_COOKIE_HTTPONLY = False  # ajax.js reads the cookie for X-CSRFToken
 AES_KEY = env("AES_KEY", default="")
 AES_IV = env("AES_IV", default="")
 RENEWAL_BONUS_DAYS = env.int("RENEWAL_BONUS_DAYS", default=3)
+# One all-access plan (N5-N1) replaces the per-level prices from this date (Asia/Bangkok, inclusive).
+# Rollback without a code change: set SINGLE_PLAN_START=2099-01-01 in .env and restart.
+SINGLE_PLAN_START = datetime.date.fromisoformat(env("SINGLE_PLAN_START", default="2026-12-01"))
+SINGLE_PLAN_MONTHLY = env.int("SINGLE_PLAN_MONTHLY", default=960)
+SINGLE_PLAN_YEARLY = env.int("SINGLE_PLAN_YEARLY", default=9600)
 EASYSLIP_API_KEY = env("EASYSLIP_API_KEY", default="")
 MERCHANT_ACCOUNT_NUMBER = env("MERCHANT_ACCOUNT_NUMBER", default="")
 TELEGRAM_BOT_TOKEN = env("TELEGRAM_BOT_TOKEN", default="")
