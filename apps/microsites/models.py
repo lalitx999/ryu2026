@@ -27,7 +27,8 @@ class Kanji(models.Model):
     examples = models.JSONField(default=list, blank=True)                  # [{"word", "reading", "th"}]
     ai_status = models.CharField(max_length=10, choices=AI_STATUS, default=AI_NONE, db_index=True)
     ai_model = models.CharField(max_length=80, blank=True)
-    reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+",
+                                    db_constraint=False)  # legacy users.id is INT UNSIGNED: no DB-level FK
     reviewed_at = models.DateTimeField(null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -117,7 +118,8 @@ class ExamItem(models.Model):
     status = models.CharField(max_length=10, choices=STATUS, default=LIVE, db_index=True)
     reports = models.PositiveIntegerField(default=0)
     ai_model = models.CharField(max_length=80, blank=True)
-    reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
+    reviewed_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+",
+                                    db_constraint=False)  # legacy users.id is INT UNSIGNED: no DB-level FK
     reviewed_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
                 ('ai_model', models.CharField(blank=True, max_length=80)),
                 ('reviewed_at', models.DateTimeField(blank=True, null=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('reviewed_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
+                ('reviewed_by', models.ForeignKey(blank=True, null=True, db_constraint=False, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'db_table': 'ryu_kanji',
