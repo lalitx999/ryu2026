@@ -107,7 +107,7 @@ sudo systemctl restart ryu-web ryu-worker
 2. homeserver: `docker start ryuclass_backend`
 > ข้อมูลที่เกิดบน VPS หลังปล่อยจะไม่ย้อนกลับไปเว็บเก่าเอง ถ้าต้องถอยหลังมีคนใช้ไปแล้ว ให้ dump จาก VPS ก่อน (`sudo /usr/local/bin/ryu-backup.sh`)
 
-## 6) RYU Network — โดเมนเครือข่าย 8 ชื่อ (เสิร์ฟจากโปรเจกต์เดียวกัน)
+## 6) RYU Network — โดเมนเครือข่าย 7 ชื่อ (เสิร์ฟจากโปรเจกต์เดียวกัน)
 แอป `apps/microsites` ดู Host แล้วเลือกหน้าของโดเมนนั้นเอง (ไม่ redirect ไป ryusosense) รายชื่อโดเมนอยู่ที่ `apps/microsites/registry.py`
 และ `production.py` เติมโดเมนเหล่านี้เข้า `ALLOWED_HOSTS` ให้อัตโนมัติ **ไม่ต้องแก้ .env**
 
@@ -116,8 +116,7 @@ sudo systemctl restart ryu-web ryu-worker
 | เรียนภาษาญี่ปุ่น.online | `xn--e3cxbhxkg5c9db1ah4b2g4fc.online` | เซลเพจ (หลักสูตร) |
 | ภาษาญี่ปุ่น.online | `xn--e3cyfs9bzcbz2a2nc.online` | เซลเพจ (ผู้เริ่มต้น) |
 | เรียนภาษาญี่ปุ่นกับพี่ริว.online | `xn--12cx9abgdykqjj2cs0jjb6bdhg1d3j0hcg.online` | เซลเพจ (พี่ริว) |
-| อักษรภาษาญี่ปุ่น.online | `xn--12cyzbhxr5bc5a4bpb4b5b4qc.online` | ตารางฮิรางานะ/คาตากานะ (เฟส 2) |
-| คันจิ.online | `xn--42ci4c5era.online` | คลังคันจิ N5–N1 (เฟส 3) |
+| คันจิ.online | `xn--42ci4c5era.online` | คลังคันจิ N5–N1 (เฟส 3) + ตารางฮิรางานะ/คาตากานะที่ `/kana/` (ไม่ได้ซื้อ อักษรภาษาญี่ปุ่น.online) |
 | พจนานุกรมภาษาญี่ปุ่น.online | `xn--12cnq0cacnswjv8evffb3c2bk61ac.online` | พจนานุกรม AI (เฟส 4) |
 | แปลภาษาญี่ปุ่น.online | `xn--e3cyebx3a3a5eb5a8a6gtec.online` | ล่าม AI ไทย⇄ญี่ปุ่น (เฟส 5) |
 | วัดระดับภาษาญี่ปุ่น.online | `xn--e3cnavdh7av8aza7ejeqb3cyc8sc.online` | ข้อสอบจำลอง JLPT (เฟส 6) |
@@ -125,12 +124,12 @@ sudo systemctl restart ryu-web ryu-worker
 **พรีวิวก่อนต่อ DNS**: ล็อกอินแอดมินบน www.ryusosense.online แล้วเปิด `https://www.ryusosense.online/?site=learn`
 (`learn` / `japanese` / `ryu` / `kana` / `kanji` / `dictionary` / `translator` / `jlpt`) · ออกจากพรีวิว: `?site=off` · หน้าพรีวิวเป็น noindex
 
-**6.1 DNS** — เพิ่มแต่ละโดเมนเป็น zone ใน Cloudflare (เปลี่ยน nameserver ที่ Hostinger ตามที่ Cloudflare บอก) แล้วสร้าง A record
-`@` และ `www` → `72.60.199.62` ตั้ง proxy แบบเดียวกับ ryusosense.online
+**6.1 DNS** — DNS ของทั้ง 7 โดเมนอยู่ที่ Hostinger (ไม่ได้ผ่าน Cloudflare): A record `@` → `72.60.199.62` (TTL 300)
+และ CNAME `www` → ตัวโดเมนเอง (ตั้งแล้ว 2026-11-27)
 
 **6.2 nginx + HTTPS** (บน VPS หลังจาก DNS ชี้มาแล้ว)
 ```bash
-HOSTS="xn--e3cxbhxkg5c9db1ah4b2g4fc.online xn--e3cyfs9bzcbz2a2nc.online xn--12cx9abgdykqjj2cs0jjb6bdhg1d3j0hcg.online xn--12cyzbhxr5bc5a4bpb4b5b4qc.online xn--42ci4c5era.online xn--12cnq0cacnswjv8evffb3c2bk61ac.online xn--e3cyebx3a3a5eb5a8a6gtec.online xn--e3cnavdh7av8aza7ejeqb3cyc8sc.online"
+HOSTS="xn--e3cxbhxkg5c9db1ah4b2g4fc.online xn--e3cyfs9bzcbz2a2nc.online xn--12cx9abgdykqjj2cs0jjb6bdhg1d3j0hcg.online xn--42ci4c5era.online xn--12cnq0cacnswjv8evffb3c2bk61ac.online xn--e3cyebx3a3a5eb5a8a6gtec.online xn--e3cnavdh7av8aza7ejeqb3cyc8sc.online"
 NAMES="$(for h in $HOSTS; do printf '%s www.%s ' "$h" "$h"; done)"
 sudo tee /etc/nginx/sites-available/ryu-network >/dev/null <<NGINX
 server {

@@ -3,6 +3,9 @@
 Pure data with no Django imports, so `config/settings` can read the host list for ALLOWED_HOSTS.
 Thai domains are stored as people type them; `host` is the punycode form that browsers send in
 the Host header (and that nginx / certbot / Cloudflare need).
+
+A site whose `domain` has a path ("คันจิ.online/kana") has no domain of its own: it is served under
+that path of its host site (see `mount`), and its host is not added to BY_HOST.
 """
 from dataclasses import dataclass, field
 
@@ -10,7 +13,7 @@ from dataclasses import dataclass, field
 @dataclass(frozen=True)
 class Microsite:
     key: str                # stable id: template name, ?site= preview, UTM campaign
-    domain: str             # human form, e.g. "คันจิ.online"
+    domain: str             # human form, e.g. "คันจิ.online", or "คันจิ.online/kana" for a mounted site
     kind: str               # "sales" (sales page) or "tool" (free tool, no login)
     name: str               # brand shown in the header, e.g. "RYU KANJI"
     title: str              # <title> / og:title
@@ -23,11 +26,16 @@ class Microsite:
 
     @property
     def host(self):
-        return self.domain.encode("idna").decode("ascii")
+        return self.domain.split("/", 1)[0].encode("idna").decode("ascii")
+
+    @property
+    def mount(self):
+        """Path this site lives under on its host site ("kana"), or "" for a site with its own domain."""
+        return self.domain.partition("/")[2].strip("/")
 
     @property
     def url(self):
-        return f"https://{self.host}/"
+        return f"https://{self.host}/" + (f"{self.mount}/" if self.mount else "")
 
 
 SITES = (
@@ -53,7 +61,7 @@ SITES = (
         keywords=("พี่ริว", "Ryuso Sense", "ครูสอนภาษาญี่ปุ่น", "เรียนภาษาญี่ปุ่นกับพี่ริว"),
     ),
     Microsite(
-        key="kana", domain="อักษรภาษาญี่ปุ่น.online", kind="tool", name="RYU KANA",
+        key="kana", domain="คันจิ.online/kana", kind="tool", name="RYU KANA",
         title="ฮิรางานะ คาตากานะ ตารางอักษรญี่ปุ่น พร้อมเสียงอ่านและแบบฝึก | RYU KANA",
         description="เรียนอักษรภาษาญี่ปุ่น ฮิรางานะ และคาตากานะ ฟรี ตารางครบ 104 เสียง พร้อมเสียงอ่าน คำศัพท์ตัวอย่าง ฝึกเขียน และแบบทดสอบ ไม่ต้องสมัครสมาชิก",
         tagline="ฮิรางานะ · คาตากานะ ฟรี", icon="あ", accent="#db2777",
@@ -92,6 +100,8 @@ SITES = (
 BY_KEY = {s.key: s for s in SITES}
 BY_HOST = {}
 for _s in SITES:
+    if _s.mount:        # served by its host site, which owns the Host header
+        continue
     BY_HOST[_s.host] = _s
     BY_HOST["www." + _s.host] = _s
 

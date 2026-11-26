@@ -194,6 +194,15 @@ def site_home(request):
     return render(request, f"microsites/{site.key}.html", builder(request, site))
 
 
+def mounted_home(request, key):
+    """A site without its own domain, served under a path of its host site (คันจิ.online/kana/)."""
+    site = registry.BY_KEY[key]
+    host_site = _site(request)
+    if host_site.mount or host_site.host != site.host:   # only on the host site itself
+        raise Http404
+    return render(request, f"microsites/{site.key}.html", SALES_PAGES[site.key](request, site))
+
+
 def robots_txt(request):
     return HttpResponse(seo.robots_txt(_site(request)), content_type="text/plain; charset=utf-8")
 
@@ -209,6 +218,7 @@ def sitemap_xml(request):
         from microsites.models import DictEntry
         extra += [f"word/{i}/" for i in DictEntry.objects.exclude(ai_status=DictEntry.AI_NONE).order_by("rank").values_list("id", flat=True)]
     if site.live and site.key == "kanji":
+        extra += [f"{s.mount}/" for s in registry.SITES if s.mount and s.host == site.host and s.live]
         extra += [f"level/{lv.lower()}/" for lv in kanji_selector.LEVELS]
         extra += [f"kanji/{quote(c)}/" for c in kanji_selector.all_chars()]
     return HttpResponse(seo.sitemap_xml(site, extra), content_type="application/xml; charset=utf-8")

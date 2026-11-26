@@ -300,7 +300,7 @@
 .ms-dark-sec .ms-step { border-color: #fff; }
 .ms-dark-sec .ms-step-no { color: #8b93a1; }
 
-/* ── อักษรภาษาญี่ปุ่น.online (RYU KANA) ─────────────────────────────── */
+/* ── คันจิ.online/kana (RYU KANA) ─────────────────────────────── */
 .kn-progress { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 34rem; margin: 0 auto; }
 .kn-progress > div { display: flex; align-items: center; gap: 10px; background: var(--ms-soft); border-radius: 999px; padding: 8px 16px; font-size: 13px; }
 .kn-progress b { color: var(--ms-ink); font-size: 13px; white-space: nowrap; }

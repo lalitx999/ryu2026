@@ -1,4 +1,4 @@
-/* RYU KANA (อักษรภาษาญี่ปุ่น.online): chart + detail, speech, progress (localStorage), quiz, writing pad.
+/* RYU KANA (คันจิ.online/kana): chart + detail, speech, progress (localStorage), quiz, writing pad.
    Works without login; progress lives only in this browser. */
 (function () {
   'use strict';

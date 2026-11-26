@@ -1,4 +1,4 @@
-"""Hiragana / katakana data for อักษรภาษาญี่ปุ่น.online (RYU KANA).
+"""Hiragana / katakana data for คันจิ.online/kana (RYU KANA).
 
 Each sound is defined once in hiragana; katakana is derived by code point (+0x60).  Romaji is Hepburn; the Thai
 reading follows the common Thai transcription used in Japanese textbooks.  Example words are everyday words a

@@ -28,7 +28,7 @@ class MicrositeRoutingTests(TestCase):
 
     def test_registry_hosts_are_punycode_and_unique(self):
         self.assertEqual(len(registry.SITES), 8)
-        self.assertEqual(len({s.host for s in registry.SITES}), 8)
+        self.assertEqual(len({s.host for s in registry.SITES}), 7)   # kana shares คันจิ.online
         self.assertTrue(all(s.host.isascii() and s.host.endswith(".online") for s in registry.SITES))
         self.assertEqual(registry.lookup("คันจิ.online").key, "kanji")       # unicode Host
         self.assertEqual(registry.lookup(f"WWW.{KANJI}:443").key, "kanji")  # case / www / port
@@ -99,13 +99,23 @@ class MicrositeRoutingTests(TestCase):
     def test_kana_site_renders_both_charts_without_db(self):
         host = registry.BY_KEY["kana"].host
         with self.assertNumQueries(0):
-            html = self.client.get("/", HTTP_HOST=host).content.decode()
+            html = self.client.get("/kana/", HTTP_HOST=host).content.decode()
         self.assertEqual(html.count('class="kn-cell"'), 208)          # 104 sounds x hiragana + katakana
         self.assertIn('data-key="きゃ"', html)
         self.assertIn(">キャ<", html)                                 # katakana derived from hiragana
         self.assertIn('id="kana-data"', html)
         self.assertIn(registry.BY_KEY["kanji"].url, html)            # next step: คันจิ.online
         self.assertNotIn("เร็ว ๆ นี้</span>\n    <h1", html)
+
+    def test_kana_lives_under_the_kanji_domain(self):
+        kana, kanji = registry.BY_KEY["kana"], registry.BY_KEY["kanji"]
+        self.assertEqual(kana.host, kanji.host)
+        self.assertEqual(kana.url, "https://xn--42ci4c5era.online/kana/")
+        self.assertNotIn("xn--12cyzbhxr5bc5a4bpb4b5b4qc.online", registry.all_hosts())   # อักษรภาษาญี่ปุ่น.online is not ours
+        self.assertIs(registry.lookup(kanji.host), kanji)
+        html = self.client.get("/kana/", HTTP_HOST=kanji.host).content.decode()
+        self.assertIn('href="https://xn--42ci4c5era.online/kana/"', html)              # canonical
+        self.assertEqual(self.client.get("/kana/", HTTP_HOST=registry.BY_KEY["dictionary"].host).status_code, 404)
 
 
 class KanaDataTests(TestCase):

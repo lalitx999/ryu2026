@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path("", views.site_home, name="microsite_home"),
+    path("kana/", views.mounted_home, {"key": "kana"}, name="microsite_kana"),
     path("robots.txt", views.robots_txt, name="microsite_robots"),
     path("sitemap.xml", views.sitemap_xml, name="microsite_sitemap"),
     path("level/<str:level>/", views.kanji_level, name="kanji_level"),
