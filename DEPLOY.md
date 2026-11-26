@@ -144,6 +144,8 @@ server {
     }
 }
 NGINX
+# punycode ยาวเกิน bucket 64 ของ nginx (ตั้งไว้แล้วบน VPS 2026-11-27)
+echo "server_names_hash_bucket_size 128;" | sudo tee /etc/nginx/conf.d/ryu-server-names.conf
 sudo ln -sf /etc/nginx/sites-available/ryu-network /etc/nginx/sites-enabled/ryu-network && sudo nginx -t && sudo systemctl reload nginx
 sudo certbot --nginx $(for n in $NAMES; do printf -- '-d %s ' "$n"; done) --redirect
 ```
