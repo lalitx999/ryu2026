@@ -62,3 +62,34 @@ class YouTubeEmbedReferrerTests(TestCase):
     def test_pages_let_embeds_see_our_origin(self):
         resp = self.client.get("/robots.txt")
         self.assertEqual(resp.headers["Referrer-Policy"], "strict-origin-when-cross-origin")
+
+
+class NetworkEmbedTests(TestCase):
+    """Only ryusoclass.com may frame /network/; every other page keeps X-Frame-Options DENY."""
+
+    def test_network_can_be_framed_by_ryusoclass_only(self):
+        resp = self.client.get("/network/?embed=1")
+        self.assertNotIn("X-Frame-Options", resp.headers)
+        self.assertEqual(resp.headers["Content-Security-Policy"],
+                         "frame-ancestors 'self' https://ryusoclass.com https://www.ryusoclass.com")
+        html = resp.content.decode()
+        self.assertIn('<base target="_blank">', html)
+        self.assertIn("utm_medium=network_embed", html)
+        self.assertNotIn("กลับหน้าหลัก", html)
+        self.assertNotIn('class="m-nav"', html)
+
+    def test_plain_network_page_keeps_its_chrome(self):
+        html = self.client.get("/network/").content.decode()
+        self.assertIn("กลับหน้าหลัก", html)
+        self.assertIn("utm_medium=network_hub", html)
+        self.assertNotIn("<base", html)
+
+    def test_other_pages_still_refuse_frames(self):
+        for url in ("/", "/salepage/"):
+            self.assertEqual(self.client.get(url).headers.get("X-Frame-Options"), "DENY", url)
+
+    def test_payment_dialog_shows_the_new_bank_account(self):
+        html = self.client.get("/").content.decode()
+        self.assertIn("639-7-16623-9", html)
+        self.assertIn("ธ.กรุงเทพ", html)
+        self.assertNotIn("612-2-76925-7", html)

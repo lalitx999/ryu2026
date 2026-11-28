@@ -336,6 +336,7 @@
 .kn-detail-ex small { color: var(--ms-muted); font-size: 12px; }
 .kn-detail-ex .ms-jp { font-size: 1.3rem; font-weight: 600; color: var(--ms-ink); }
 .kn-ex-meaning { font-size: 14px; }
+.kn-ex-sep { display: none; }
 .kn-learn[aria-pressed="true"] { background: var(--ms-ink); color: #fff !important; border-color: var(--ms-ink); }
 .kn-quiz { background: var(--ms-dark-2); border: 1px solid rgba(255,255,255,.08); border-radius: 28px; padding: 28px; }
 .kn-opt { margin-bottom: 16px; }
@@ -388,8 +389,26 @@
   .kn-cell { border-radius: 12px; padding: 8px 2px 6px; }
   .kn-cols-3 { max-width: none; }
   .kn-detail-other { display: none; }
+  /* phones: one short bar (about a quarter of the screen) so the chart under it stays visible */
+  .kn-detail { padding: 10px 12px; gap: 12px; border-radius: 20px; }
+  .kn-detail-glyph { font-size: 2.8rem; padding: 8px 12px; border-radius: 14px; }
+  .kn-stroke-btn span { display: none; }
+  .kn-detail-read { gap: 8px; }
+  .kn-detail-read b { font-size: 1.2rem; }
+  .kn-detail-read > span { font-size: 14px; }
+  .kn-detail-ex { background: none; padding: 0; margin-top: 2px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 6px; font-size: 14px; }
+  .kn-detail-ex small { display: none; }
+  .kn-detail-ex .ms-jp { font-size: 1.05rem; }
+  .kn-ex-meaning, .kn-ex-sep { display: inline; }
+  .kn-detail-acts { margin-top: 8px !important; flex-wrap: nowrap !important; gap: 6px !important; }
+  .kn-detail-acts .ms-btn-sm { padding: 5px 10px; font-size: 13px; white-space: nowrap; }
+  .kn-detail-acts [data-act="speak"] .kn-lbl, .kn-lbl-pre { display: none; }
   .kn-quiz { padding: 20px; }
   .kn-plan ol { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 369.98px) {
+  .kn-detail-acts [data-act="speak-ex"] .kn-lbl { display: none; }   /* very narrow phones: icons only */
 }
 
 /* ── คันจิ.online (RYU KANJI) ─────────────────────────────── */

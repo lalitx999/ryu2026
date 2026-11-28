@@ -27,7 +27,7 @@
     <div class="col-md-3"><label class="form-label small fw-semibold">เบอร์โทร</label><input class="form-control form-control-sm" name="phone"></div>
     <div class="col-md-4"><label class="form-label small fw-semibold">ยอดสะสม (บาท)</label><input class="form-control form-control-sm" name="total_spent" value="0"></div>
     <div class="col-md-4"><label class="form-label small fw-semibold">คะแนนสะสม</label><input class="form-control form-control-sm" name="points" value="0"></div>
-    <div class="col-md-4"><label class="form-label small fw-semibold">ราคาต่ออายุเฉพาะบุคคล <span class="text-danger fw-normal">(ไม่ใช้แล้วตั้งแต่ 1 ธ.ค. 2026)</span></label><input class="form-control form-control-sm" name="custom_renewal_price"></div>
+    <div class="col-md-4"><label class="form-label small fw-semibold">ราคาต่ออายุเฉพาะบุคคล <span class="text-danger fw-normal">(ไม่ใช้แล้วตั้งแต่ 28 พ.ย. 2026)</span></label><input class="form-control form-control-sm" name="custom_renewal_price"></div>
     <div class="col-md-6"><label class="form-label small fw-semibold">เปิดคอร์สให้ทันที (ไม่บังคับ)</label><select class="form-select form-select-sm" name="course_id"><option value="">— ไม่เปิดคอร์ส —</option>{% for c in courses %}<option value="{{ c.id }}">{{ c.level }} · {{ c.title }}</option>{% endfor %}</select></div>
     <div class="col-md-3"><label class="form-label small fw-semibold">ระยะเวลา (วัน, 999 = ตลอดชีพ)</label><input class="form-control form-control-sm" name="duration_days" value="30"></div>
     <div class="col-md-3"><label class="form-label small fw-semibold">หรือวันหมดอายุ</label><input class="form-control form-control-sm" type="date" name="expires_at"></div>

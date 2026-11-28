@@ -1,4 +1,5 @@
 """Page views for the XP desktop.  They render shells; data is loaded through the AJAX endpoints."""
+from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -42,7 +43,7 @@ def _boot(logged_in, profile, courses):
 GUIDE_STEPS = [
     (1, "ขั้นตอนการสมัครและแจ้งสลิปชำระเงิน",
      "กดปุ่ม <b>\"เข้าสู่ระบบ / สมัครเรียน\"</b> บนแถบด้านบน หรือเลือกคอร์สที่ต้องการ กรอกข้อมูลสมัครพร้อมแนบไฟล์สลิปโอนเงิน "
-     "(ธ.ทหารไทยธนชาต ttb เลขบัญชี 612-2-76925-7 บจก. ออโต้บอทยูเอ จำกัด) ระบบจะตรวจสอบและอนุมัติสิทธิ์ให้อัตโนมัติหรือภายใน 24 ชม."),
+     "(ธ.กรุงเทพ เลขบัญชี 639-7-16623-9 บจ. ออนไลน์ ซะโลน (ประเทศไทย)) ระบบจะตรวจสอบและอนุมัติสิทธิ์ให้อัตโนมัติหรือภายใน 24 ชม."),
     (2, "การเข้าเรียนสดผ่าน Zoom",
      "ชั้นเรียนสดจะจัดขึ้นผ่าน Zoom ทุกสัปดาห์ ลิงก์ห้องเรียน Zoom จะถูกส่งในกลุ่ม LINE Support ประจำคลาส ก่อนเริ่มเรียน 15 นาที"),
     (3, "การดูคลิปย้อนหลังและทำแบบฝึกหัด",
@@ -88,12 +89,20 @@ def salepage(request):
 
 
 def network(request):
-    """RYU Network hub: one card per domain (คันจิ.online, เรียนภาษาญี่ปุ่น.online, ...), each a site of its own."""
+    """RYU Network hub: one card per domain (คันจิ.online, เรียนภาษาญี่ปุ่น.online, ...), each a site of its own.
+
+    The only page another site may frame: settings.NETWORK_EMBED_ORIGINS (ryusoclass.com) shows it as a menu page.
+    `?embed=1` drops our own header/footer/nav and opens every link in a new tab."""
     from microsites import registry
-    return render(request, "portal/network.html", {
+    embed = request.GET.get("embed") == "1"
+    response = render(request, "portal/network.html", {
         "tools": [s for s in registry.SITES if s.kind == "tool"],
         "sales": [s for s in registry.SITES if s.kind == "sales"],
+        "embed": embed, "utm_medium": "network_embed" if embed else "network_hub",
     })
+    response.xframe_options_exempt = True     # X-Frame-Options can't list a site; frame-ancestors does it instead
+    response["Content-Security-Policy"] = "frame-ancestors " + " ".join(["'self'", *settings.NETWORK_EMBED_ORIGINS])
+    return response
 
 
 def register_redirect(request):

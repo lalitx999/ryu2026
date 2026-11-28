@@ -21,7 +21,7 @@
       body.innerHTML = `<div class="row g-2">
         ${field('ชื่อ-นามสกุล', 'name', u.name)}${field('อีเมล', 'email', u.email, 'email')}${field('ชื่อเล่น', 'nickname', u.nickname)}
         ${field('เบอร์โทร', 'phone', u.phone)}${field('Telegram Chat ID', 'telegram_chat_id', u.telegram_chat_id)}${field('รหัสผ่านใหม่ (ว่าง = ไม่เปลี่ยน)', 'password', '', 'text')}
-        ${field('ยอดสะสม (บาท) — ปลดล็อกตลอดชีพอัตโนมัติ', 'total_spent', u.total_spent)}${field('คะแนนสะสม', 'points', u.points, 'number')}${field('ราคาต่ออายุเฉพาะบุคคล (บาท) — ไม่ใช้แล้วตั้งแต่ 1 ธ.ค. 2026', 'custom_renewal_price', u.custom_renewal_price)}
+        ${field('ยอดสะสม (บาท) — ปลดล็อกตลอดชีพอัตโนมัติ', 'total_spent', u.total_spent)}${field('คะแนนสะสม', 'points', u.points, 'number')}${field('ราคาต่ออายุเฉพาะบุคคล (บาท) — ไม่ใช้แล้วตั้งแต่ 28 พ.ย. 2026', 'custom_renewal_price', u.custom_renewal_price)}
         <div class="col-md-4"><label class="form-label small fw-semibold">บทบาท</label><select name="role" class="form-select form-select-sm"><option value="student" ${u.role === 'student' ? 'selected' : ''}>Student</option><option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option></select></div>
         <div class="col-md-8 d-flex align-items-end"><div class="form-check"><input class="form-check-input" type="checkbox" name="is_active" id="e-active" ${u.is_active ? 'checked' : ''}><label class="form-check-label small" for="e-active">เปิดใช้งานบัญชี (ปิด = ระงับการเข้าสู่ระบบ)</label></div></div>
         <div class="col-12"><label class="form-label small fw-semibold">บันทึกจากแอดมิน</label><textarea class="form-control form-control-sm" name="admin_remark" rows="2">${esc(u.admin_remark)}</textarea></div></div>
